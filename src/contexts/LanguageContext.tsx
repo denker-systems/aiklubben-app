@@ -42,9 +42,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const t = (key: string, options?: any) => i18n.t(key, options);
 
   return (
-    <LanguageContext.Provider value={{ locale, setLocale, t }}>
-      {children}
-    </LanguageContext.Provider>
+    <LanguageContext.Provider value={{ locale, setLocale, t }}>{children}</LanguageContext.Provider>
   );
 };
 

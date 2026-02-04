@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Image, StyleSheet, ViewStyle } from 'react-native';
+import { View, Image, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { Card } from './Card';
 import { Text } from './Text';
 import { ChevronRight } from 'lucide-react-native';
+import { brandColors } from '@/config/theme';
+import { uiColors } from '@/config/design';
 
 interface ImageCardProps {
   title: string;
@@ -13,7 +15,7 @@ interface ImageCardProps {
   emoji?: string;
   emojiBgColor?: string;
   onPress?: () => void;
-  style?: ViewStyle | ViewStyle[];
+  style?: StyleProp<ViewStyle>;
   variant?: 'vertical' | 'horizontal';
 }
 
@@ -32,23 +34,25 @@ export function ImageCard({
   const isHorizontal = variant === 'horizontal';
 
   return (
-    <Card 
-      onPress={onPress} 
-      variant="elevated" 
-      noPadding 
+    <Card
+      onPress={onPress}
+      variant="elevated"
+      noPadding
       style={[isHorizontal ? styles.horizontalContainer : styles.verticalContainer, style]}
     >
       {image ? (
-        <Image 
-          source={{ uri: image }} 
-          style={isHorizontal ? styles.horizontalImage : styles.verticalImage} 
+        <Image
+          source={{ uri: image }}
+          style={isHorizontal ? styles.horizontalImage : styles.verticalImage}
           resizeMode="cover"
         />
       ) : emoji ? (
-        <View style={[
-          isHorizontal ? styles.horizontalEmoji : styles.verticalEmoji, 
-          { backgroundColor: emojiBgColor }
-        ]}>
+        <View
+          style={[
+            isHorizontal ? styles.horizontalEmoji : styles.verticalEmoji,
+            { backgroundColor: emojiBgColor },
+          ]}
+        >
           <Text style={styles.emojiText}>{emoji}</Text>
         </View>
       ) : null}
@@ -74,8 +78,10 @@ export function ImageCard({
         )}
         {onPress && (
           <View style={styles.footer}>
-            <Text variant="tiny" weight="bold" style={styles.actionText}>LÄS MER</Text>
-            <ChevronRight size={12} color="#8B5CF6" strokeWidth={3} />
+            <Text variant="tiny" weight="bold" style={styles.actionText}>
+              LÄS MER
+            </Text>
+            <ChevronRight size={12} color={brandColors.purple} strokeWidth={3} />
           </View>
         )}
       </View>
@@ -86,10 +92,14 @@ export function ImageCard({
 const styles = StyleSheet.create({
   verticalContainer: {
     width: '100%',
+    backgroundColor: uiColors.card.background,
+    borderColor: uiColors.card.border,
   },
   horizontalContainer: {
     flexDirection: 'row',
     height: 120,
+    backgroundColor: uiColors.card.background,
+    borderColor: uiColors.card.border,
   },
   verticalImage: {
     width: '100%',
@@ -120,19 +130,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   subtitle: {
-    color: '#8B5CF6',
+    color: brandColors.purple,
     letterSpacing: 1,
     marginBottom: 4,
   },
   title: {
     marginBottom: 6,
+    color: uiColors.text.primary,
   },
   date: {
-    color: '#9CA3AF',
+    color: uiColors.text.secondary,
     marginBottom: 8,
   },
   description: {
-    color: '#9CA3AF',
+    color: uiColors.text.secondary,
     marginBottom: 12,
   },
   footer: {
@@ -140,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionText: {
-    color: '#8B5CF6',
+    color: brandColors.purple,
     marginRight: 4,
   },
 });

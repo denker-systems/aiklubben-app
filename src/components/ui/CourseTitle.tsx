@@ -13,12 +13,8 @@ export function CourseTitle({ title, level, category }: CourseTitleProps) {
   return (
     <View style={styles.container}>
       <View style={styles.badgeRow}>
-        {category && (
-          <Badge label={category} variant="primary" style={styles.badge} />
-        )}
-        {level && (
-          <Badge label={level} variant="outline" style={styles.badge} />
-        )}
+        {category && <Badge label={category} variant="primary" style={styles.badge} />}
+        {level && <Badge label={level} variant="outline" style={styles.badge} />}
       </View>
       <Text variant="h1" weight="bold" style={styles.title}>
         {title}

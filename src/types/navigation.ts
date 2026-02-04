@@ -3,11 +3,17 @@ export type RootStackParamList = {
   Main: undefined;
   Home: undefined;
   News: undefined;
+  Courses: undefined;
   Content: undefined;
   Profile: undefined;
-  Settings: undefined;
   NewsDetail: { id: string };
   ContentDetail: { id: string };
+  CourseDetail: { id: string };
+  Lesson: { lessonId: string; courseId: string };
+  Settings: undefined;
+  Support: undefined;
+  Privacy: undefined;
+  About: undefined;
 };
 
 declare global {

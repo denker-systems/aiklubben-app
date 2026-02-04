@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ViewProps, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { uiColors } from '@/config/design';
 
 interface CardProps extends ViewProps {
   variant?: 'default' | 'elevated' | 'outline' | 'glass';
@@ -24,13 +25,23 @@ export function Card({
     const bgColor = isDark ? '#121023' : '#FFFFFF';
     const borderColor = isDark ? 'rgba(139, 92, 246, 0.1)' : '#E5E7EB';
 
+    // Use centralized design colors for default cards if available
+    // This ensures consistency with the new design system
+    if (variant === 'default' && isDark) {
+      return {
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.05)',
+      };
+    }
+
     switch (variant) {
       case 'elevated':
         return {
-          backgroundColor: bgColor,
+          backgroundColor: isDark ? uiColors.card.background : bgColor,
           boxShadow: `0 4px 12px ${isDark ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 0, 0, 0.1)'}`,
           borderWidth: 1,
-          borderColor: 'rgba(139, 92, 246, 0.05)',
+          borderColor: isDark ? uiColors.card.border : 'rgba(139, 92, 246, 0.05)',
         };
       case 'outline':
         return {
@@ -77,7 +88,7 @@ export function Card({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: 24,
+    borderRadius: 20, // Updated to match new design (was 24)
     overflow: 'hidden',
   },
   padding: {

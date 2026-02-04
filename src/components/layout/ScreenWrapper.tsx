@@ -37,11 +37,7 @@ export function ScreenWrapper({
 
   const backgroundColor = isDark ? '#0C0A17' : '#F9FAFB';
 
-  const containerStyle = [
-    styles.container, 
-    { backgroundColor, paddingTop: insets.top }, 
-    style
-  ];
+  const containerStyle = [styles.container, { backgroundColor, paddingTop: insets.top }, style];
 
   const innerStyle = [
     !noPadding && styles.padding,

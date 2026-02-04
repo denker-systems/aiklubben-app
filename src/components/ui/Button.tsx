@@ -1,5 +1,12 @@
 import React from 'react';
-import { Pressable, PressableProps, View, ActivityIndicator, StyleSheet, ViewStyle } from 'react-native';
+import {
+  Pressable,
+  PressableProps,
+  View,
+  ActivityIndicator,
+  StyleSheet,
+  ViewStyle,
+} from 'react-native';
 import { Text } from './Text';
 import { brandColors } from '@/config/theme';
 
@@ -34,7 +41,11 @@ export function Button({
       case 'secondary':
         return { backgroundColor: brandColors.pink, text: '#FFFFFF' };
       case 'outline':
-        return { backgroundColor: 'transparent', border: brandColors.purple, text: brandColors.purple };
+        return {
+          backgroundColor: 'transparent',
+          border: brandColors.purple,
+          text: brandColors.purple,
+        };
       case 'ghost':
         return { backgroundColor: 'transparent', text: brandColors.purple };
       case 'destructive':

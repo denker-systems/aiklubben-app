@@ -52,8 +52,8 @@ export const useAuth = () => {
         email,
         password,
         options: {
-          data: metadata
-        }
+          data: metadata,
+        },
       });
       return { error };
     } catch (err) {

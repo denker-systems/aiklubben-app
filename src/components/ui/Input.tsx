@@ -12,6 +12,8 @@ interface InputProps {
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   error?: string;
   style?: ViewStyle;
+  multiline?: boolean;
+  numberOfLines?: number;
 }
 
 export function Input({
@@ -24,6 +26,8 @@ export function Input({
   autoCapitalize = 'none',
   error,
   style,
+  multiline = false,
+  numberOfLines = 1,
 }: InputProps) {
   const { isDark } = useTheme();
 
@@ -38,12 +42,18 @@ export function Input({
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
+        multiline={multiline}
+        numberOfLines={numberOfLines}
+        textAlignVertical={multiline ? 'top' : 'center'}
         style={[
           styles.input,
           {
             backgroundColor: isDark ? '#121023' : '#F3F4F6',
             color: isDark ? '#F9FAFB' : '#111827',
             borderColor: error ? '#EF4444' : isDark ? '#2A2445' : '#E5E7EB',
+            height: multiline ? 'auto' : 56,
+            minHeight: multiline ? 100 : 56,
+            paddingTop: multiline ? 16 : 0,
           },
         ]}
       />

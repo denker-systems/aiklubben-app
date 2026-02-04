@@ -13,7 +13,12 @@ interface PageHeaderProps {
   rightContent?: React.ReactNode;
 }
 
-export function PageHeader({ title, showBack = false, onBackPress, rightContent }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  showBack = false,
+  onBackPress,
+  rightContent,
+}: PageHeaderProps) {
   const { isDark } = useTheme();
   const navigation = useNavigation();
   const menuContext = useMenu();

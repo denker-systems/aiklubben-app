@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import {
+  createNavigationContainerRef,
+  NavigationContainer,
+  DarkTheme,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,14 +12,21 @@ import { HomeScreen } from '@/screens/home/HomeScreen';
 import { NewsScreen } from '@/screens/news/NewsScreen';
 import { ContentScreen } from '@/screens/content/ContentScreen';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
+import { SettingsScreen } from '@/screens/profile/SettingsScreen';
+import { SupportScreen } from '@/screens/SupportScreen';
+import { PrivacyScreen } from '@/screens/PrivacyScreen';
+import { AboutScreen } from '@/screens/AboutScreen';
 import { NewsDetailScreen } from '@/screens/news/NewsDetailScreen';
 import { ContentDetailScreen } from '@/screens/content/ContentDetailScreen';
+import { CoursesScreen, CourseDetailScreen } from '@/screens/courses';
+import { LessonScreen } from '@/screens/lessons';
 import { FloatingTabBar } from '@/components/ui/FloatingTabBar';
 import { FullscreenMenu } from '@/components/ui/FullscreenMenu';
 import { MenuProvider, useMenu } from '@/contexts/MenuContext';
 import { RootStackParamList } from '@/types/navigation';
 import { brandColors } from '@/config/theme';
 
+const navigationRef = createNavigationContainerRef<RootStackParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigatorContent = () => {
@@ -35,8 +46,13 @@ const AppNavigatorContent = () => {
     setActiveTab(key);
   };
 
-  const handleNavigate = (screen: string) => {
-    setActiveTab(screen);
+  const handleNavigate = (screen: any) => {
+    menuContext?.closeMenu();
+    if (['Home', 'News', 'Courses', 'Content', 'Profile'].includes(screen)) {
+      setActiveTab(screen);
+    } else if (navigationRef.isReady()) {
+      navigationRef.navigate(screen);
+    }
   };
 
   const navigationTheme = {
@@ -52,7 +68,7 @@ const AppNavigatorContent = () => {
   };
 
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer theme={navigationTheme} ref={navigationRef}>
       <View style={styles.container}>
         <Stack.Navigator
           screenOptions={{
@@ -66,18 +82,25 @@ const AppNavigatorContent = () => {
             <>
               {activeTab === 'Home' && <Stack.Screen name="Home" component={HomeScreen} />}
               {activeTab === 'News' && <Stack.Screen name="News" component={NewsScreen} />}
+              {activeTab === 'Courses' && <Stack.Screen name="Courses" component={CoursesScreen} />}
               {activeTab === 'Content' && <Stack.Screen name="Content" component={ContentScreen} />}
               {activeTab === 'Profile' && <Stack.Screen name="Profile" component={ProfileScreen} />}
               <Stack.Screen name="NewsDetail" component={NewsDetailScreen} />
               <Stack.Screen name="ContentDetail" component={ContentDetailScreen} />
+              <Stack.Screen name="CourseDetail" component={CourseDetailScreen} />
+              <Stack.Screen name="Lesson" component={LessonScreen} />
+              <Stack.Screen name="Settings" component={SettingsScreen} />
+              <Stack.Screen name="Support" component={SupportScreen} />
+              <Stack.Screen name="Privacy" component={PrivacyScreen} />
+              <Stack.Screen name="About" component={AboutScreen} />
             </>
           )}
         </Stack.Navigator>
 
         {user && <FloatingTabBar activeTab={activeTab} onTabPress={handleTabPress} />}
-        
-        <FullscreenMenu 
-          visible={menuContext?.menuVisible || false} 
+
+        <FullscreenMenu
+          visible={menuContext?.menuVisible || false}
           onClose={() => menuContext?.closeMenu()}
           onNavigate={handleNavigate}
           onLogout={() => signOut()}

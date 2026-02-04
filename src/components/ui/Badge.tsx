@@ -31,11 +31,17 @@ export function Badge({ label, variant = 'primary', style, textStyle }: BadgePro
   const vStyles = getVariantStyles();
 
   return (
-    <View style={[
-      styles.container, 
-      { backgroundColor: vStyles.bg, borderColor: vStyles.border, borderWidth: vStyles.border ? 1 : 0 }, 
-      style
-    ]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: vStyles.bg,
+          borderColor: vStyles.border,
+          borderWidth: vStyles.border ? 1 : 0,
+        },
+        style,
+      ]}
+    >
       <RNText style={[styles.text, { color: vStyles.text }, textStyle]}>
         {label.toUpperCase()}
       </RNText>
