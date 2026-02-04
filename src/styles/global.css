@@ -1,0 +1,15 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+  :root {
+    --color-background-0: #0C0A17;
+    --color-background-50: #121023;
+    --color-background-100: #1D1933;
+    --color-background-200: #2A2445;
+    --color-primary: #8B5CF6;
+    --color-foreground: #F9FAFB;
+    --color-border: #2A2445;
+  }
+}

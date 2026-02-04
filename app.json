@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "AI Klubben",
+    "slug": "aiklubben-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "nu.aiklubben.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "nu.aiklubben.app"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
