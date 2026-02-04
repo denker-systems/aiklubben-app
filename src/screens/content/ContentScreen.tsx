@@ -92,7 +92,7 @@ export const ContentScreen = () => {
 
   const scrollY = useSharedValue(0);
   const headerHeight = getHeaderHeight(insets);
-  const activeCat = categories.find(cat => cat.id === activeCategory);
+  const activeCat = categories.find((cat) => cat.id === activeCategory);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {

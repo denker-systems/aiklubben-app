@@ -6,26 +6,69 @@ import { SPRING_CONFIGS } from '@/lib/animations';
 import { uiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
 
+import { Heart, Zap } from 'lucide-react-native';
+
 interface LessonProgressProps {
   currentStep: number;
   totalSteps: number;
+  lives: number;
+  streak: number;
 }
 
-export const LessonProgress: React.FC<LessonProgressProps> = ({ currentStep, totalSteps }) => {
+export const LessonProgress: React.FC<LessonProgressProps> = ({
+  currentStep,
+  totalSteps,
+  lives,
+  streak,
+}) => {
   const progress = ((currentStep + 1) / totalSteps) * 100;
+  const maxLives = 3;
 
   return (
     <View style={styles.container}>
-      <View style={styles.track}>
-        <MotiView
-          style={styles.fill}
-          from={{ width: '0%' }}
-          animate={{ width: `${progress}%` }}
-          transition={SPRING_CONFIGS.smooth}
-        />
+      <View style={styles.topRow}>
+        <View style={styles.track}>
+          <MotiView
+            style={styles.fill}
+            from={{ width: '0%' }}
+            animate={{ width: `${progress}%` }}
+            transition={SPRING_CONFIGS.smooth}
+          />
+        </View>
+
+        <View style={styles.statsRow}>
+          {/* Visual Hearts */}
+          <View style={styles.heartsContainer}>
+            {Array.from({ length: maxLives }).map((_, index) => (
+              <MotiView
+                key={index}
+                from={index >= lives ? { scale: 1 } : undefined}
+                animate={index >= lives ? { scale: 0.8 } : { scale: 1 }}
+                transition={SPRING_CONFIGS.bouncy}
+              >
+                <Heart
+                  size={20}
+                  color="#EF4444"
+                  fill={index < lives ? '#EF4444' : 'transparent'}
+                  strokeWidth={index < lives ? 2 : 1.5}
+                  style={{ opacity: index < lives ? 1 : 0.3 }}
+                />
+              </MotiView>
+            ))}
+          </View>
+
+          {/* Streak Badge */}
+          {streak > 0 && (
+            <View style={styles.streakBadge}>
+              <Zap size={14} color="#FBBF24" fill="#FBBF24" />
+              <Text style={styles.streakText}>{streak}</Text>
+            </View>
+          )}
+        </View>
       </View>
-      <Text variant="caption" style={styles.text}>
-        {currentStep + 1} / {totalSteps}
+
+      <Text variant="caption" style={styles.stepText}>
+        STEG {currentStep + 1} AV {totalSteps}
       </Text>
     </View>
   );
@@ -33,25 +76,53 @@ export const LessonProgress: React.FC<LessonProgressProps> = ({ currentStep, tot
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    gap: 8,
+  },
+  topRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
   },
   track: {
     flex: 1,
-    height: 8,
+    height: 12,
     backgroundColor: uiColors.glass.light,
-    borderRadius: 4,
+    borderRadius: 6,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
     backgroundColor: brandColors.purple,
-    borderRadius: 4,
+    borderRadius: 6,
   },
-  text: {
-    color: uiColors.text.secondary,
-    fontWeight: '600',
-    minWidth: 50,
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  heartsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  streakBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    backgroundColor: 'rgba(251, 191, 36, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  streakText: {
+    color: '#FBBF24',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  stepText: {
+    color: uiColors.text.muted,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
 });

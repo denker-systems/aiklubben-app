@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Modal, Pressable, StyleSheet } from 'react-native';
 import { MotiView } from 'moti';
-import { Text, Button } from '@/components/ui';
+import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { uiColors } from '@/config/design';
 
@@ -29,12 +29,24 @@ export const ExitModal: React.FC<ExitModalProps> = ({ visible, onCancel, onConfi
           </Text>
 
           <View style={styles.buttons}>
-            <Pressable onPress={onCancel} style={styles.cancelButton}>
+            <Pressable
+              onPress={onCancel}
+              style={styles.cancelButton}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Fortsätt med lektionen"
+            >
               <Text variant="body" style={styles.cancelText}>
                 Fortsätt
               </Text>
             </Pressable>
-            <Pressable onPress={onConfirm} style={styles.confirmButton}>
+            <Pressable
+              onPress={onConfirm}
+              style={styles.confirmButton}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Avsluta lektionen utan att spara"
+            >
               <Text variant="body" style={styles.confirmText}>
                 Avsluta
               </Text>
@@ -82,7 +94,9 @@ const styles = StyleSheet.create({
     backgroundColor: uiColors.glass.medium,
     borderRadius: 16,
     padding: 16,
+    minHeight: 52,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   cancelText: {
     color: uiColors.text.primary,
@@ -93,7 +107,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#EF4444',
     borderRadius: 16,
     padding: 16,
+    minHeight: 52,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   confirmText: {
     color: '#FFFFFF',

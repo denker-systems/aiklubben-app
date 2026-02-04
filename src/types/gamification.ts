@@ -207,3 +207,102 @@ export function getNextLevel(xp: number): UserLevel | null {
 export function getBadgesByCategory(category: Badge['category']): Badge[] {
   return BADGES.filter((badge) => badge.category === category);
 }
+
+// Daily Quest Types
+export type QuestType =
+  | 'complete_lesson'
+  | 'answer_correct'
+  | 'maintain_streak'
+  | 'perfect_lesson';
+
+export interface DailyQuest {
+  id: string;
+  type: QuestType;
+  title: string;
+  description: string;
+  icon: string;
+  target: number;
+  progress: number;
+  xpReward: number;
+  completed: boolean;
+}
+
+export const DAILY_QUEST_TEMPLATES: Omit<DailyQuest, 'id' | 'progress' | 'completed'>[] = [
+  {
+    type: 'complete_lesson',
+    title: 'Lektionsmästare',
+    description: 'Slutför 1 lektion',
+    icon: '📚',
+    target: 1,
+    xpReward: 10,
+  },
+  {
+    type: 'answer_correct',
+    title: 'Kunskapsjägare',
+    description: 'Svara rätt på 5 frågor',
+    icon: '✅',
+    target: 5,
+    xpReward: 15,
+  },
+  {
+    type: 'maintain_streak',
+    title: 'Streak-väktare',
+    description: 'Behåll din streak',
+    icon: '🔥',
+    target: 1,
+    xpReward: 5,
+  },
+  {
+    type: 'perfect_lesson',
+    title: 'Perfektionist',
+    description: 'Slutför en lektion utan fel',
+    icon: '💎',
+    target: 1,
+    xpReward: 25,
+  },
+];
+
+// Treasure Chest Types
+export type TreasureRewardType = 'xp' | 'streak_freeze' | 'badge_progress';
+
+export interface TreasureReward {
+  type: TreasureRewardType;
+  amount: number;
+  title: string;
+  description: string;
+  icon: string;
+}
+
+export const TREASURE_REWARDS: TreasureReward[] = [
+  { type: 'xp', amount: 10, title: 'Bonus XP', description: '+10 XP', icon: '⚡' },
+  { type: 'xp', amount: 25, title: 'XP-skatt', description: '+25 XP', icon: '💰' },
+  { type: 'xp', amount: 50, title: 'XP-jackpot!', description: '+50 XP', icon: '🎉' },
+  { type: 'streak_freeze', amount: 1, title: 'Streak Freeze', description: '+1 Streak Freeze', icon: '🧊' },
+];
+
+// Random treasure reward (20% chance)
+export function getRandomTreasure(): TreasureReward | null {
+  if (Math.random() > 0.2) return null; // 80% chance of no reward
+  
+  const weights = [50, 30, 10, 10]; // Probability weights
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  let random = Math.random() * totalWeight;
+  
+  for (let i = 0; i < TREASURE_REWARDS.length; i++) {
+    random -= weights[i];
+    if (random <= 0) return TREASURE_REWARDS[i];
+  }
+  
+  return TREASURE_REWARDS[0];
+}
+
+// Generate today's quests (select 3 random quests)
+export function generateDailyQuests(): DailyQuest[] {
+  const shuffled = [...DAILY_QUEST_TEMPLATES].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 3).map((template, index) => ({
+    ...template,
+    id: `quest_${Date.now()}_${index}`,
+    progress: 0,
+    completed: false,
+  }));
+}

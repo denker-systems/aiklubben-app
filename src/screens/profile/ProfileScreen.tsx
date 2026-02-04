@@ -71,7 +71,6 @@ export const ProfileScreen = () => {
     fetchProfileData();
   }, [user]);
 
-
   const level = getLevelForXP(stats?.totalXP || 0);
   const nextLevel = getNextLevel(stats?.totalXP || 0);
   const xpProgress = getXPProgress(stats?.totalXP || 0);

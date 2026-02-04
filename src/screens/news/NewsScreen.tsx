@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Image,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
+import { View, Image, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedScrollHandler } from 'react-native-reanimated';
 import { MotiView } from 'moti';
@@ -154,9 +149,7 @@ export const NewsScreen = () => {
                     >
                       {/* Card Content */}
                       <View style={styles.cardContent}>
-                        <Text
-                          style={[styles.cardTitle, isFeatured && styles.featuredTitle]}
-                        >
+                        <Text style={[styles.cardTitle, isFeatured && styles.featuredTitle]}>
                           {article.title}
                         </Text>
                         {isFeatured && article.summary && (

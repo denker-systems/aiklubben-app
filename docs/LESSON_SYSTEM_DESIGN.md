@@ -114,6 +114,41 @@ Sant eller falskt
 }
 ```
 
+### 6. **Video**
+Video-innehåll med progression tracking
+```json
+{
+  "type": "video",
+  "title": "Introduktion till Neural Networks",
+  "description": "En visuell förklaring av hur neurala nätverk fungerar",
+  "video_url": "https://...",
+  "thumbnail_url": "https://..." // optional
+}
+```
+
+### 7. **Code Snippet**
+Kodexempel med syntax highlighting
+```json
+{
+  "type": "code_snippet",
+  "title": "Skapa en enkel AI-modell",
+  "description": "Så här skapar du en enkel klassificeringsmodell i Python",
+  "code": "import tensorflow as tf\nmodel = tf.keras.Sequential([...])",
+  "language": "python",
+  "explanation": "Denna kod skapar en sekventiell modell..." // optional
+}
+```
+
+### 8-15. **Interaktiva Step-typer**
+- `word_bank` - Dra ord till rätt plats
+- `match_pairs` - Para ihop relaterade koncept
+- `slider` - Justera värde på en skala
+- `ordering` - Ordna items i rätt sekvens
+- `image_choice` - Välj rätt bild
+- `highlight` - Markera rätt delar i text
+- `category_sort` - Sortera items i kategorier
+- `spot_error` - Hitta fel i kod
+
 ## User Flow
 
 ### Lesson Start
@@ -160,20 +195,39 @@ Sant eller falskt
 ## Gamification
 
 ### XP System
-- Varje lektion ger XP
-- Bonus XP för perfekt score
-- Streak bonus för daglig aktivitet
+- **Base XP**: Varje lektion ger `xp_reward` XP (standard 25)
+- **Perfect Bonus**: +50% XP för 100% rätt svar
+- **Streak Bonus**: +10 XP per streak-dag (max 50 XP)
+- **Total XP**: `baseXP + perfectBonus + streakBonus`
+
+### Streak System
+- Streak ökar med 1 för varje konsekutiv dag med aktivitet
+- Streak återställs till 1 om en dag missas
+- `longest_streak` sparas för achievements
+- Visuell feedback i CelebrationScreen
+
+### Level System (8 nivåer)
+1. Nybörjare 🌱 (0-100 XP)
+2. Utforskare 🔍 (100-300 XP)
+3. Lärling 📚 (300-600 XP)
+4. Praktikant ⚡ (600-1000 XP)
+5. Specialist 🎯 (1000-2000 XP)
+6. Expert 💎 (2000-4000 XP)
+7. Mästare 👑 (4000-8000 XP)
+8. AI Guru 🚀 (8000+ XP)
 
 ### Progress Tracking
 - Visa % completed per course
 - Unlock system för lektioner
 - Badges för milestones
+- Level-up celebration vid nivåhöjning
 
 ### Motivation
-- Celebratory animations (Moti)
-- Progress bars
-- Encouraging messages
-- Streak tracking
+- Celebratory animations (Moti + Confetti)
+- Progress bars med visuell feedback
+- Streak-kort med 🔥 emoji
+- Level-up meddelanden
+- Haptic feedback på alla interaktioner
 
 ## Technical Implementation
 

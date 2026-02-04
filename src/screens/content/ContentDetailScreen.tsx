@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { ArrowLeft, Clock, BookOpen, Award } from 'lucide-react-native';
@@ -17,14 +17,20 @@ import { brandColors } from '@/config/theme';
 import Markdown from 'react-native-markdown-display';
 import { Text, Badge } from '@/components/ui';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
+import { useTabNavigation } from '@/contexts/TabNavigationContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export const ContentDetailScreen = () => {
   const route = useRoute<any>();
-  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { navigateToTab } = useTabNavigation();
   const { id } = route.params;
+
+  // Navigate to Content tab instead of goBack to maintain correct navigation flow
+  const handleGoBack = () => {
+    navigateToTab('Content');
+  };
 
   const [content, setContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -71,7 +77,7 @@ export const ContentDetailScreen = () => {
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.loadingContainer}>
           <Text variant="h2">Innehållet kunde inte hittas.</Text>
-          <Pressable onPress={() => navigation.goBack()} style={styles.backLink}>
+          <Pressable onPress={handleGoBack} style={styles.backLink}>
             <Text variant="body" style={{ color: brandColors.purple }}>
               Gå tillbaka
             </Text>
@@ -104,7 +110,7 @@ export const ContentDetailScreen = () => {
         ]}
         animate={{ opacity: headerOpacity }}
       >
-        <Pressable onPress={() => navigation.goBack()} style={styles.headerBackButton}>
+        <Pressable onPress={handleGoBack} style={styles.headerBackButton}>
           <ArrowLeft size={20} color="#F9FAFB" />
         </Pressable>
         <Text variant="body" numberOfLines={1} style={styles.headerTitle}>
@@ -139,8 +145,11 @@ export const ContentDetailScreen = () => {
 
           {/* Back button on image */}
           <Pressable
-            onPress={() => navigation.goBack()}
+            onPress={handleGoBack}
             style={[styles.backButton, { top: insets.top + 16 }]}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Gå tillbaka till innehåll"
           >
             <ArrowLeft size={24} color="#FFFFFF" />
           </Pressable>

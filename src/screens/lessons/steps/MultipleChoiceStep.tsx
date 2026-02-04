@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { MotiView } from 'moti';
 import { Check, X } from 'lucide-react-native';
@@ -6,6 +6,9 @@ import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { uiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+import * as Haptics from 'expo-haptics';
+
+// Screen dimensions available if needed
 
 interface MultipleChoiceStepProps {
   content: {
@@ -17,7 +20,7 @@ interface MultipleChoiceStepProps {
   onAnswer: (selectedIndex: number, isCorrect: boolean) => void;
 }
 
-export const MultipleChoiceStep: React.FC<MultipleChoiceStepProps> = ({
+const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
   content,
   correctIndex,
   explanation,
@@ -26,13 +29,29 @@ export const MultipleChoiceStep: React.FC<MultipleChoiceStepProps> = ({
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
-  const handleSelect = (index: number) => {
-    if (showFeedback) return;
+  // useCallback for performance (Rule 10)
+  const handleSelect = useCallback(
+    (index: number) => {
+      if (showFeedback) return;
 
-    setSelectedIndex(index);
-    setShowFeedback(true);
-    const isCorrect = index === correctIndex;
-    onAnswer(index, isCorrect);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      setSelectedIndex(index);
+      setShowFeedback(true);
+      const isCorrect = index === correctIndex;
+
+      if (isCorrect) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } else {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      }
+
+      onAnswer(index, isCorrect);
+    },
+    [showFeedback, correctIndex, onAnswer],
+  );
+
+  const getOptionLetter = (index: number) => {
+    return String.fromCharCode(65 + index); // A, B, C, D...
   };
 
   const isCorrect = selectedIndex === correctIndex;
@@ -44,10 +63,14 @@ export const MultipleChoiceStep: React.FC<MultipleChoiceStepProps> = ({
       animate={{ opacity: 1, translateY: 0 }}
       transition={SPRING_CONFIGS.smooth}
     >
-      <Text variant="h3" style={styles.question}>
-        {content.question}
-      </Text>
+      {/* Question Card */}
+      <View style={styles.questionCard}>
+        <Text variant="h2" style={styles.question}>
+          {content.question}
+        </Text>
+      </View>
 
+      {/* Options */}
       <View style={styles.options}>
         {content.options.map((option, index) => {
           const isSelected = selectedIndex === index;
@@ -56,59 +79,104 @@ export const MultipleChoiceStep: React.FC<MultipleChoiceStepProps> = ({
           const showAsIncorrect = showFeedback && isSelected && !isCorrect;
 
           return (
-            <Pressable
+            <MotiView
               key={index}
-              onPress={() => handleSelect(index)}
-              disabled={showFeedback}
-              style={({ pressed }) => [
-                styles.option,
-                isSelected && styles.optionSelected,
-                showAsCorrect && styles.optionCorrect,
-                showAsIncorrect && styles.optionIncorrect,
-                pressed && styles.optionPressed,
-              ]}
+              from={{ opacity: 0, translateX: -20 }}
+              animate={{ opacity: 1, translateX: 0 }}
+              transition={{ ...SPRING_CONFIGS.smooth, delay: 50 + index * 60 }}
             >
-              <Text
-                variant="body"
-                style={[
-                  styles.optionText,
-                  (showAsCorrect || showAsIncorrect) && styles.optionTextBold,
+              <Pressable
+                onPress={() => handleSelect(index)}
+                disabled={showFeedback}
+                style={({ pressed }) => [
+                  styles.option,
+                  isSelected && !showFeedback && styles.optionSelected,
+                  showAsCorrect && styles.optionCorrect,
+                  showAsIncorrect && styles.optionIncorrect,
+                  pressed && !showFeedback && styles.optionPressed,
                 ]}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={`Alternativ ${getOptionLetter(index)}: ${option}`}
+                accessibilityHint={showFeedback ? undefined : 'Tryck för att välja detta svar'}
+                accessibilityState={{
+                  selected: isSelected,
+                  disabled: showFeedback,
+                }}
               >
-                {option}
-              </Text>
-
-              {showAsCorrect && (
-                <MotiView
-                  from={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={SPRING_CONFIGS.bouncy}
+                {/* Letter Badge */}
+                <View
+                  style={[
+                    styles.letterBadge,
+                    isSelected && !showFeedback && styles.letterBadgeSelected,
+                    showAsCorrect && styles.letterBadgeCorrect,
+                    showAsIncorrect && styles.letterBadgeIncorrect,
+                  ]}
                 >
-                  <Check size={24} color="#10B981" strokeWidth={3} />
-                </MotiView>
-              )}
+                  {showAsCorrect ? (
+                    <MotiView
+                      from={{ scale: 0, rotate: '-180deg' }}
+                      animate={{ scale: 1, rotate: '0deg' }}
+                      transition={SPRING_CONFIGS.bouncy}
+                    >
+                      <Check size={20} color="#FFFFFF" strokeWidth={3} />
+                    </MotiView>
+                  ) : showAsIncorrect ? (
+                    <MotiView
+                      from={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={SPRING_CONFIGS.bouncy}
+                    >
+                      <X size={20} color="#FFFFFF" strokeWidth={3} />
+                    </MotiView>
+                  ) : (
+                    <Text style={[styles.letterText, isSelected && styles.letterTextSelected]}>
+                      {getOptionLetter(index)}
+                    </Text>
+                  )}
+                </View>
 
-              {showAsIncorrect && (
-                <MotiView
-                  from={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={SPRING_CONFIGS.bouncy}
+                {/* Option Text */}
+                <Text
+                  variant="body"
+                  style={[
+                    styles.optionText,
+                    isSelected && !showFeedback && styles.optionTextSelected,
+                    showAsCorrect && styles.optionTextCorrect,
+                    showAsIncorrect && styles.optionTextIncorrect,
+                  ]}
                 >
-                  <X size={24} color="#EF4444" strokeWidth={3} />
-                </MotiView>
-              )}
-            </Pressable>
+                  {option}
+                </Text>
+              </Pressable>
+            </MotiView>
           );
         })}
       </View>
 
+      {/* Feedback Card */}
       {showFeedback && explanation && (
         <MotiView
           style={[styles.feedback, isCorrect ? styles.feedbackCorrect : styles.feedbackIncorrect]}
-          from={{ opacity: 0, translateY: 10 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ ...SPRING_CONFIGS.smooth, delay: 300 }}
+          from={{ opacity: 0, translateY: 20, scale: 0.95 }}
+          animate={{ opacity: 1, translateY: 0, scale: 1 }}
+          transition={{ ...SPRING_CONFIGS.bouncy, delay: 300 }}
         >
+          <View style={styles.feedbackHeader}>
+            {isCorrect ? (
+              <Check size={24} color="#10B981" strokeWidth={3} />
+            ) : (
+              <X size={24} color="#EF4444" strokeWidth={3} />
+            )}
+            <Text
+              style={[
+                styles.feedbackTitle,
+                isCorrect ? styles.feedbackTitleCorrect : styles.feedbackTitleIncorrect,
+              ]}
+            >
+              {isCorrect ? 'Rätt!' : 'Fel svar'}
+            </Text>
+          </View>
           <Text variant="body" style={styles.feedbackText}>
             {explanation}
           </Text>
@@ -121,11 +189,20 @@ export const MultipleChoiceStep: React.FC<MultipleChoiceStepProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 24,
+    gap: 20,
+  },
+  questionCard: {
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
   },
   question: {
     color: uiColors.text.primary,
-    marginBottom: 8,
+    fontSize: 20,
+    lineHeight: 28,
+    fontWeight: '600',
   },
   options: {
     gap: 12,
@@ -133,38 +210,99 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: uiColors.card.background,
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: uiColors.card.border,
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 20,
+    padding: 18,
+    minHeight: 72,
   },
   optionSelected: {
     borderColor: brandColors.purple,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
   },
   optionCorrect: {
     borderColor: '#10B981',
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    backgroundColor: '#10B981',
   },
   optionIncorrect: {
     borderColor: '#EF4444',
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: '#EF4444',
   },
   optionPressed: {
-    opacity: 0.7,
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
+  },
+  letterBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  letterBadgeSelected: {
+    backgroundColor: brandColors.purple,
+    borderColor: brandColors.purple,
+  },
+  letterBadgeCorrect: {
+    backgroundColor: '#10B981',
+    borderColor: '#10B981',
+  },
+  letterBadgeIncorrect: {
+    backgroundColor: '#EF4444',
+    borderColor: '#EF4444',
+  },
+  letterText: {
+    color: '#9CA3AF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  letterTextSelected: {
+    color: '#FFFFFF',
   },
   optionText: {
     color: uiColors.text.primary,
     flex: 1,
+    fontSize: 16,
+    lineHeight: 22,
   },
-  optionTextBold: {
+  optionTextSelected: {
+    color: uiColors.text.primary,
+    fontWeight: '600',
+  },
+  optionTextCorrect: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  optionTextIncorrect: {
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   feedback: {
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 2,
+    marginTop: 8,
+  },
+  feedbackHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  feedbackTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  feedbackTitleCorrect: {
+    color: '#10B981',
+  },
+  feedbackTitleIncorrect: {
+    color: '#EF4444',
   },
   feedbackCorrect: {
     backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -175,6 +313,10 @@ const styles = StyleSheet.create({
     borderColor: '#EF4444',
   },
   feedbackText: {
-    color: uiColors.text.primary,
+    color: uiColors.text.secondary,
+    lineHeight: 22,
   },
 });
+
+// Memoized export for performance (Rule 10)
+export const MultipleChoiceStep = memo(MultipleChoiceStepComponent);

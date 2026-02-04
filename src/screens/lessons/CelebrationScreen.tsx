@@ -1,33 +1,126 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { MotiView } from 'moti';
-import { Zap, Trophy, TrendingUp } from 'lucide-react-native';
+import { Zap, Trophy, TrendingUp, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { Text } from '@/components/ui';
-import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
+import { SPRING_CONFIGS } from '@/lib/animations';
 import { uiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
 
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Confetti particle component
+const ConfettiParticle: React.FC<{ delay: number; color: string; startX: number }> = ({
+  delay,
+  color,
+  startX,
+}) => {
+  return (
+    <MotiView
+      style={[styles.confetti, { left: startX }]}
+      from={{
+        opacity: 1,
+        translateY: -20,
+        translateX: 0,
+        rotate: '0deg',
+        scale: 1,
+      }}
+      animate={{
+        opacity: 0,
+        translateY: SCREEN_HEIGHT * 0.6,
+        translateX: (Math.random() - 0.5) * 100,
+        rotate: `${Math.random() * 720}deg`,
+        scale: 0.5,
+      }}
+      transition={{
+        type: 'timing',
+        duration: 2000 + Math.random() * 1000,
+        delay,
+      }}
+    >
+      <View style={[styles.confettiPiece, { backgroundColor: color }]} />
+    </MotiView>
+  );
+};
+
 interface CelebrationScreenProps {
   xpEarned: number;
+  bonusXP?: number;
   score: number;
   totalSteps: number;
+  streak?: number;
+  leveledUp?: boolean;
+  newLevel?: { name: string; icon: string };
   onContinue: () => void;
 }
 
 export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
   xpEarned,
+  bonusXP = 0,
   score,
   totalSteps,
+  streak = 0,
+  leveledUp = false,
+  newLevel,
   onContinue,
 }) => {
   const percentage = Math.round((score / totalSteps) * 100);
   const isPerfect = score === totalSteps;
+  const totalXP = xpEarned + bonusXP;
+  const [showConfetti, setShowConfetti] = useState(true);
+
+  const confettiColors = ['#8B5CF6', '#EC4899', '#F59E0B', '#10B981', '#3B82F6'];
+  const confettiParticles = Array.from({ length: 30 }).map((_, i) => ({
+    id: i,
+    delay: i * 50,
+    color: confettiColors[i % confettiColors.length],
+    startX: Math.random() * SCREEN_WIDTH,
+  }));
+
+  useEffect(() => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    const timer = setTimeout(() => setShowConfetti(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={styles.container}>
-      {/* Confetti effect could be added here */}
-      
+      {/* Confetti Effect */}
+      {showConfetti && (
+        <View style={styles.confettiContainer}>
+          {confettiParticles.map((particle) => (
+            <ConfettiParticle
+              key={particle.id}
+              delay={particle.delay}
+              color={particle.color}
+              startX={particle.startX}
+            />
+          ))}
+        </View>
+      )}
+
+      {/* Floating Stars Background */}
+      <MotiView
+        style={styles.starsContainer}
+        from={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ type: 'timing', duration: 1000 }}
+      >
+        {[...Array(5)].map((_, i) => (
+          <MotiView
+            key={i}
+            style={[styles.floatingStar, { left: `${15 + i * 18}%`, top: `${10 + (i % 3) * 15}%` }]}
+            from={{ scale: 0, rotate: '0deg' }}
+            animate={{ scale: 1, rotate: '360deg' }}
+            transition={{ ...SPRING_CONFIGS.bouncy, delay: 500 + i * 100 }}
+          >
+            <Sparkles size={20} color="rgba(251, 191, 36, 0.4)" />
+          </MotiView>
+        ))}
+      </MotiView>
+
       <MotiView
         style={styles.content}
         from={{ opacity: 0, scale: 0.8 }}
@@ -55,10 +148,14 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
           transition={{ ...SPRING_CONFIGS.smooth, delay: 400 }}
         >
           <Text variant="h1" style={styles.title}>
-            {isPerfect ? 'Perfekt! 🎉' : 'Bra jobbat! ✨'}
+            {leveledUp
+              ? `Level Up! ${newLevel?.icon || '🌟'}`
+              : isPerfect
+                ? 'Perfekt! 🎉'
+                : 'Bra jobbat! ✨'}
           </Text>
           <Text variant="body" style={styles.subtitle}>
-            Du klarade lektionen!
+            {leveledUp ? `Du är nu ${newLevel?.name}!` : 'Du klarade lektionen!'}
           </Text>
         </MotiView>
 
@@ -79,10 +176,10 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
             </LinearGradient>
             <View>
               <Text variant="h2" style={styles.statValue}>
-                +{xpEarned}
+                +{totalXP}
               </Text>
               <Text variant="caption" style={styles.statLabel}>
-                XP Earned
+                {bonusXP > 0 ? `${xpEarned} + ${bonusXP} bonus` : 'XP Earned'}
               </Text>
             </View>
           </MotiView>
@@ -111,6 +208,29 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
             </View>
           </MotiView>
         </View>
+
+        {/* Streak Card */}
+        {streak > 0 && (
+          <MotiView
+            style={styles.streakCard}
+            from={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ ...SPRING_CONFIGS.bouncy, delay: 800 }}
+          >
+            <LinearGradient
+              colors={['#F97316', '#EA580C']}
+              style={styles.streakGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Text style={styles.streakEmoji}>🔥</Text>
+              <View style={styles.streakContent}>
+                <Text style={styles.streakValue}>{streak} dagars streak!</Text>
+                <Text style={styles.streakLabel}>Fortsätt imorgon för att behålla den</Text>
+              </View>
+            </LinearGradient>
+          </MotiView>
+        )}
 
         <MotiView
           from={{ opacity: 0, translateY: 20 }}
@@ -143,6 +263,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+  },
+  confettiContainer: {
+    ...StyleSheet.absoluteFillObject,
+    pointerEvents: 'none',
+  },
+  confetti: {
+    position: 'absolute',
+    top: 0,
+  },
+  confettiPiece: {
+    width: 10,
+    height: 10,
+    borderRadius: 2,
+  },
+  starsContainer: {
+    ...StyleSheet.absoluteFillObject,
+    pointerEvents: 'none',
+  },
+  floatingStar: {
+    position: 'absolute',
   },
   content: {
     alignItems: 'center',
@@ -212,5 +352,32 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 18,
+  },
+  streakCard: {
+    width: '100%',
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  streakGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    gap: 16,
+  },
+  streakEmoji: {
+    fontSize: 36,
+  },
+  streakContent: {
+    flex: 1,
+  },
+  streakValue: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  streakLabel: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 14,
+    marginTop: 2,
   },
 });

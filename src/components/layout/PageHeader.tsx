@@ -3,13 +3,14 @@ import { View, Pressable, StyleSheet } from 'react-native';
 import { ChevronLeft, Menu } from 'lucide-react-native';
 import { Text } from '../ui/Text';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useNavigation } from '@react-navigation/native';
 import { useMenu } from '@/contexts/MenuContext';
+import { useTabNavigationSafe } from '@/contexts/TabNavigationContext';
 
 interface PageHeaderProps {
   title: string;
   showBack?: boolean;
   onBackPress?: () => void;
+  backToTab?: 'Home' | 'News' | 'Courses' | 'Content' | 'Profile';
   rightContent?: React.ReactNode;
 }
 
@@ -17,19 +18,21 @@ export function PageHeader({
   title,
   showBack = false,
   onBackPress,
+  backToTab,
   rightContent,
 }: PageHeaderProps) {
   const { isDark } = useTheme();
-  const navigation = useNavigation();
   const menuContext = useMenu();
+  const tabNavigation = useTabNavigationSafe();
   const textColor = isDark ? '#FAFAFA' : '#111827';
 
   const handleBack = () => {
     if (onBackPress) {
       onBackPress();
-    } else {
-      navigation.goBack();
+    } else if (backToTab && tabNavigation) {
+      tabNavigation.navigateToTab(backToTab);
     }
+    // If no backToTab or onBackPress specified, do nothing (button shouldn't be shown)
   };
 
   return (
@@ -82,9 +85,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },

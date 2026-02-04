@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   createNavigationContainerRef,
   NavigationContainer,
@@ -7,6 +7,7 @@ import {
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/hooks/useAuth';
+// ... rest of imports
 import { AuthScreen } from '@/screens/auth/AuthScreen';
 import { HomeScreen } from '@/screens/home/HomeScreen';
 import { NewsScreen } from '@/screens/news/NewsScreen';
@@ -23,6 +24,7 @@ import { LessonScreen } from '@/screens/lessons';
 import { FloatingTabBar } from '@/components/ui/FloatingTabBar';
 import { FullscreenMenu } from '@/components/ui/FullscreenMenu';
 import { MenuProvider, useMenu } from '@/contexts/MenuContext';
+import { TabNavigationProvider, useTabNavigation } from '@/contexts/TabNavigationContext';
 import { RootStackParamList } from '@/types/navigation';
 import { brandColors } from '@/config/theme';
 
@@ -31,8 +33,22 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigatorContent = () => {
   const { user, loading, signOut } = useAuth();
-  const [activeTab, setActiveTab] = useState('Home');
+  const { activeTab, setActiveTab } = useTabNavigation();
+  const [isTabBarVisible, setIsTabBarVisible] = useState(true);
   const menuContext = useMenu();
+
+  useEffect(() => {
+    const unsubscribe = navigationRef.addListener('state', () => {
+      if (navigationRef.isReady()) {
+        const routeName = navigationRef.getCurrentRoute()?.name;
+        // Dölj tab bar på specifika screens
+        const hideOnScreens = ['Lesson', 'CourseDetail', 'NewsDetail', 'ContentDetail', 'Auth'];
+        setIsTabBarVisible(!hideOnScreens.includes(routeName || ''));
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   if (loading) {
     return (
@@ -43,7 +59,10 @@ const AppNavigatorContent = () => {
   }
 
   const handleTabPress = (key: string) => {
-    setActiveTab(key);
+    const validTabs = ['Home', 'News', 'Courses', 'Content', 'Profile'] as const;
+    if (validTabs.includes(key as (typeof validTabs)[number])) {
+      setActiveTab(key as (typeof validTabs)[number]);
+    }
   };
 
   const handleNavigate = (screen: any) => {
@@ -97,7 +116,9 @@ const AppNavigatorContent = () => {
           )}
         </Stack.Navigator>
 
-        {user && <FloatingTabBar activeTab={activeTab} onTabPress={handleTabPress} />}
+        {user && isTabBarVisible && (
+          <FloatingTabBar activeTab={activeTab} onTabPress={handleTabPress} />
+        )}
 
         <FullscreenMenu
           visible={menuContext?.menuVisible || false}
@@ -111,9 +132,11 @@ const AppNavigatorContent = () => {
 };
 
 export const AppNavigator = () => (
-  <MenuProvider>
-    <AppNavigatorContent />
-  </MenuProvider>
+  <TabNavigationProvider>
+    <MenuProvider>
+      <AppNavigatorContent />
+    </MenuProvider>
+  </TabNavigationProvider>
 );
 
 const styles = StyleSheet.create({

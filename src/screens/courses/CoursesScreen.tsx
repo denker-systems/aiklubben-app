@@ -1,16 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { View, ScrollView, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  View,
+  ScrollView,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '@/types/navigation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/config/supabase';
 import { brandColors } from '@/config/theme';
-import { Text, FloatingOrbs, TiltCard } from '@/components/ui';
-import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
+import { Text, FloatingOrbs } from '@/components/ui';
+import { SPRING_CONFIGS } from '@/lib/animations';
 import { useMenu } from '@/contexts/MenuContext';
 import { getLevelForXP } from '@/types/gamification';
 import { uiColors } from '@/config/design';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CARD_WIDTH = SCREEN_WIDTH * 0.75;
 
 interface Course {
   id: string;
@@ -23,8 +36,11 @@ interface Course {
   category: string;
 }
 
+// Type-safe navigation (Rule 08)
+type CoursesNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Courses'>;
+
 export const CoursesScreen = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<CoursesNavigationProp>();
   const insets = useSafeAreaInsets();
   const menuContext = useMenu();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -60,7 +76,8 @@ export const CoursesScreen = () => {
     fetchCourses();
   }, []);
 
-  const getLevelInfo = (level: string) => {
+  // useMemo for expensive computations (Rule 10)
+  const getLevelInfo = useCallback((level: string) => {
     switch (level?.toLowerCase()) {
       case 'nybörjare':
         return { color: '#10B981', gradient: ['#10B981', '#059669'] as const, emoji: '🌱' };
@@ -75,7 +92,19 @@ export const CoursesScreen = () => {
           emoji: '📚',
         };
     }
-  };
+  }, []);
+
+  // useCallback for navigation (Rule 10)
+  const handleCoursePress = useCallback(
+    (courseId: string) => {
+      navigation.navigate('CourseDetail', { id: courseId });
+    },
+    [navigation],
+  );
+
+  const handleOpenMenu = useCallback(() => {
+    menuContext?.openMenu();
+  }, [menuContext]);
 
   const userStats = { totalXP: 150, currentStreak: 3 };
   const level = getLevelForXP(userStats.totalXP);
@@ -102,11 +131,15 @@ export const CoursesScreen = () => {
               <Text variant="h1" style={styles.headerTitle}>
                 Kurser
               </Text>
-              <Text variant="body" style={styles.headerSubtitle}>
-                Lär dig AI steg för steg
-              </Text>
             </View>
-            <Pressable onPress={() => menuContext?.openMenu()} style={styles.menuButton}>
+            <Pressable
+              onPress={handleOpenMenu}
+              style={styles.menuButton}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Öppna meny"
+              accessibilityHint="Öppnar navigationsmenyn"
+            >
               <View style={styles.menuLine} />
               <View style={[styles.menuLine, styles.menuLineShort]} />
             </Pressable>
@@ -221,7 +254,6 @@ export const CoursesScreen = () => {
             transition={{ ...SPRING_CONFIGS.smooth, delay: 200 }}
           >
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionEmoji}>✨</Text>
               <Text variant="h3" style={styles.sectionTitle}>
                 Fortsätt lära
               </Text>
@@ -229,7 +261,11 @@ export const CoursesScreen = () => {
 
             <Pressable
               style={styles.continueCard}
-              onPress={() => navigation.navigate('CourseDetail', { id: courses[0].id })}
+              onPress={() => handleCoursePress(courses[0].id)}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={`Fortsätt med ${courses[0].title}`}
+              accessibilityHint="Återupptar kursen där du slutade"
             >
               <View style={styles.continueContent}>
                 <LinearGradient
@@ -271,17 +307,19 @@ export const CoursesScreen = () => {
           </MotiView>
         )}
 
-        {/* All Courses Section */}
+        {/* All Courses Carousel */}
         <MotiView
-          style={styles.section}
+          style={styles.carouselSection}
           from={{ opacity: 0, translateY: 20 }}
           animate={{ opacity: 1, translateY: 0 }}
           transition={{ ...SPRING_CONFIGS.smooth, delay: 300 }}
         >
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionEmoji}>📚</Text>
+          <View style={styles.sectionHeaderPadded}>
             <Text variant="h3" style={styles.sectionTitle}>
               Alla kurser
+            </Text>
+            <Text variant="caption" style={styles.carouselHint}>
+              Svep för fler →
             </Text>
           </View>
 
@@ -296,91 +334,89 @@ export const CoursesScreen = () => {
               </Text>
             </View>
           ) : (
-            <View style={styles.coursesList}>
-              {courses.map((course, index) => (
+            <FlatList
+              data={courses}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={CARD_WIDTH + 16}
+              decelerationRate="fast"
+              contentContainerStyle={styles.carouselContent}
+              keyExtractor={(item) => item.id}
+              initialNumToRender={3}
+              maxToRenderPerBatch={5}
+              windowSize={5}
+              removeClippedSubviews={true}
+              renderItem={({ item: course, index }) => (
                 <MotiView
-                  key={course.id}
-                  from={{ opacity: 0, translateX: -20 }}
-                  animate={{ opacity: 1, translateX: 0 }}
+                  from={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={{
                     ...SPRING_CONFIGS.smooth,
-                    delay: 400 + index * STAGGER_DELAYS.fast,
+                    delay: 400 + index * 100,
                   }}
                 >
-                  <TiltCard
-                    onPress={() => navigation.navigate('CourseDetail', { id: course.id })}
-                    tiltAmount={2}
-                    scaleAmount={0.98}
-                    style={styles.courseCard}
+                  <Pressable
+                    onPress={() => handleCoursePress(course.id)}
+                    style={({ pressed }) => [
+                      styles.carouselCard,
+                      pressed && styles.carouselCardPressed,
+                    ]}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${course.title}, ${course.level || 'Alla nivåer'}`}
+                    accessibilityHint="Tryck för att öppna kursen"
                   >
-                    <View style={styles.courseCardContent}>
-                      <LinearGradient
-                        colors={getLevelInfo(course.level).gradient}
-                        style={styles.courseIconGradient}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                      >
-                        <Text style={styles.courseEmoji}>{getLevelInfo(course.level).emoji}</Text>
-                      </LinearGradient>
+                    <LinearGradient
+                      colors={getLevelInfo(course.level).gradient}
+                      style={styles.carouselIconGradient}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                    >
+                      <Text style={styles.carouselEmoji}>{getLevelInfo(course.level).emoji}</Text>
+                    </LinearGradient>
 
-                      <View style={styles.courseInfo}>
-                        <Text variant="body" style={styles.courseTitle} numberOfLines={2}>
-                          {course.title}
-                        </Text>
-                        <Text variant="caption" style={styles.courseExcerpt} numberOfLines={2}>
-                          {course.excerpt}
-                        </Text>
+                    <Text variant="body" style={styles.carouselTitle} numberOfLines={2}>
+                      {course.title}
+                    </Text>
 
-                        <View style={styles.courseMeta}>
-                          {course.level && (
-                            <View
-                              style={[
-                                styles.levelBadge,
-                                { backgroundColor: getLevelInfo(course.level).color + '20' },
-                              ]}
-                            >
-                              <Text
-                                style={[
-                                  styles.levelText,
-                                  { color: getLevelInfo(course.level).color },
-                                ]}
-                              >
-                                {course.level}
-                              </Text>
-                            </View>
-                          )}
-                          <View style={styles.metaItem}>
-                            <Text style={styles.metaEmoji}>⏱️</Text>
-                            <Text variant="caption" style={styles.metaText}>
-                              {course.duration || 30} min
-                            </Text>
-                          </View>
-                          <View style={styles.metaItem}>
-                            <Text style={styles.metaEmoji}>⚡</Text>
-                            <Text variant="caption" style={styles.metaText}>
-                              +50 XP
-                            </Text>
-                          </View>
-                        </View>
+                    <Text variant="caption" style={styles.carouselExcerpt} numberOfLines={3}>
+                      {course.excerpt}
+                    </Text>
+
+                    <View style={styles.carouselMeta}>
+                      <View style={styles.carouselMetaRow}>
+                        <Text style={styles.carouselMetaIcon}>⏱</Text>
+                        <Text variant="caption" style={styles.carouselMetaText}>
+                          {course.duration || 30} min
+                        </Text>
                       </View>
-
-                      <Text style={styles.courseArrow}>›</Text>
+                      <View style={styles.carouselMetaRow}>
+                        <Text style={styles.carouselMetaIcon}>⚡</Text>
+                        <Text variant="caption" style={styles.carouselMetaText}>
+                          +50 XP
+                        </Text>
+                      </View>
                     </View>
 
                     {userProgress[course.id] > 0 && (
-                      <View style={styles.courseProgressBar}>
-                        <View
-                          style={[
-                            styles.courseProgressFill,
-                            { width: `${userProgress[course.id]}%` },
-                          ]}
-                        />
+                      <View style={styles.carouselProgress}>
+                        <View style={styles.carouselProgressTrack}>
+                          <View
+                            style={[
+                              styles.carouselProgressFill,
+                              { width: `${userProgress[course.id]}%` },
+                            ]}
+                          />
+                        </View>
+                        <Text variant="caption" style={styles.carouselProgressText}>
+                          {userProgress[course.id]}%
+                        </Text>
                       </View>
                     )}
-                  </TiltCard>
+                  </Pressable>
                 </MotiView>
-              ))}
-            </View>
+              )}
+            />
           )}
         </MotiView>
       </ScrollView>
@@ -687,5 +723,104 @@ const styles = StyleSheet.create({
   courseProgressFill: {
     height: '100%',
     backgroundColor: brandColors.purple,
+  },
+  // Carousel styles
+  carouselSection: {
+    marginBottom: 24,
+  },
+  sectionHeaderPadded: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+    paddingHorizontal: 20,
+  },
+  carouselHint: {
+    color: '#6B7280',
+    fontStyle: 'italic',
+  },
+  carouselContent: {
+    paddingHorizontal: 20,
+    gap: 16,
+  },
+  carouselCard: {
+    width: CARD_WIDTH,
+    backgroundColor: uiColors.card.background,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: uiColors.card.border,
+    padding: 24,
+    minHeight: 280,
+  },
+  carouselCardPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.98 }],
+  },
+  carouselIconGradient: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  carouselEmoji: {
+    fontSize: 42,
+  },
+  carouselTitle: {
+    color: '#F9FAFB',
+    fontWeight: '700',
+    fontSize: 18,
+    marginBottom: 8,
+  },
+  carouselExcerpt: {
+    color: '#9CA3AF',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 16,
+    flex: 1,
+  },
+  carouselMeta: {
+    flexDirection: 'row',
+    gap: 16,
+    marginTop: 'auto',
+  },
+  carouselMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  carouselMetaIcon: {
+    fontSize: 14,
+  },
+  carouselMetaText: {
+    color: '#9CA3AF',
+    fontSize: 13,
+  },
+  carouselProgress: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  carouselProgressTrack: {
+    flex: 1,
+    height: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  carouselProgressFill: {
+    height: '100%',
+    backgroundColor: brandColors.purple,
+    borderRadius: 3,
+  },
+  carouselProgressText: {
+    color: brandColors.purple,
+    fontWeight: '600',
+    fontSize: 13,
   },
 });

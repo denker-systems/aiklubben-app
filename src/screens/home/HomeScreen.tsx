@@ -184,13 +184,14 @@ export const HomeScreen = () => {
         </MotiView>
 
         {/* Daily Progress Card */}
-        <MotiView
-          style={styles.dailyCard}
-          from={{ opacity: 0, translateX: -30 }}
-          animate={{ opacity: 1, translateX: 0 }}
-          transition={{ ...SPRING_CONFIGS.smooth, delay: 100 }}
-        >
-          <View style={styles.dailyCardHeader}>
+        <Pressable onPress={() => navigation.navigate('Courses')}>
+          <MotiView
+            style={styles.dailyCard}
+            from={{ opacity: 0, translateX: -30 }}
+            animate={{ opacity: 1, translateX: 0 }}
+            transition={{ ...SPRING_CONFIGS.smooth, delay: 100 }}
+          >
+            <View style={styles.dailyCardHeader}>
             <LinearGradient
               colors={['#10B981', '#059669']}
               style={styles.dailyCardIconGradient}
@@ -211,15 +212,16 @@ export const HomeScreen = () => {
               <Text style={styles.dailyCardPercent}>40%</Text>
             </View>
           </View>
-          <View style={styles.dailyProgressTrack}>
-            <MotiView
-              style={styles.dailyProgressFill}
-              from={{ width: '0%' }}
-              animate={{ width: '40%' }}
-              transition={{ ...SPRING_CONFIGS.smooth, delay: 500 }}
-            />
-          </View>
-        </MotiView>
+            <View style={styles.dailyProgressTrack}>
+              <MotiView
+                style={styles.dailyProgressFill}
+                from={{ width: '0%' }}
+                animate={{ width: '40%' }}
+                transition={{ ...SPRING_CONFIGS.smooth, delay: 500 }}
+              />
+            </View>
+          </MotiView>
+        </Pressable>
 
         {/* Quick Actions */}
         <MotiView

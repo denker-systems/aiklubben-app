@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
+import { View, TextInput, StyleSheet, Pressable } from 'react-native';
 import { MotiView } from 'moti';
-import { Check, X } from 'lucide-react-native';
+import { Check, X, Send } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { uiColors } from '@/config/design';
+import { brandColors } from '@/config/theme';
 
 interface FillBlankStepProps {
   content: {
@@ -56,35 +58,60 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
           {parts[0]}
         </Text>
 
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={[
-              styles.input,
-              showFeedback && (isCorrect ? styles.inputCorrect : styles.inputIncorrect),
-            ]}
-            value={userAnswer}
-            onChangeText={setUserAnswer}
-            onSubmitEditing={checkAnswer}
-            placeholder="Skriv ditt svar..."
-            placeholderTextColor={uiColors.text.muted}
-            editable={!showFeedback}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
+        <View style={styles.inputRow}>
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={[
+                styles.input,
+                showFeedback && (isCorrect ? styles.inputCorrect : styles.inputIncorrect),
+              ]}
+              value={userAnswer}
+              onChangeText={setUserAnswer}
+              onSubmitEditing={checkAnswer}
+              placeholder="Skriv ditt svar..."
+              placeholderTextColor={uiColors.text.muted}
+              editable={!showFeedback}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
 
-          {showFeedback && (
-            <MotiView
-              style={styles.iconContainer}
-              from={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={SPRING_CONFIGS.bouncy}
+            {showFeedback && (
+              <MotiView
+                style={styles.iconContainer}
+                from={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={SPRING_CONFIGS.bouncy}
+              >
+                {isCorrect ? (
+                  <Check size={24} color="#10B981" strokeWidth={3} />
+                ) : (
+                  <X size={24} color="#EF4444" strokeWidth={3} />
+                )}
+              </MotiView>
+            )}
+          </View>
+
+          {!showFeedback && (
+            <Pressable
+              onPress={checkAnswer}
+              disabled={!userAnswer.trim()}
+              style={({ pressed }) => [
+                styles.checkButton,
+                !userAnswer.trim() && styles.checkButtonDisabled,
+                pressed && styles.checkButtonPressed,
+              ]}
             >
-              {isCorrect ? (
-                <Check size={24} color="#10B981" strokeWidth={3} />
-              ) : (
-                <X size={24} color="#EF4444" strokeWidth={3} />
-              )}
-            </MotiView>
+              <LinearGradient
+                colors={
+                  userAnswer.trim() ? [brandColors.purple, '#a855f7'] : ['#4B5563', '#374151']
+                }
+                style={styles.checkButtonGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Send size={20} color="#FFFFFF" />
+              </LinearGradient>
+            </Pressable>
           )}
         </View>
 
@@ -141,8 +168,14 @@ const styles = StyleSheet.create({
   text: {
     color: uiColors.text.primary,
   },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   inputWrapper: {
     position: 'relative',
+    flex: 1,
     minWidth: 150,
   },
   input: {
@@ -201,5 +234,21 @@ const styles = StyleSheet.create({
   },
   feedbackText: {
     color: uiColors.text.primary,
+  },
+  checkButton: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  checkButtonDisabled: {
+    opacity: 0.5,
+  },
+  checkButtonPressed: {
+    opacity: 0.8,
+  },
+  checkButtonGradient: {
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -31,20 +31,23 @@ export function useTilt3D() {
   const scale = useSharedValue(1);
   const translateZ = useSharedValue(0);
 
-  const onPressIn = useCallback((event: any) => {
-    const { locationX, locationY } = event.nativeEvent;
-    const width = 300; // Approximate card width
-    const height = 200; // Approximate card height
+  const onPressIn = useCallback(
+    (event: any) => {
+      const { locationX, locationY } = event.nativeEvent;
+      const width = 300; // Approximate card width
+      const height = 200; // Approximate card height
 
-    // Calculate tilt based on touch position (subtle: max 3 degrees)
-    const tiltX = (locationY / height - 0.5) * -6; // Inverted for natural feel
-    const tiltY = (locationX / width - 0.5) * 6;
+      // Calculate tilt based on touch position (subtle: max 3 degrees)
+      const tiltX = (locationY / height - 0.5) * -6; // Inverted for natural feel
+      const tiltY = (locationX / width - 0.5) * 6;
 
-    rotateX.value = withSpring(tiltX, TILT_SPRING);
-    rotateY.value = withSpring(tiltY, TILT_SPRING);
-    scale.value = withSpring(1.02, TILT_SPRING);
-    translateZ.value = withSpring(10, TILT_SPRING);
-  }, [rotateX, rotateY, scale, translateZ]);
+      rotateX.value = withSpring(tiltX, TILT_SPRING);
+      rotateY.value = withSpring(tiltY, TILT_SPRING);
+      scale.value = withSpring(1.02, TILT_SPRING);
+      translateZ.value = withSpring(10, TILT_SPRING);
+    },
+    [rotateX, rotateY, scale, translateZ],
+  );
 
   const onPressOut = useCallback(() => {
     rotateX.value = withSpring(0, TILT_SPRING);

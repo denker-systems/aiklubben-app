@@ -22,3 +22,5 @@ export { SectionHeader } from './SectionHeader';
 export { TiltCard } from './TiltCard';
 export { ParallaxLayer } from './ParallaxLayer';
 export { ContentCard } from './ContentCard';
+export { DailyQuestsCard } from './DailyQuestsCard';
+export { TreasureChestModal } from './TreasureChestModal';

@@ -98,7 +98,6 @@ export const CourseDetailScreen = () => {
   const totalDuration = lessons.reduce((sum, l) => sum + l.duration, 0);
   const xpReward = lessons.length * 10;
 
-
   if (loading) {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -295,7 +294,9 @@ export const CourseDetailScreen = () => {
                   }}
                 >
                   <Pressable
-                    onPress={() => navigation.navigate('Lesson', { lessonId: lesson.id, courseId: id })}
+                    onPress={() =>
+                      navigation.navigate('Lesson', { lessonId: lesson.id, courseId: id })
+                    }
                     style={[
                       styles.lessonCard,
                       lesson.locked && styles.lessonCardLocked,

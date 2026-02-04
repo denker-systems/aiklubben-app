@@ -1,5 +1,98 @@
 import { brandColors } from './theme';
 
+// Theme Colors - Dark & Light Mode
+export const themeColors = {
+  dark: {
+    // Backgrounds
+    background: '#0C0A17',
+    surface: '#1F1F1F',
+    surfaceElevated: '#2A2A2A',
+    card: '#1F1F1F',
+    
+    // Text
+    text: {
+      primary: '#F9FAFB',
+      secondary: '#9CA3AF',
+      muted: '#6B7280',
+      inverse: '#0C0A17',
+    },
+    
+    // Borders
+    border: {
+      default: 'rgba(255, 255, 255, 0.1)',
+      subtle: 'rgba(255, 255, 255, 0.05)',
+      strong: 'rgba(255, 255, 255, 0.2)',
+    },
+    
+    // Glass effects
+    glass: {
+      light: 'rgba(255, 255, 255, 0.05)',
+      medium: 'rgba(255, 255, 255, 0.08)',
+      strong: 'rgba(255, 255, 255, 0.15)',
+      pressed: 'rgba(255, 255, 255, 0.1)',
+    },
+    
+    // Status colors
+    success: '#10B981',
+    error: '#EF4444',
+    warning: '#F59E0B',
+    info: '#3B82F6',
+    
+    // Tab bar
+    tabBar: {
+      background: 'rgba(31, 31, 31, 0.95)',
+      active: brandColors.purple,
+      inactive: '#6B7280',
+    },
+  },
+  
+  light: {
+    // Backgrounds
+    background: '#FFFFFF',
+    surface: '#F9FAFB',
+    surfaceElevated: '#FFFFFF',
+    card: '#FFFFFF',
+    
+    // Text
+    text: {
+      primary: '#111827',
+      secondary: '#4B5563',
+      muted: '#9CA3AF',
+      inverse: '#FFFFFF',
+    },
+    
+    // Borders
+    border: {
+      default: 'rgba(0, 0, 0, 0.1)',
+      subtle: 'rgba(0, 0, 0, 0.05)',
+      strong: 'rgba(0, 0, 0, 0.2)',
+    },
+    
+    // Glass effects
+    glass: {
+      light: 'rgba(0, 0, 0, 0.03)',
+      medium: 'rgba(0, 0, 0, 0.05)',
+      strong: 'rgba(0, 0, 0, 0.1)',
+      pressed: 'rgba(0, 0, 0, 0.08)',
+    },
+    
+    // Status colors
+    success: '#059669',
+    error: '#DC2626',
+    warning: '#D97706',
+    info: '#2563EB',
+    
+    // Tab bar
+    tabBar: {
+      background: 'rgba(255, 255, 255, 0.95)',
+      active: brandColors.purple,
+      inactive: '#9CA3AF',
+    },
+  },
+};
+
+export type ThemeColors = typeof themeColors.dark;
+
 export const gradients = {
   // Primary Brand Gradients
   primary: [brandColors.purple, '#6366f1'] as const, // Purple to Indigo
