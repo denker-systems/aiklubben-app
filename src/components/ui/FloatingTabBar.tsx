@@ -30,6 +30,8 @@ export function FloatingTabBar({ activeTab, onTabPress }: FloatingTabBarProps) {
   const insets = useSafeAreaInsets();
   const { isDark } = useTheme();
 
+  console.log('[FloatingTabBar] Rendered', { activeTab });
+
   return (
     <View
       style={[
@@ -49,7 +51,10 @@ export function FloatingTabBar({ activeTab, onTabPress }: FloatingTabBarProps) {
           return (
             <MotiPressable
               key={tab.key}
-              onPress={() => onTabPress(tab.key)}
+              onPress={() => {
+                console.log('[FloatingTabBar] Tab pressed:', tab.key);
+                onTabPress(tab.key);
+              }}
               style={styles.tabButton}
               animate={isActive ? { scale: 1.15 } : { scale: 1 }}
               transition={SPRING_CONFIGS.snappy}

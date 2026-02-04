@@ -14,6 +14,8 @@ import { BADGES, getLevelForXP, getXPProgress, getNextLevel } from '@/types/gami
 import { uiColors } from '@/config/design';
 
 export const ProfileScreen = () => {
+  console.log('[ProfileScreen] Rendered');
+  
   const { user, signOut } = useAuth();
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
@@ -22,9 +24,15 @@ export const ProfileScreen = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('[ProfileScreen] useEffect triggered', { hasUser: !!user });
+    
     const fetchProfileData = async () => {
-      if (!user) return;
+      if (!user) {
+        console.log('[ProfileScreen] No user, skipping fetch');
+        return;
+      }
 
+      console.log('[ProfileScreen] Fetching profile data for user:', user.id);
       try {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
@@ -32,7 +40,12 @@ export const ProfileScreen = () => {
           .eq('id', user.id)
           .single();
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.error('[ProfileScreen] Error fetching profile:', profileError);
+          throw profileError;
+        }
+        
+        console.log('[ProfileScreen] Profile data fetched:', { name: profileData?.name });
         setProfile(profileData);
 
         const { data: statsData, error: statsError } = await supabase

@@ -37,20 +37,32 @@ const AppNavigatorContent = () => {
   const [isTabBarVisible, setIsTabBarVisible] = useState(true);
   const menuContext = useMenu();
 
+  console.log('[AppNavigator] Rendered', { hasUser: !!user, loading, activeTab });
+
   useEffect(() => {
+    console.log('[AppNavigator] Setting up navigation listener');
+    
     const unsubscribe = navigationRef.addListener('state', () => {
       if (navigationRef.isReady()) {
         const routeName = navigationRef.getCurrentRoute()?.name;
+        console.log('[AppNavigator] Navigation state changed', { routeName });
+        
         // Dölj tab bar på specifika screens
         const hideOnScreens = ['Lesson', 'CourseDetail', 'NewsDetail', 'ContentDetail', 'Auth'];
-        setIsTabBarVisible(!hideOnScreens.includes(routeName || ''));
+        const shouldHide = hideOnScreens.includes(routeName || '');
+        console.log('[AppNavigator] Tab bar visibility', { routeName, shouldHide });
+        setIsTabBarVisible(!shouldHide);
       }
     });
 
-    return unsubscribe;
+    return () => {
+      console.log('[AppNavigator] Cleaning up navigation listener');
+      unsubscribe();
+    };
   }, []);
 
   if (loading) {
+    console.log('[AppNavigator] Showing loading screen');
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={brandColors.purple} />
@@ -59,18 +71,40 @@ const AppNavigatorContent = () => {
   }
 
   const handleTabPress = (key: string) => {
+    console.log('[AppNavigator] handleTabPress', { key });
     const validTabs = ['Home', 'News', 'Courses', 'Content', 'Profile'] as const;
     if (validTabs.includes(key as (typeof validTabs)[number])) {
+      console.log('[AppNavigator] Setting active tab:', key);
+      
+      // Reset navigation stack to the tab screen when switching tabs
+      if (navigationRef.isReady()) {
+        const currentRoute = navigationRef.getCurrentRoute()?.name;
+        const tabScreens = ['Home', 'News', 'Courses', 'Content', 'Profile'];
+        
+        // If we're on a detail/settings screen, navigate to the tab screen first
+        if (currentRoute && !tabScreens.includes(currentRoute)) {
+          console.log('[AppNavigator] Resetting to tab screen from:', currentRoute);
+          navigationRef.navigate(key as any);
+        }
+      }
+      
       setActiveTab(key as (typeof validTabs)[number]);
+    } else {
+      console.warn('[AppNavigator] Invalid tab key:', key);
     }
   };
 
   const handleNavigate = (screen: any) => {
+    console.log('[AppNavigator] handleNavigate', { screen });
     menuContext?.closeMenu();
     if (['Home', 'News', 'Courses', 'Content', 'Profile'].includes(screen)) {
+      console.log('[AppNavigator] Navigating to tab:', screen);
       setActiveTab(screen);
     } else if (navigationRef.isReady()) {
+      console.log('[AppNavigator] Navigating to screen:', screen);
       navigationRef.navigate(screen);
+    } else {
+      console.warn('[AppNavigator] Navigation not ready');
     }
   };
 

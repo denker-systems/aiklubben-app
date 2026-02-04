@@ -39,7 +39,10 @@ const UnitHeaderComponent: React.FC<UnitHeaderProps> = ({
         {/* Back Button - Apple HIG: 44x44 touch target */}
         {onBack && (
           <Pressable
-            onPress={onBack}
+            onPress={() => {
+              console.log('[UnitHeader] Back button pressed');
+              onBack();
+            }}
             style={styles.backButton}
             accessible={true}
             accessibilityRole="button"

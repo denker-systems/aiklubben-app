@@ -36,6 +36,8 @@ export const ContentScreen = () => {
   const insets = useSafeAreaInsets();
   const initialCategory = route.params?.category || 'resurser';
 
+  console.log('[ContentScreen] Rendered', { initialCategory });
+
   const [activeCategory, setActiveCategory] = useState<Category>(initialCategory);
   const [content, setContent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,8 +70,12 @@ export const ContentScreen = () => {
   ];
 
   useEffect(() => {
+    console.log('[ContentScreen] useEffect triggered', { activeCategory });
+    
     const fetchContent = async () => {
       setLoading(true);
+      console.log('[ContentScreen] Fetching content for category:', activeCategory);
+      
       try {
         const { data, error } = await supabase
           .from('content')
@@ -77,6 +83,12 @@ export const ContentScreen = () => {
           .eq('category', activeCategory)
           .eq('status', 'published')
           .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('[ContentScreen] Error fetching content:', error);
+        } else {
+          console.log('[ContentScreen] Content fetched:', { count: data?.length });
+        }
 
         if (error) throw error;
         setContent(data || []);

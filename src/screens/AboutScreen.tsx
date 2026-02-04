@@ -5,6 +5,8 @@ import { View, StyleSheet } from 'react-native';
 import { brandColors } from '@/config/theme';
 
 export const AboutScreen = () => {
+  console.log('[AboutScreen] Rendered');
+  
   return (
     <ScreenWrapper title="Om AI Klubben" showBack>
       <View style={styles.header}>

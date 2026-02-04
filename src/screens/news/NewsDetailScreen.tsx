@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react-native';
@@ -19,26 +19,31 @@ import { sv } from 'date-fns/locale';
 import Markdown from 'react-native-markdown-display';
 import { Text, Badge, AuthorBadge } from '@/components/ui';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
-import { useTabNavigation } from '@/contexts/TabNavigationContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export const NewsDetailScreen = () => {
   const route = useRoute<any>();
+  const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
-  const { navigateToTab } = useTabNavigation();
   const { id } = route.params;
 
-  // Navigate to News tab instead of goBack to maintain correct navigation flow
+  console.log('[NewsDetailScreen] Rendered', { articleId: id });
+
+  // Navigate to News screen instead of goBack to maintain correct navigation flow
   const handleGoBack = () => {
-    navigateToTab('News');
+    console.log('[NewsDetailScreen] handleGoBack - going back');
+    navigation.goBack();
   };
 
   const [article, setArticle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('[NewsDetailScreen] useEffect triggered', { id });
+    
     const fetchArticle = async () => {
+      console.log('[NewsDetailScreen] Fetching article');
       try {
         // Since news.author_id points to auth.users, and profiles is linked to auth.users,
         // we might not be able to join profiles directly in one go if the schema cache is stale
@@ -48,6 +53,12 @@ export const NewsDetailScreen = () => {
           .select('*, news_categories(name, emoji)')
           .eq('id', id)
           .single();
+
+        if (error) {
+          console.error('[NewsDetailScreen] Error fetching article:', error);
+        } else {
+          console.log('[NewsDetailScreen] Article fetched:', { title: data?.title });
+        }
 
         if (error) throw error;
 

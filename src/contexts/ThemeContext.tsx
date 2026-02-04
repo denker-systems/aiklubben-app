@@ -55,6 +55,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode; defaultTheme?:
   }, [resolvedTheme]);
 
   const setTheme = useCallback(async (newTheme: ThemeType) => {
+    console.log('[ThemeContext] Setting theme:', newTheme);
     try {
       setThemeState(newTheme);
       await AsyncStorage.setItem(THEME_STORAGE_KEY, newTheme);
@@ -69,6 +70,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode; defaultTheme?:
   }, [resolvedTheme, setTheme]);
 
   const setNotificationsEnabled = useCallback(async (enabled: boolean) => {
+    console.log('[ThemeContext] Setting notifications enabled:', enabled);
     try {
       setNotificationsState(enabled);
       await AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(enabled));

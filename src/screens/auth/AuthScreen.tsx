@@ -6,6 +6,8 @@ import { ScreenWrapper } from '@/components/layout';
 import { Text, Button, Input } from '@/components/ui';
 
 export const AuthScreen = () => {
+  console.log('[AuthScreen] Rendered');
+  
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +17,10 @@ export const AuthScreen = () => {
   const { signIn, signUp } = useAuth();
 
   const handleAuth = async () => {
+    console.log('[AuthScreen] handleAuth', { isLogin, email });
+    
     if (!email || !password) {
+      console.warn('[AuthScreen] Missing email or password');
       setError('Vänligen fyll i alla fält');
       return;
     }
@@ -24,14 +29,19 @@ export const AuthScreen = () => {
     setError(null);
 
     try {
+      console.log('[AuthScreen] Attempting', isLogin ? 'sign in' : 'sign up');
       const { error: authError } = isLogin
         ? await signIn(email, password)
         : await signUp(email, password, { name: email.split('@')[0] });
 
       if (authError) {
+        console.error('[AuthScreen] Auth error:', authError.message);
         setError(authError.message);
+      } else {
+        console.log('[AuthScreen] Auth successful');
       }
-    } catch {
+    } catch (err) {
+      console.error('[AuthScreen] Unexpected error:', err);
       setError('Ett oväntat fel uppstod');
     } finally {
       setLoading(false);

@@ -18,6 +18,7 @@ export const TabNavigationProvider: React.FC<TabNavigationProviderProps> = ({ ch
   const [activeTab, setActiveTab] = useState<TabKey>('Home');
 
   const navigateToTab = useCallback((tab: TabKey) => {
+    console.log('[TabNavigationContext] Navigating to tab:', tab);
     setActiveTab(tab);
   }, []);
 

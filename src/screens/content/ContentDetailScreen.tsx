@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { ArrowLeft, Clock, BookOpen, Award } from 'lucide-react-native';
@@ -17,19 +17,21 @@ import { brandColors } from '@/config/theme';
 import Markdown from 'react-native-markdown-display';
 import { Text, Badge } from '@/components/ui';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
-import { useTabNavigation } from '@/contexts/TabNavigationContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export const ContentDetailScreen = () => {
   const route = useRoute<any>();
+  const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
-  const { navigateToTab } = useTabNavigation();
   const { id } = route.params;
 
-  // Navigate to Content tab instead of goBack to maintain correct navigation flow
+  console.log('[ContentDetailScreen] Rendered', { contentId: id });
+
+  // Navigate to Content screen instead of goBack to maintain correct navigation flow
   const handleGoBack = () => {
-    navigateToTab('Content');
+    console.log('[ContentDetailScreen] handleGoBack - going back');
+    navigation.goBack();
   };
 
   const [content, setContent] = useState<any>(null);
@@ -37,14 +39,22 @@ export const ContentDetailScreen = () => {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
+    console.log('[ContentDetailScreen] useEffect triggered', { id });
+    
     const fetchContent = async () => {
+      console.log('[ContentDetailScreen] Fetching content');
       try {
         const { data, error } = await supabase.from('content').select('*').eq('id', id).single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('[ContentDetailScreen] Error fetching content:', error);
+          throw error;
+        }
+        
+        console.log('[ContentDetailScreen] Content fetched:', { title: data?.title });
         setContent(data);
       } catch (err) {
-        console.error('Error fetching content:', err);
+        console.error('[ContentDetailScreen] Error fetching content:', err);
       } finally {
         setLoading(false);
       }

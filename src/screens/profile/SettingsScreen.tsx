@@ -19,15 +19,19 @@ import {
 } from 'lucide-react-native';
 
 export const SettingsScreen = () => {
+  console.log('[SettingsScreen] Rendered');
+  
   const navigation = useNavigation<any>();
   const { isDark, toggleTheme, notificationsEnabled, setNotificationsEnabled, colors } = useTheme();
   const { signOut } = useAuth();
 
   const handleProfileSettings = useCallback(() => {
+    console.log('[SettingsScreen] handleProfileSettings - navigating to Profile');
     navigation.navigate('Profile');
   }, [navigation]);
 
   const handleChangePassword = useCallback(() => {
+    console.log('[SettingsScreen] handleChangePassword');
     Alert.alert(
       'Byt lösenord',
       'Vi skickar en länk till din e-post för att återställa ditt lösenord.',

@@ -21,6 +21,8 @@ import { SPRING_CONFIGS } from '@/lib/animations';
 import { getLayeredShadow } from '@/hooks/use3DEffects';
 
 export const NewsScreen = () => {
+  console.log('[NewsScreen] Rendered');
+  
   const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<any>();
@@ -34,14 +36,24 @@ export const NewsScreen = () => {
   });
 
   useEffect(() => {
+    console.log('[NewsScreen] useEffect triggered');
+    
     const fetchNews = async () => {
       setLoading(true);
+      console.log('[NewsScreen] Fetching news articles');
+      
       try {
         const { data, error } = await supabase
           .from('news')
           .select('*, news_categories(name, emoji)')
           .eq('is_published', true)
           .order('published_at', { ascending: false });
+
+        if (error) {
+          console.error('[NewsScreen] Error fetching news:', error);
+        } else {
+          console.log('[NewsScreen] News articles fetched:', { count: data?.length });
+        }
 
         if (error) throw error;
 

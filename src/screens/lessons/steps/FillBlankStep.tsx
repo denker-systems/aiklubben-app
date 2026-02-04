@@ -10,7 +10,9 @@ import { brandColors } from '@/config/theme';
 
 interface FillBlankStepProps {
   content: {
-    text: string;
+    text?: string;
+    text_before?: string;
+    text_after?: string;
     alternatives?: string[];
   };
   correctAnswer: string;
@@ -43,8 +45,29 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
     onAnswer(userAnswer, correct);
   };
 
-  // Split text by ___ to show blank
-  const parts = content.text.split('___');
+  // Handle both text formats
+  let textBefore = '';
+  let textAfter = '';
+  
+  if (content?.text) {
+    // Format 1: "text with ___ blank"
+    const parts = content.text.split('___');
+    textBefore = parts[0] || '';
+    textAfter = parts[1] || '';
+  } else if (content?.text_before || content?.text_after) {
+    // Format 2: { text_before, text_after }
+    textBefore = content.text_before || '';
+    textAfter = content.text_after || '';
+  } else {
+    // No valid content
+    return (
+      <View style={styles.container}>
+        <Text variant="body" style={{ color: uiColors.text.secondary }}>
+          Ingen text tillgänglig för denna fråga.
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <MotiView
@@ -55,7 +78,7 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
     >
       <View style={styles.textContainer}>
         <Text variant="h3" style={styles.text}>
-          {parts[0]}
+          {textBefore}
         </Text>
 
         <View style={styles.inputRow}>
@@ -115,9 +138,9 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
           )}
         </View>
 
-        {parts[1] && (
+        {textAfter && (
           <Text variant="h3" style={styles.text}>
-            {parts[1]}
+            {textAfter}
           </Text>
         )}
       </View>

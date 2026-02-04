@@ -11,8 +11,15 @@ const MenuContext = createContext<MenuContextType | undefined>(undefined);
 export function MenuProvider({ children }: { children: React.ReactNode }) {
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const openMenu = useCallback(() => setMenuVisible(true), []);
-  const closeMenu = useCallback(() => setMenuVisible(false), []);
+  const openMenu = useCallback(() => {
+    console.log('[MenuContext] Opening menu');
+    setMenuVisible(true);
+  }, []);
+  
+  const closeMenu = useCallback(() => {
+    console.log('[MenuContext] Closing menu');
+    setMenuVisible(false);
+  }, []);
 
   return (
     <MenuContext.Provider value={{ menuVisible, openMenu, closeMenu }}>

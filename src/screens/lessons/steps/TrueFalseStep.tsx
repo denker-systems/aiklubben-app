@@ -25,16 +25,25 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  console.log('[TrueFalseStep] Rendered', { statement: content.statement, correctAnswer });
+  
   const [selectedAnswer, setSelectedAnswer] = useState<boolean | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
   const handleSelect = (answer: boolean) => {
-    if (showFeedback) return;
+    console.log('[TrueFalseStep] handleSelect', { answer, showFeedback });
+    
+    if (showFeedback) {
+      console.log('[TrueFalseStep] Already showing feedback, ignoring');
+      return;
+    }
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setSelectedAnswer(answer);
     setShowFeedback(true);
     const isCorrect = answer === correctAnswer;
+
+    console.log('[TrueFalseStep] Answer checked', { answer, correctAnswer, isCorrect });
 
     if (isCorrect) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

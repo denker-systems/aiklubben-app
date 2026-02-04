@@ -26,18 +26,31 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  console.log('[MultipleChoiceStep] Rendered', { 
+    question: content.question, 
+    optionsCount: content.options.length, 
+    correctIndex 
+  });
+  
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
   // useCallback for performance (Rule 10)
   const handleSelect = useCallback(
     (index: number) => {
-      if (showFeedback) return;
+      console.log('[MultipleChoiceStep] handleSelect', { index, showFeedback });
+      
+      if (showFeedback) {
+        console.log('[MultipleChoiceStep] Already showing feedback, ignoring');
+        return;
+      }
 
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       setSelectedIndex(index);
       setShowFeedback(true);
       const isCorrect = index === correctIndex;
+
+      console.log('[MultipleChoiceStep] Answer checked', { selectedIndex: index, correctIndex, isCorrect });
 
       if (isCorrect) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

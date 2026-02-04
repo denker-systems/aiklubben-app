@@ -119,17 +119,23 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
   const { isDark } = useTheme();
   const [showContent, setShowContent] = useState(false);
 
+  console.log('[FullscreenMenu] Rendered', { visible });
+
   useEffect(() => {
     if (visible) {
+      console.log('[FullscreenMenu] Menu opened');
       setShowContent(true);
     }
   }, [visible, showContent]);
 
   const handleItemPress = (key: string) => {
+    console.log('[FullscreenMenu] Item pressed:', key);
     if (key === 'logout') {
+      console.log('[FullscreenMenu] Logout pressed');
       onLogout?.();
       onClose();
     } else {
+      console.log('[FullscreenMenu] Navigating to:', key);
       onNavigate?.(key);
       onClose();
     }
@@ -177,7 +183,10 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
               </Text>
             </View>
             <Pressable
-              onPress={onClose}
+              onPress={() => {
+                console.log('[FullscreenMenu] Close button pressed');
+                onClose();
+              }}
               style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}
             >
               <Text style={styles.closeEmoji}>✕</Text>

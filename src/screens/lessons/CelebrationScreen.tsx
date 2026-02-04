@@ -66,6 +66,16 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
   newLevel,
   onContinue,
 }) => {
+  console.log('[CelebrationScreen] Rendered', { 
+    xpEarned, 
+    bonusXP, 
+    score, 
+    totalSteps, 
+    streak, 
+    leveledUp,
+    newLevel: newLevel?.name 
+  });
+
   const percentage = Math.round((score / totalSteps) * 100);
   const isPerfect = score === totalSteps;
   const totalXP = xpEarned + bonusXP;
@@ -238,7 +248,10 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
           transition={{ ...SPRING_CONFIGS.smooth, delay: 800 }}
           style={styles.buttonContainer}
         >
-          <Pressable onPress={onContinue} style={styles.button}>
+          <Pressable onPress={() => {
+            console.log('[CelebrationScreen] Continue button pressed');
+            onContinue();
+          }} style={styles.button}>
             <LinearGradient
               colors={[brandColors.purple, '#a855f7']}
               style={styles.buttonGradient}

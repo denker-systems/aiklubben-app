@@ -16,9 +16,12 @@ const MenuButtonComponent = memo(function MenuButton({
   const menuContext = useMenu();
 
   const handlePress = useCallback(() => {
+    console.log('[MenuButton] Button pressed');
     if (onPress) {
+      console.log('[MenuButton] Calling custom onPress');
       onPress();
     } else {
+      console.log('[MenuButton] Opening menu');
       menuContext?.openMenu();
     }
   }, [onPress, menuContext]);

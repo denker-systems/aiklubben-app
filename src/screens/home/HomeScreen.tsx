@@ -14,6 +14,8 @@ import { getLevelForXP } from '@/types/gamification';
 import { uiColors } from '@/config/design';
 
 export const HomeScreen = () => {
+  console.log('[HomeScreen] Rendered');
+  
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const menuContext = useMenu();
@@ -25,28 +27,44 @@ export const HomeScreen = () => {
   const level = getLevelForXP(stats.totalXP);
 
   useEffect(() => {
+    console.log('[HomeScreen] useEffect triggered', { hasUser: !!user });
+    
     const fetchData = async () => {
       try {
         // Fetch profile
         if (user) {
-          const { data: profileData } = await supabase
+          console.log('[HomeScreen] Fetching profile for user:', user.id);
+          const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('name')
             .eq('id', user.id)
             .single();
+          
+          if (profileError) {
+            console.error('[HomeScreen] Error fetching profile:', profileError);
+          } else {
+            console.log('[HomeScreen] Profile fetched:', { name: profileData?.name });
+          }
           setProfile(profileData);
         }
 
         // Fetch recent news
-        const { data: newsData } = await supabase
+        console.log('[HomeScreen] Fetching recent news');
+        const { data: newsData, error: newsError } = await supabase
           .from('news')
           .select('id, title, summary, image_url')
-          .eq('status', 'published')
+          .eq('is_published', true)
           .order('published_at', { ascending: false })
           .limit(3);
+        
+        if (newsError) {
+          console.error('[HomeScreen] Error fetching news:', newsError);
+        } else {
+          console.log('[HomeScreen] News fetched:', { count: newsData?.length });
+        }
         setRecentNews(newsData || []);
       } catch (err) {
-        console.error('Error fetching home data:', err);
+        console.error('[HomeScreen] Error fetching home data:', err);
       }
     };
 

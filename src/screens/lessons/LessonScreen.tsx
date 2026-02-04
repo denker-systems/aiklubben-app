@@ -112,21 +112,36 @@ export const LessonScreen = () => {
   } | null>(null);
 
   useEffect(() => {
+    console.log('[LessonScreen] useEffect triggered', { lessonId, userId: user?.id });
+    
     const fetchUserData = async () => {
-      if (!user) return;
-      const { data } = await supabase
+      if (!user) {
+        console.log('[LessonScreen] No user, skipping user data fetch');
+        return;
+      }
+      
+      console.log('[LessonScreen] Fetching user data for:', user.id);
+      const { data, error } = await supabase
         .from('profiles')
         .select('current_streak')
         .eq('id', user.id)
         .single();
-      if (data) setStreak(data.current_streak || 0);
+      
+      if (error) {
+        console.error('[LessonScreen] Error fetching user data:', error);
+      } else {
+        console.log('[LessonScreen] User data fetched:', data);
+        if (data) setStreak(data.current_streak || 0);
+      }
     };
+    
     fetchUserData();
     fetchLesson();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonId, user]);
 
   const fetchLesson = async () => {
+    console.log('[LessonScreen] fetchLesson started', { lessonId });
     try {
       const { data, error } = await supabase
         .from('course_lessons')
@@ -134,22 +149,36 @@ export const LessonScreen = () => {
         .eq('id', lessonId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('[LessonScreen] Error fetching lesson:', error);
+        throw error;
+      }
+
+      console.log('[LessonScreen] Lesson data fetched:', {
+        id: data.id,
+        title: data.title,
+        stepsCount: data.lesson_steps?.length
+      });
 
       // Sort steps by order_index
       if (data.lesson_steps) {
         data.lesson_steps.sort((a: LessonStep, b: LessonStep) => a.order_index - b.order_index);
+        console.log('[LessonScreen] Steps sorted, types:', data.lesson_steps.map((s: LessonStep) => s.step_type));
       }
 
       setLesson(data);
     } catch (err) {
-      console.error('Error fetching lesson:', err);
+      console.error('[LessonScreen] Error fetching lesson:', err);
     } finally {
       setLoading(false);
     }
   };
 
   const playSound = async (type: 'correct' | 'incorrect') => {
+    // Sounds disabled - causes CORS issues on web
+    return;
+    
+    /* Uncomment when sound files are properly hosted
     try {
       const { sound } = await Audio.Sound.createAsync(
         type === 'correct'
@@ -162,30 +191,36 @@ export const LessonScreen = () => {
       );
       await sound.playAsync();
     } catch (error) {
-      console.log('Error playing sound', error);
+      // Silently fail - sounds are optional
     }
+    */
   };
 
   const handleAnswer = async (answer: any, isCorrect?: boolean) => {
+    console.log('[LessonScreen] handleAnswer', { currentStepIndex, answer, isCorrect });
     setAnswers({ ...answers, [currentStepIndex]: answer });
 
     if (isCorrect !== undefined) {
       if (isCorrect) {
+        console.log('[LessonScreen] Correct answer! Score:', score + 1);
         setScore(score + 1);
         setFeedbackType('correct');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         await playSound('correct');
       } else {
-        setFeedbackType('incorrect');
         const newLives = Math.max(0, lives - 1);
+        console.log('[LessonScreen] Incorrect answer! Lives:', newLives);
+        setFeedbackType('incorrect');
         setLives(newLives);
         if (newLives === 0) {
+          console.log('[LessonScreen] Game over - no lives left');
           setIsGameOver(true);
         }
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         await playSound('incorrect');
       }
     } else {
+      console.log('[LessonScreen] Answer recorded (no correctness check)');
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
@@ -193,28 +228,52 @@ export const LessonScreen = () => {
   };
 
   const handleNext = async () => {
-    if (!lesson || !canContinue) return;
+    console.log('[LessonScreen] handleNext', { 
+      hasLesson: !!lesson, 
+      canContinue, 
+      currentStepIndex, 
+      totalSteps: lesson?.lesson_steps.length,
+      lives 
+    });
+    
+    if (!lesson || !canContinue) {
+      console.log('[LessonScreen] Cannot continue - missing lesson or not allowed');
+      return;
+    }
 
     if (lives === 0) {
+      console.log('[LessonScreen] No lives left, navigating back to course');
       navigation.navigate('CourseDetail', { id: courseId });
       return;
     }
 
     setFeedbackType(null);
     if (currentStepIndex < lesson.lesson_steps.length - 1) {
+      console.log('[LessonScreen] Moving to next step:', currentStepIndex + 1);
       setCurrentStepIndex(currentStepIndex + 1);
       setCanContinue(false); // Reset for next step
     } else {
-      // Lesson completed
+      console.log('[LessonScreen] Last step completed, calling completeLesson');
       await completeLesson();
     }
   };
 
   const completeLesson = async () => {
-    if (!lesson || !user) return;
+    console.log('[LessonScreen] completeLesson started', { 
+      hasLesson: !!lesson, 
+      hasUser: !!user,
+      score,
+      totalSteps: lesson?.lesson_steps.length 
+    });
+    
+    if (!lesson) {
+      console.error('[LessonScreen] No lesson data, cannot complete');
+      return;
+    }
 
     const totalSteps = lesson.lesson_steps.length;
     const isPerfect = score === totalSteps;
+    console.log('[LessonScreen] Lesson stats', { totalSteps, score, isPerfect });
 
     // Calculate XP: base + perfect bonus + streak bonus
     let baseXP = lesson.xp_reward;
@@ -231,15 +290,40 @@ export const LessonScreen = () => {
 
     const totalXP = baseXP + bonusXP;
 
+    // If no user, still show celebration but don't save progress
+    if (!user) {
+      console.log('[LessonScreen] No user logged in, showing celebration without saving');
+      setCelebrationData({
+        xpEarned: baseXP,
+        bonusXP: bonusXP,
+        newStreak: streak,
+        leveledUp: false,
+      });
+      setShowCelebration(true);
+      return;
+    }
+    
+    console.log('[LessonScreen] User logged in, saving progress to database');
+
     try {
       // 1. Get current profile data
-      const { data: currentProfile } = await supabase
+      console.log('[LessonScreen] Fetching profile data for user:', user.id);
+      const { data: currentProfile, error: profileError } = await supabase
         .from('profiles')
         .select('total_xp, current_streak, longest_streak, last_activity_date, lessons_completed')
         .eq('id', user.id)
         .single();
 
-      if (!currentProfile) return;
+      if (profileError) {
+        console.error('[LessonScreen] Error fetching profile:', profileError);
+      }
+      
+      if (!currentProfile) {
+        console.error('[LessonScreen] No profile found for user');
+        return;
+      }
+      
+      console.log('[LessonScreen] Profile data:', currentProfile);
 
       const currentXP = currentProfile.total_xp || 0;
       const newXP = currentXP + totalXP;
@@ -272,7 +356,8 @@ export const LessonScreen = () => {
       const leveledUp = newLevel.level > oldLevel.level;
 
       // 4. Save lesson progress
-      await supabase.from('user_lesson_progress').upsert({
+      console.log('[LessonScreen] Saving lesson progress');
+      const { error: progressError } = await supabase.from('user_lesson_progress').upsert({
         user_id: user.id,
         lesson_id: lesson.id,
         status: 'completed',
@@ -282,9 +367,16 @@ export const LessonScreen = () => {
         completed_at: new Date().toISOString(),
         xp_earned: totalXP,
       });
+      
+      if (progressError) {
+        console.error('[LessonScreen] Error saving progress:', progressError);
+      } else {
+        console.log('[LessonScreen] Progress saved successfully');
+      }
 
       // 5. Update profile with XP, streak, and stats
-      await supabase
+      console.log('[LessonScreen] Updating profile', { newXP, newStreak, longestStreak, lessonsCompleted });
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({
           total_xp: newXP,
@@ -294,8 +386,15 @@ export const LessonScreen = () => {
           lessons_completed: lessonsCompleted,
         })
         .eq('id', user.id);
+        
+      if (updateError) {
+        console.error('[LessonScreen] Error updating profile:', updateError);
+      } else {
+        console.log('[LessonScreen] Profile updated successfully');
+      }
 
       // 6. Set celebration data
+      console.log('[LessonScreen] Setting celebration data', { baseXP, bonusXP, newStreak, leveledUp });
       setCelebrationData({
         xpEarned: baseXP,
         bonusXP: bonusXP,
@@ -304,7 +403,7 @@ export const LessonScreen = () => {
         newLevel: leveledUp ? { name: newLevel.name, icon: newLevel.icon } : undefined,
       });
     } catch (err) {
-      console.error('Error saving progress:', err);
+      console.error('[LessonScreen] Error saving progress:', err);
       // Still show celebration even if save fails
       setCelebrationData({
         xpEarned: baseXP,
@@ -314,16 +413,20 @@ export const LessonScreen = () => {
       });
     }
 
+    console.log('[LessonScreen] Showing celebration screen');
     setShowCelebration(true);
   };
 
   // useCallback for performance (Rule 10)
   const handleExit = useCallback(() => {
+    console.log('[LessonScreen] handleExit - showing exit modal');
     setShowExitModal(true);
   }, []);
 
   // Navigate to CourseDetail instead of goBack to maintain correct navigation flow
   const confirmExit = useCallback(() => {
+    console.log('[LessonScreen] confirmExit - exiting lesson');
+    setShowExitModal(false);
     navigation.navigate('CourseDetail', { id: courseId });
   }, [navigation, courseId]);
 
@@ -342,6 +445,7 @@ export const LessonScreen = () => {
   }, []);
 
   const handleCloseExitModal = useCallback(() => {
+    console.log('[LessonScreen] handleCloseExitModal - canceling exit');
     setShowExitModal(false);
   }, []);
 

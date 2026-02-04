@@ -4,6 +4,8 @@ import { Text } from '@/components/ui';
 import { View } from 'react-native';
 
 export const PrivacyScreen = () => {
+  console.log('[PrivacyScreen] Rendered');
+  
   return (
     <ScreenWrapper title="Integritetspolicy" showBack>
       <View style={{ gap: 24 }}>

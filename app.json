@@ -5,19 +5,29 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "nu.aiklubben.app",
+      "buildNumber": "2",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "nu.aiklubben.app"
+      "package": "nu.aiklubben.app",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c44a138e-9537-4cd3-897b-5dd3c2fe4bf4"
+      }
+    },
+    "owner": "denkersystems"
   }
 }

@@ -31,6 +31,8 @@ const LessonPathComponent: React.FC<LessonPathProps> = ({
   onLessonPress,
   currentLessonId,
 }) => {
+  console.log('[LessonPath] Rendered', { lessonsCount: lessons.length, currentLessonId });
+  
   const [selectedLesson, setSelectedLesson] = useState<{ lesson: Lesson; index: number } | null>(
     null,
   );
@@ -65,11 +67,13 @@ const LessonPathComponent: React.FC<LessonPathProps> = ({
 
   // useCallback for performance (Rule 10)
   const handleNodePress = useCallback((lesson: Lesson, index: number) => {
+    console.log('[LessonPath] handleNodePress', { lessonId: lesson.id, title: lesson.title, index });
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelectedLesson({ lesson, index });
   }, []);
 
   const handleStartLesson = useCallback(() => {
+    console.log('[LessonPath] handleStartLesson', { lessonId: selectedLesson?.lesson.id });
     if (selectedLesson) {
       onLessonPress(selectedLesson.lesson.id);
       setSelectedLesson(null);
@@ -77,6 +81,7 @@ const LessonPathComponent: React.FC<LessonPathProps> = ({
   }, [selectedLesson, onLessonPress]);
 
   const handleCloseDialog = useCallback(() => {
+    console.log('[LessonPath] handleCloseDialog');
     setSelectedLesson(null);
   }, []);
 

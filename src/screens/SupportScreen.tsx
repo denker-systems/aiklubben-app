@@ -6,6 +6,8 @@ import { Mail, MessageCircle } from 'lucide-react-native';
 import { brandColors } from '@/config/theme';
 
 export const SupportScreen = () => {
+  console.log('[SupportScreen] Rendered');
+  
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
 

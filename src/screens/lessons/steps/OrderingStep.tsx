@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { View, Pressable, StyleSheet } from 'react-native';
+import React, { useState, useCallback, useRef } from 'react';
+import { View, Pressable, StyleSheet, PanResponder, Animated, ScrollView } from 'react-native';
 import { MotiView } from 'moti';
 import { GripVertical, ArrowUp, ArrowDown } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -20,6 +20,8 @@ interface OrderingStepProps {
   onAnswer: (order: number[], isCorrect: boolean) => void;
 }
 
+const ITEM_HEIGHT = 72;
+
 export const OrderingStep: React.FC<OrderingStepProps> = ({
   content,
   correctOrder,
@@ -37,6 +39,10 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const dragY = useRef(new Animated.Value(0)).current;
+  const itemPositions = useRef<number[]>([]);
 
   const moveItem = useCallback(
     (fromIndex: number, direction: 'up' | 'down') => {
@@ -62,6 +68,49 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
       setSelectedIndex(selectedIndex === index ? null : index);
     },
     [selectedIndex, showFeedback],
+  );
+
+  const createPanResponder = useCallback(
+    (index: number) => {
+      return PanResponder.create({
+        onStartShouldSetPanResponder: () => !showFeedback,
+        onMoveShouldSetPanResponder: (_, gestureState) => {
+          return !showFeedback && Math.abs(gestureState.dy) > 5;
+        },
+        onPanResponderGrant: () => {
+          setDraggingIndex(index);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          // Disable scroll when dragging starts
+          scrollViewRef.current?.setNativeProps({ scrollEnabled: false });
+        },
+        onPanResponderMove: (_, gestureState) => {
+          dragY.setValue(gestureState.dy);
+
+          // Calculate which position we're hovering over
+          const currentY = index * ITEM_HEIGHT + gestureState.dy;
+          const hoverIndex = Math.round(currentY / ITEM_HEIGHT);
+          const clampedIndex = Math.max(0, Math.min(items.length - 1, hoverIndex));
+
+          if (clampedIndex !== index) {
+            // Reorder items
+            const newItems = [...items];
+            const [removed] = newItems.splice(index, 1);
+            newItems.splice(clampedIndex, 0, removed);
+            setItems(newItems);
+            setDraggingIndex(clampedIndex);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }
+        },
+        onPanResponderRelease: () => {
+          dragY.setValue(0);
+          setDraggingIndex(null);
+          // Re-enable scroll
+          scrollViewRef.current?.setNativeProps({ scrollEnabled: true });
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        },
+      });
+    },
+    [items, showFeedback, dragY],
   );
 
   const handleCheck = useCallback(() => {
@@ -94,39 +143,40 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
           const isSelected = selectedIndex === index;
           const isFirst = index === 0;
           const isLast = index === items.length - 1;
+          const isDragging = draggingIndex === index;
 
           let itemState: 'default' | 'correct' | 'incorrect' = 'default';
           if (showFeedback) {
             itemState = item.originalIndex === correctOrder[index] ? 'correct' : 'incorrect';
           }
 
+          const panResponder = createPanResponder(index);
+
           return (
-            <MotiView
+            <Animated.View
               key={item.originalIndex}
+              {...panResponder.panHandlers}
               style={[
                 styles.itemRow,
                 isSelected && styles.itemRowSelected,
                 itemState === 'correct' && styles.itemRowCorrect,
                 itemState === 'incorrect' && styles.itemRowIncorrect,
+                isDragging && styles.itemRowDragging,
+                isDragging && {
+                  transform: [{ translateY: dragY }],
+                },
               ]}
-              from={{ opacity: 0, translateX: -20 }}
-              animate={{ opacity: 1, translateX: 0 }}
-              transition={{ ...SPRING_CONFIGS.snappy, delay: index * 50 }}
             >
               <View style={styles.orderNumber}>
                 <Text style={styles.orderNumberText}>{index + 1}</Text>
               </View>
 
-              <Pressable
-                style={styles.itemContent}
-                onPress={() => handleItemPress(index)}
-                disabled={showFeedback}
-              >
-                <GripVertical size={20} color={uiColors.text.muted} />
+              <View style={styles.itemContent}>
+                <GripVertical size={20} color={isDragging ? brandColors.purple : uiColors.text.muted} />
                 <Text variant="body" style={styles.itemText}>
                   {item.item}
                 </Text>
-              </Pressable>
+              </View>
 
               <View style={styles.arrowButtons}>
                 <Pressable
@@ -150,7 +200,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
                   <ArrowDown size={18} color={isLast ? uiColors.text.muted : brandColors.purple} />
                 </Pressable>
               </View>
-            </MotiView>
+            </Animated.View>
           );
         })}
       </View>
@@ -173,7 +223,8 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
 
 const styles = StyleSheet.create({
   itemsContainer: {
-    gap: 10,
+    gap: 12,
+    marginBottom: 20,
   },
   itemRow: {
     flexDirection: 'row',
@@ -183,10 +234,19 @@ const styles = StyleSheet.create({
     borderColor: uiColors.card.border,
     borderRadius: 16,
     overflow: 'hidden',
+    // iOS shadow (Rule 01)
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    // Android
+    elevation: 2,
   },
   itemRowSelected: {
     borderColor: brandColors.purple,
     backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    shadowOpacity: 0.2,
+    elevation: 4,
   },
   itemRowCorrect: {
     borderColor: '#10B981',
@@ -196,12 +256,17 @@ const styles = StyleSheet.create({
     borderColor: '#EF4444',
     backgroundColor: 'rgba(239, 68, 68, 0.08)',
   },
+  itemRowDragging: {
+    opacity: 0.9,
+    shadowOpacity: 0.3,
+    elevation: 8,
+    zIndex: 1000,
+  },
   orderNumber: {
-    width: 40,
-    height: '100%',
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    width: 44, // Apple HIG: min 44x44 touch target
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     paddingVertical: 16,
   },
   orderNumberText: {
@@ -214,20 +279,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 16,
+    minHeight: 56, // Apple HIG: comfortable touch target
   },
   itemText: {
     color: uiColors.text.primary,
     flex: 1,
+    fontSize: 15,
+    lineHeight: 22,
   },
   arrowButtons: {
     flexDirection: 'column',
     paddingRight: 8,
-    gap: 2,
+    gap: 4,
   },
   arrowButton: {
-    padding: 6,
+    width: 44, // Apple HIG: min 44x44 touch target
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 8,
   },
   arrowButtonDisabled: {

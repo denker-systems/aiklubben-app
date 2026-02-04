@@ -18,13 +18,20 @@ interface ContentStepProps {
 }
 
 const ContentStepComponent: React.FC<ContentStepProps> = ({ content, onContinue }) => {
+  console.log('[ContentStep] Rendered', { title: content.title });
+
+  const handleContinue = () => {
+    console.log('[ContentStep] handleContinue - user clicked continue');
+    onContinue();
+  };
+
   // Auto-enable continue after content is shown
   useEffect(() => {
     const timer = setTimeout(() => {
-      onContinue();
+      handleContinue();
     }, 500);
     return () => clearTimeout(timer);
-  }, [onContinue]);
+  }, [handleContinue]);
 
   return (
     <MotiView
