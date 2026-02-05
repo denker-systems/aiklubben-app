@@ -76,18 +76,20 @@ const AppNavigatorContent = () => {
     if (validTabs.includes(key as (typeof validTabs)[number])) {
       console.log('[AppNavigator] Setting active tab:', key);
       
-      // Reset navigation stack to the tab screen when switching tabs
+      // Pop all detail screens from the stack first (reset to current base screen)
       if (navigationRef.isReady()) {
-        const currentRoute = navigationRef.getCurrentRoute()?.name;
-        const tabScreens = ['Home', 'News', 'Courses', 'Content', 'Profile'];
-        
-        // If we're on a detail/settings screen, navigate to the tab screen first
-        if (currentRoute && !tabScreens.includes(currentRoute)) {
-          console.log('[AppNavigator] Resetting to tab screen from:', currentRoute);
-          navigationRef.navigate(key as any);
+        const state = navigationRef.getState();
+        if (state && state.routes.length > 1) {
+          const baseRoute = state.routes[0].name;
+          console.log('[AppNavigator] Resetting stack to base:', baseRoute, 'had', state.routes.length, 'routes');
+          navigationRef.reset({
+            index: 0,
+            routes: [{ name: baseRoute as any }],
+          });
         }
       }
       
+      // Then switch to the new tab
       setActiveTab(key as (typeof validTabs)[number]);
     } else {
       console.warn('[AppNavigator] Invalid tab key:', key);
@@ -97,8 +99,16 @@ const AppNavigatorContent = () => {
   const handleNavigate = (screen: any) => {
     console.log('[AppNavigator] handleNavigate', { screen });
     menuContext?.closeMenu();
-    if (['Home', 'News', 'Courses', 'Content', 'Profile'].includes(screen)) {
+    const tabScreens = ['Home', 'News', 'Courses', 'Content', 'Profile'];
+    if (tabScreens.includes(screen)) {
       console.log('[AppNavigator] Navigating to tab:', screen);
+      // Reset stack when navigating to a tab from the menu
+      if (navigationRef.isReady()) {
+        navigationRef.reset({
+          index: 0,
+          routes: [{ name: screen }],
+        });
+      }
       setActiveTab(screen);
     } else if (navigationRef.isReady()) {
       console.log('[AppNavigator] Navigating to screen:', screen);

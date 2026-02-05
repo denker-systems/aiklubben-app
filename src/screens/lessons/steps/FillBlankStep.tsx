@@ -115,26 +115,24 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
           </View>
 
           {!showFeedback && (
-            <Pressable
-              onPress={checkAnswer}
-              disabled={!userAnswer.trim()}
-              style={({ pressed }) => [
-                styles.checkButton,
-                !userAnswer.trim() && styles.checkButtonDisabled,
-                pressed && styles.checkButtonPressed,
-              ]}
-            >
-              <LinearGradient
-                colors={
-                  userAnswer.trim() ? [brandColors.purple, '#a855f7'] : ['#4B5563', '#374151']
-                }
-                style={styles.checkButtonGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+            <View style={[styles.checkButton, !userAnswer.trim() && styles.checkButtonDisabled]}>
+              <Pressable
+                onPress={checkAnswer}
+                disabled={!userAnswer.trim()}
+                style={styles.checkButtonPressable}
               >
-                <Send size={20} color="#FFFFFF" />
-              </LinearGradient>
-            </Pressable>
+                <LinearGradient
+                  colors={
+                    userAnswer.trim() ? [brandColors.purple, '#a855f7'] : ['#4B5563', '#374151']
+                  }
+                  style={styles.checkButtonGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Send size={20} color="#FFFFFF" />
+                </LinearGradient>
+              </Pressable>
+            </View>
           )}
         </View>
 
@@ -261,6 +259,9 @@ const styles = StyleSheet.create({
   checkButton: {
     borderRadius: 16,
     overflow: 'hidden',
+  },
+  checkButtonPressable: {
+    flex: 1,
   },
   checkButtonDisabled: {
     opacity: 0.5,

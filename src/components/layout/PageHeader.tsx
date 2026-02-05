@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { ChevronLeft, Menu } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Text } from '../ui/Text';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useMenu } from '@/contexts/MenuContext';
@@ -22,6 +23,7 @@ export function PageHeader({
   rightContent,
 }: PageHeaderProps) {
   const { isDark } = useTheme();
+  const navigation = useNavigation();
   const menuContext = useMenu();
   const tabNavigation = useTabNavigationSafe();
   const textColor = isDark ? '#FAFAFA' : '#111827';
@@ -31,8 +33,9 @@ export function PageHeader({
       onBackPress();
     } else if (backToTab && tabNavigation) {
       tabNavigation.navigateToTab(backToTab);
+    } else if (navigation.canGoBack()) {
+      navigation.goBack();
     }
-    // If no backToTab or onBackPress specified, do nothing (button shouldn't be shown)
   };
 
   return (

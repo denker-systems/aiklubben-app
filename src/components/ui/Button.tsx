@@ -71,43 +71,47 @@ export function Button({
   const vStyle = getVariantStyle();
   const sStyle = getSizeStyle();
 
+  const wrapperStyle: ViewStyle = {
+    backgroundColor: vStyle.backgroundColor,
+    height: sStyle.height,
+    paddingHorizontal: sStyle.paddingHorizontal,
+    borderRadius: 24,
+    borderColor: vStyle.border,
+    borderWidth: vStyle.border ? 1 : 0,
+    opacity: disabled || loading ? 0.5 : 1,
+    overflow: 'hidden',
+  };
+
   return (
-    <Pressable
-      disabled={disabled || loading}
-      style={({ pressed }) => {
-        const baseStyle: ViewStyle = {
-          backgroundColor: vStyle.backgroundColor,
-          height: sStyle.height,
-          paddingHorizontal: sStyle.paddingHorizontal,
-          borderRadius: 24,
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'row',
-          borderColor: vStyle.border,
-          borderWidth: vStyle.border ? 1 : 0,
-          opacity: disabled || loading ? 0.5 : pressed ? 0.9 : 1,
-          transform: [{ scale: pressed ? 0.98 : 1 }],
-        };
-        return [baseStyle, style as ViewStyle];
-      }}
-      {...props}
-    >
-      {loading ? (
-        <ActivityIndicator color={vStyle.text} size="small" />
-      ) : (
-        <View style={styles.content}>
-          {icon && iconPosition === 'left' && <View style={styles.iconLeft}>{icon}</View>}
-          {typeof children === 'string' ? (
-            <Text weight="bold" style={{ color: vStyle.text, fontSize: sStyle.fontSize }}>
-              {children}
-            </Text>
-          ) : (
-            children
-          )}
-          {icon && iconPosition === 'right' && <View style={styles.iconRight}>{icon}</View>}
-        </View>
-      )}
-    </Pressable>
+    <View style={[wrapperStyle, style as ViewStyle]}>
+      <Pressable
+        disabled={disabled || loading}
+        style={({ pressed }) => ({
+          flex: 1,
+          alignItems: 'center' as const,
+          justifyContent: 'center' as const,
+          flexDirection: 'row' as const,
+          opacity: pressed ? 0.8 : 1,
+        })}
+        {...props}
+      >
+        {loading ? (
+          <ActivityIndicator color={vStyle.text} size="small" />
+        ) : (
+          <View style={styles.content}>
+            {icon && iconPosition === 'left' && <View style={styles.iconLeft}>{icon}</View>}
+            {typeof children === 'string' ? (
+              <Text weight="bold" style={{ color: vStyle.text, fontSize: sStyle.fontSize }}>
+                {children}
+              </Text>
+            ) : (
+              children
+            )}
+            {icon && iconPosition === 'right' && <View style={styles.iconRight}>{icon}</View>}
+          </View>
+        )}
+      </Pressable>
+    </View>
   );
 }
 

@@ -36,22 +36,25 @@ const MenuButtonComponent = memo(function MenuButton({
   }, [size]);
 
   return (
-    <Pressable
-      onPress={handlePress}
-      style={({ pressed }) => [
+    <View
+      style={[
         styles.menuButton,
         {
           width: config.button,
           height: config.button,
           borderRadius: config.button / 2,
         },
-        pressed && styles.menuButtonPressed,
         style,
       ]}
     >
-      <View style={[styles.menuLine, { width: config.lineWidth }]} />
-      <View style={[styles.menuLine, { width: config.lineShort }]} />
-    </Pressable>
+      <Pressable
+        onPress={handlePress}
+        style={styles.menuButtonPressable}
+      >
+        <View style={[styles.menuLine, { width: config.lineWidth }]} />
+        <View style={[styles.menuLine, { width: config.lineShort }]} />
+      </Pressable>
+    </View>
   );
 });
 
@@ -62,6 +65,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 6,
+  },
+  menuButtonPressable: {
+    flex: 1,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
     gap: 6,
   },
   menuButtonPressed: {

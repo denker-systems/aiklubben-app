@@ -2,8 +2,8 @@ import React, { useCallback, memo } from 'react';
 import { View, Pressable, StyleSheet, Modal } from 'react-native';
 import { MotiView } from 'moti';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Play, Star, Clock, Zap, X, Trophy, Target } from 'lucide-react-native';
-import { Text } from '@/components/ui';
+import { Play, Clock, Zap, X, Target } from 'lucide-react-native';
+import { Text, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import * as Haptics from 'expo-haptics';
 
@@ -71,18 +71,7 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
               transition={{ ...SPRING_CONFIGS.bouncy, delay: 100 }}
               style={styles.iconContainer}
             >
-              <LinearGradient
-                colors={lesson.isCompleted ? ['#10B981', '#059669'] : ['#8B5CF6', '#6366F1']}
-                style={styles.iconGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                {lesson.isCompleted ? (
-                  <Trophy size={36} color="#FFFFFF" />
-                ) : (
-                  <Star size={36} color="#FFFFFF" fill="#FFFFFF" />
-                )}
-              </LinearGradient>
+              <AppIcon name="courses-example" size={80} />
             </MotiView>
 
             {/* Lesson Number Badge */}
@@ -151,9 +140,10 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
               transition={{ ...SPRING_CONFIGS.bouncy, delay: 350 }}
               style={styles.buttonContainer}
             >
+              <View style={styles.startButton}>
               <Pressable
                 onPress={handleStart}
-                style={({ pressed }) => [styles.startButton, pressed && styles.startButtonPressed]}
+                style={styles.startButtonPressable}
                 accessible={true}
                 accessibilityRole="button"
                 accessibilityLabel={lesson.isCompleted ? 'Öva igen' : 'Starta lektion'}
@@ -171,6 +161,7 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
                   </Text>
                 </LinearGradient>
               </Pressable>
+              </View>
             </MotiView>
 
             {/* Bottom decorative element */}
@@ -290,6 +281,8 @@ const styles = StyleSheet.create({
   startButton: {
     borderRadius: 16,
     overflow: 'hidden',
+  },
+  startButtonPressable: {
   },
   startButtonPressed: {
     transform: [{ scale: 0.98 }],

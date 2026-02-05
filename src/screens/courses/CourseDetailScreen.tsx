@@ -170,23 +170,23 @@ export const CourseDetailScreen = () => {
 
   return (
     <View style={styles.container}>
+      {/* Sticky Unit Header */}
+      <View style={{ paddingTop: insets.top }}>
+        <UnitHeader
+          title={course.title || 'Kurs'}
+          subtitle={course.excerpt}
+          lessonCount={lessons.length}
+          completedCount={completedLessons}
+          onBack={handleGoBack}
+        />
+      </View>
+
+      {/* Scrollable Lesson Path */}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Unit Header - Duolingo style */}
-        <View style={{ paddingTop: insets.top }}>
-          <UnitHeader
-            title={course.title || 'Kurs'}
-            subtitle={course.excerpt}
-            lessonCount={lessons.length}
-            completedCount={completedLessons}
-            onBack={handleGoBack}
-          />
-        </View>
-
-        {/* Lesson Path - Duolingo style zigzag */}
         <LessonPath
           lessons={lessons}
           onLessonPress={handleLessonPress}

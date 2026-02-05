@@ -13,6 +13,7 @@ interface LessonNodeProps {
   status: LessonStatus;
   progress?: number;
   lessonNumber: number;
+  title?: string;
   onPress?: () => void;
   delay?: number;
   size?: 'small' | 'medium' | 'large';
@@ -58,6 +59,7 @@ const LessonNodeComponent: React.FC<LessonNodeProps> = ({
   status,
   progress = 0,
   lessonNumber,
+  title,
   onPress,
   delay = 0,
   size = 'medium',
@@ -225,6 +227,11 @@ const LessonNodeComponent: React.FC<LessonNodeProps> = ({
           </View>
         )}
       </Pressable>
+      {title && (
+        <Text style={styles.lessonTitle}>
+          {title}
+        </Text>
+      )}
     </MotiView>
   );
 };
@@ -270,6 +277,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 20,
     fontWeight: '800',
+  },
+  lessonTitle: {
+    color: '#9CA3AF',
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 10,
+    width: 180,
   },
 });
 

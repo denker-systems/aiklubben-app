@@ -5,7 +5,7 @@ import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/types/navigation';
 import { MotiView } from 'moti';
-import { X, CheckCircle } from 'lucide-react-native';
+import { X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/config/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -646,40 +646,6 @@ export const LessonScreen = () => {
             />
           )}
 
-          {/* Feedback Overlay */}
-          {feedbackType && (
-            <MotiView
-              from={{ translateY: 100 }}
-              animate={{ translateY: 0 }}
-              style={[
-                styles.feedbackOverlay,
-                feedbackType === 'correct' ? styles.feedbackCorrect : styles.feedbackIncorrect,
-              ]}
-            >
-              <View style={styles.feedbackHeader}>
-                <View style={styles.feedbackIcon}>
-                  {feedbackType === 'correct' ? (
-                    <CheckCircle size={32} color="#10B981" />
-                  ) : (
-                    <X size={32} color="#EF4444" />
-                  )}
-                </View>
-                <Text
-                  variant="h2"
-                  style={[
-                    styles.feedbackTitle,
-                    { color: feedbackType === 'correct' ? '#10B981' : '#EF4444' },
-                  ]}
-                >
-                  {feedbackType === 'correct' ? 'Snyggt!' : 'Inte riktigt rätt'}
-                </Text>
-              </View>
-
-              {currentStep.explanation && (
-                <Text style={styles.explanationText}>{currentStep.explanation}</Text>
-              )}
-            </MotiView>
-          )}
         </MotiView>
       </ScrollView>
 

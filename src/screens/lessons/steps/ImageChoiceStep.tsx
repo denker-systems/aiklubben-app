@@ -78,16 +78,18 @@ export const ImageChoiceStep: React.FC<ImageChoiceStepProps> = ({
               animate={{ opacity: 1, scale: 1 }}
               transition={{ ...SPRING_CONFIGS.bouncy, delay: index * 80 }}
             >
-              <Pressable
-                onPress={() => handleSelect(option.id)}
-                disabled={showFeedback}
-                style={({ pressed }) => [
+              <View
+                style={[
                   styles.option,
                   isSelected && styles.optionSelected,
                   showAsCorrect && styles.optionCorrect,
                   showAsIncorrect && styles.optionIncorrect,
-                  pressed && !showFeedback && styles.optionPressed,
                 ]}
+              >
+              <Pressable
+                onPress={() => handleSelect(option.id)}
+                disabled={showFeedback}
+                style={styles.optionPressable}
               >
                 <View style={styles.imageContainer}>
                   {option.image_url ? (
@@ -139,6 +141,7 @@ export const ImageChoiceStep: React.FC<ImageChoiceStepProps> = ({
                   {option.label}
                 </Text>
               </Pressable>
+              </View>
             </MotiView>
           );
         })}
@@ -174,6 +177,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 12,
     alignItems: 'center',
+    gap: 10,
+  },
+  optionPressable: {
+    flex: 1,
+    alignItems: 'center' as const,
+    width: '100%' as const,
     gap: 10,
   },
   optionSelected: {

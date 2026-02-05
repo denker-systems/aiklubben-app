@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, ViewStyle } from 'react-native';
+import { View, Pressable, StyleSheet, ViewStyle } from 'react-native';
 import { MotiView } from 'moti';
 import { LinearGradient } from 'expo-linear-gradient';
 import { LucideIcon } from 'lucide-react-native';
@@ -62,45 +62,47 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       transition={SPRING_CONFIGS.smooth}
       style={[fullWidth && styles.fullWidth, style]}
     >
-      <Pressable
-        onPress={onPress}
-        disabled={disabled}
-        style={({ pressed }) => [styles.button, pressed && !disabled && styles.pressed]}
-      >
-        {isGhost ? (
-          <MotiView
-            style={[styles.ghostContent, getSizeStyles()]}
-            animate={{ scale: disabled ? 1 : 1 }}
-          >
-            {Icon && iconPosition === 'left' && (
-              <Icon size={size === 'small' ? 16 : 20} color={uiColors.text.secondary} />
-            )}
-            <Text variant="body" style={[styles.ghostLabel, size === 'small' && styles.labelSmall]}>
-              {label}
-            </Text>
-            {Icon && iconPosition === 'right' && (
-              <Icon size={size === 'small' ? 16 : 20} color={uiColors.text.secondary} />
-            )}
-          </MotiView>
-        ) : (
-          <LinearGradient
-            colors={colors}
-            style={[styles.gradient, getSizeStyles()]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            {Icon && iconPosition === 'left' && (
-              <Icon size={size === 'small' ? 16 : 20} color="#FFFFFF" />
-            )}
-            <Text variant="body" style={[styles.label, size === 'small' && styles.labelSmall]}>
-              {label}
-            </Text>
-            {Icon && iconPosition === 'right' && (
-              <Icon size={size === 'small' ? 16 : 20} color="#FFFFFF" />
-            )}
-          </LinearGradient>
-        )}
-      </Pressable>
+      <View style={styles.button}>
+        <Pressable
+          onPress={onPress}
+          disabled={disabled}
+          style={styles.buttonPressable}
+        >
+          {isGhost ? (
+            <MotiView
+              style={[styles.ghostContent, getSizeStyles()]}
+              animate={{ scale: disabled ? 1 : 1 }}
+            >
+              {Icon && iconPosition === 'left' && (
+                <Icon size={size === 'small' ? 16 : 20} color={uiColors.text.secondary} />
+              )}
+              <Text variant="body" style={[styles.ghostLabel, size === 'small' && styles.labelSmall]}>
+                {label}
+              </Text>
+              {Icon && iconPosition === 'right' && (
+                <Icon size={size === 'small' ? 16 : 20} color={uiColors.text.secondary} />
+              )}
+            </MotiView>
+          ) : (
+            <LinearGradient
+              colors={colors}
+              style={[styles.gradient, getSizeStyles()]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              {Icon && iconPosition === 'left' && (
+                <Icon size={size === 'small' ? 16 : 20} color="#FFFFFF" />
+              )}
+              <Text variant="body" style={[styles.label, size === 'small' && styles.labelSmall]}>
+                {label}
+              </Text>
+              {Icon && iconPosition === 'right' && (
+                <Icon size={size === 'small' ? 16 : 20} color="#FFFFFF" />
+              )}
+            </LinearGradient>
+          )}
+        </Pressable>
+      </View>
     </MotiView>
   );
 };
@@ -112,6 +114,9 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 16,
     overflow: 'hidden',
+  },
+  buttonPressable: {
+    flex: 1,
   },
   pressed: {
     opacity: 0.9,

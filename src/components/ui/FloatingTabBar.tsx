@@ -6,19 +6,21 @@ import { MotiPressable } from 'moti/interactions';
 import { useTheme } from '@/contexts/ThemeContext';
 import { brandColors } from '@/config/theme';
 import { SPRING_CONFIGS } from '@/lib/animations';
+import { AppIcon } from './AppIcon';
 
 interface TabItem {
   key: string;
   emoji: string;
+  iconName?: string;
   label: string;
 }
 
 const tabs: TabItem[] = [
-  { key: 'Home', emoji: '🏠', label: 'Hem' },
-  { key: 'News', emoji: '📰', label: 'Nyheter' },
-  { key: 'Courses', emoji: '📚', label: 'Kurser' },
+  { key: 'Home', emoji: '🏠', iconName: 'home', label: 'Hem' },
+  { key: 'News', emoji: '📰', iconName: 'news', label: 'Nyheter' },
+  { key: 'Courses', emoji: '📚', iconName: 'courses', label: 'Kurser' },
   { key: 'Content', emoji: '📂', label: 'Resurser' },
-  { key: 'Profile', emoji: '👤', label: 'Profil' },
+  { key: 'Profile', emoji: '👤', iconName: 'profile', label: 'Profil' },
 ];
 
 interface FloatingTabBarProps {
@@ -64,9 +66,13 @@ export function FloatingTabBar({ activeTab, onTabPress }: FloatingTabBarProps) {
                   opacity: isActive ? 1 : 0.4,
                 }}
               >
-                <Text style={[styles.tabEmoji, isActive && styles.tabEmojiActive]}>
-                  {tab.emoji}
-                </Text>
+                {tab.iconName ? (
+                  <AppIcon name={tab.iconName} size={isActive ? 52 : 48} />
+                ) : (
+                  <Text style={[styles.tabEmoji, isActive && styles.tabEmojiActive]}>
+                    {tab.emoji}
+                  </Text>
+                )}
               </MotiView>
               {isActive && (
                 <MotiView

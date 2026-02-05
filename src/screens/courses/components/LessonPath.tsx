@@ -8,7 +8,7 @@ import * as Haptics from 'expo-haptics';
 
 // Dimensions available if needed for responsive layout
 // Duolingo-style: wider zigzag pattern, no connector lines
-const NODE_OFFSET = 50;
+const NODE_OFFSET = 70;
 
 interface Lesson {
   id: string;
@@ -87,8 +87,8 @@ const LessonPathComponent: React.FC<LessonPathProps> = ({
 
   // Apple HIG: Spacing between elements should be 12-48px
   // Using 24px base spacing, 32px for current node
-  const NODE_SPACING = 24;
-  const CURRENT_NODE_SPACING = 32;
+  const NODE_SPACING = 64;
+  const CURRENT_NODE_SPACING = 72;
 
   return (
     <View style={styles.container}>
@@ -123,6 +123,7 @@ const LessonPathComponent: React.FC<LessonPathProps> = ({
               status={status}
               progress={lesson.progress || (isCurrent ? 0 : lesson.completed ? 100 : 0)}
               lessonNumber={index + 1}
+              title={lesson.title}
               onPress={() => handleNodePress(lesson, index)}
               delay={150 + index * 80}
               size={isCurrent ? 'large' : 'medium'}

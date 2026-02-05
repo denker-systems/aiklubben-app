@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { MotiView } from 'moti';
-import { Zap, Trophy, TrendingUp, Sparkles } from 'lucide-react-native';
+import { Zap, TrendingUp, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { Text } from '@/components/ui';
+import { Text, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { uiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
@@ -142,14 +142,7 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
           animate={{ scale: 1, rotate: '0deg' }}
           transition={{ ...SPRING_CONFIGS.bouncy, delay: 200 }}
         >
-          <LinearGradient
-            colors={['#F59E0B', '#D97706']}
-            style={styles.iconGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <Trophy size={48} color="#FFFFFF" strokeWidth={2} />
-          </LinearGradient>
+          <AppIcon name="courses-example" size={160} />
         </MotiView>
 
         <MotiView

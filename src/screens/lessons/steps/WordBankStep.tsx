@@ -196,22 +196,27 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
                 }}
                 transition={SPRING_CONFIGS.snappy}
               >
-                <Pressable
-                  onPress={() => handleWordSelect(word, index)}
-                  disabled={isUsed || showFeedback}
-                  style={({ pressed }) => [
+                <View
+                  style={[
                     styles.wordChip,
                     isUsed && styles.wordChipUsed,
-                    pressed && !isUsed && styles.wordChipPressed,
                   ]}
                 >
-                  <Text
-                    variant="body"
-                    style={[styles.wordChipText, isUsed && styles.wordChipTextUsed]}
+                  <Pressable
+                    onPress={() => handleWordSelect(word, index)}
+                    disabled={isUsed || showFeedback}
+                    style={({ pressed }) => ({
+                      opacity: pressed && !isUsed ? 0.8 : 1,
+                    })}
                   >
-                    {word}
-                  </Text>
-                </Pressable>
+                    <Text
+                      variant="body"
+                      style={[styles.wordChipText, isUsed && styles.wordChipTextUsed]}
+                    >
+                      {word}
+                    </Text>
+                  </Pressable>
+                </View>
               </MotiView>
             );
           })}

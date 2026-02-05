@@ -42,7 +42,6 @@ export function ScreenWrapper({
   const innerStyle = [
     !noPadding && styles.padding,
     { paddingBottom: insets.bottom + 100 },
-    contentStyle,
   ];
 
   const content = (
@@ -50,7 +49,7 @@ export function ScreenWrapper({
       from={{ opacity: 0, translateY: 10 }}
       animate={{ opacity: 1, translateY: 0 }}
       transition={{ type: 'timing', duration: 400 }}
-      style={styles.flex}
+      style={[styles.flex, contentStyle]}
     >
       {children}
     </MotiView>
@@ -69,7 +68,7 @@ export function ScreenWrapper({
       {scrollable ? (
         <ScrollView
           style={styles.flex}
-          contentContainerStyle={innerStyle}
+          contentContainerStyle={[{ flexGrow: 1 }, innerStyle]}
           showsVerticalScrollIndicator={false}
           refreshControl={
             onRefresh ? (

@@ -79,17 +79,19 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
           transition={{ ...SPRING_CONFIGS.bouncy, delay: 100 }}
           style={styles.buttonWrapper}
         >
-          <Pressable
-            onPress={() => handleSelect(true)}
-            disabled={showFeedback}
-            style={({ pressed }) => [
+          <View
+            style={[
               styles.button,
               styles.buttonTrue,
               selectedAnswer === true && styles.buttonSelected,
               showFeedback && correctAnswer === true && styles.buttonCorrect,
               showFeedback && selectedAnswer === true && !isCorrect && styles.buttonIncorrect,
-              pressed && !showFeedback && styles.buttonPressed,
             ]}
+          >
+          <Pressable
+            onPress={() => handleSelect(true)}
+            disabled={showFeedback}
+            style={styles.buttonPressable}
           >
             <View style={styles.buttonIconContainer}>
               {showFeedback && correctAnswer === true ? (
@@ -122,6 +124,7 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
               Sant
             </Text>
           </Pressable>
+          </View>
         </MotiView>
 
         {/* FALSKT Button */}
@@ -131,17 +134,19 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
           transition={{ ...SPRING_CONFIGS.bouncy, delay: 200 }}
           style={styles.buttonWrapper}
         >
-          <Pressable
-            onPress={() => handleSelect(false)}
-            disabled={showFeedback}
-            style={({ pressed }) => [
+          <View
+            style={[
               styles.button,
               styles.buttonFalse,
               selectedAnswer === false && styles.buttonSelected,
               showFeedback && correctAnswer === false && styles.buttonCorrect,
               showFeedback && selectedAnswer === false && !isCorrect && styles.buttonIncorrect,
-              pressed && !showFeedback && styles.buttonPressed,
             ]}
+          >
+          <Pressable
+            onPress={() => handleSelect(false)}
+            disabled={showFeedback}
+            style={styles.buttonPressable}
           >
             <View style={styles.buttonIconContainer}>
               {showFeedback && correctAnswer === false ? (
@@ -174,6 +179,7 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
               Falskt
             </Text>
           </Pressable>
+          </View>
         </MotiView>
       </View>
 
@@ -244,6 +250,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 140,
+  },
+  buttonPressable: {
+    flex: 1,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
   },
   buttonTrue: {
     backgroundColor: 'rgba(16, 185, 129, 0.08)',

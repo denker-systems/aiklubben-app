@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, ViewStyle } from 'react-native';
+import { View, Pressable, StyleSheet, ViewStyle } from 'react-native';
 import { MotiView } from 'moti';
 import { Check, X } from 'lucide-react-native';
 import { Text } from '@/components/ui';
@@ -69,41 +69,37 @@ export const OptionChip: React.FC<OptionChipProps> = ({
       }}
       transition={{ ...SPRING_CONFIGS.snappy, delay: index * 30 }}
     >
-      <Pressable
-        onPress={onPress}
-        disabled={isDisabled}
-        style={({ pressed }) => [
-          styles.chip,
-          getSizeStyles(),
-          getStateStyles(),
-          pressed && !isDisabled && styles.pressed,
-          style,
-        ]}
-      >
-        <Text
-          variant="body"
-          style={[
-            styles.label,
-            size === 'small' && styles.labelSmall,
-            size === 'large' && styles.labelLarge,
-            state === 'used' && styles.labelUsed,
-          ]}
+      <View style={[styles.chip, getSizeStyles(), getStateStyles(), style]}>
+        <Pressable
+          onPress={onPress}
+          disabled={isDisabled}
+          style={styles.chipPressable}
         >
-          {label}
-        </Text>
+          <Text
+            variant="body"
+            style={[
+              styles.label,
+              size === 'small' && styles.labelSmall,
+              size === 'large' && styles.labelLarge,
+              state === 'used' && styles.labelUsed,
+            ]}
+          >
+            {label}
+          </Text>
 
-        {showIcon && state === 'correct' && (
-          <MotiView from={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_CONFIGS.bouncy}>
-            <Check size={20} color="#10B981" strokeWidth={3} />
-          </MotiView>
-        )}
+          {showIcon && state === 'correct' && (
+            <MotiView from={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_CONFIGS.bouncy}>
+              <Check size={20} color="#10B981" strokeWidth={3} />
+            </MotiView>
+          )}
 
-        {showIcon && state === 'incorrect' && (
-          <MotiView from={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_CONFIGS.bouncy}>
-            <X size={20} color="#EF4444" strokeWidth={3} />
-          </MotiView>
-        )}
-      </Pressable>
+          {showIcon && state === 'incorrect' && (
+            <MotiView from={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_CONFIGS.bouncy}>
+              <X size={20} color="#EF4444" strokeWidth={3} />
+            </MotiView>
+          )}
+        </Pressable>
+      </View>
     </MotiView>
   );
 };
@@ -118,6 +114,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: uiColors.card.border,
     borderRadius: 16,
+  },
+  chipPressable: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    gap: 8,
   },
   small: {
     paddingHorizontal: 14,

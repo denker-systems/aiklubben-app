@@ -41,8 +41,9 @@ const LargeCardComponent = memo(function LargeCard({
   children,
 }: LargeCardProps) {
   const cardContent = (
+    <View style={[styles.card, { height }, style]}>
     <Pressable
-      style={({ pressed }) => [styles.card, { height }, pressed && styles.cardPressed, style]}
+      style={styles.cardPressable}
       onPress={onPress}
       disabled={!onPress}
     >
@@ -121,6 +122,7 @@ const LargeCardComponent = memo(function LargeCard({
         </LinearGradient>
       )}
     </Pressable>
+    </View>
   );
 
   // Memoize transition config to prevent recreation
@@ -150,11 +152,14 @@ export const LargeCard = LargeCardComponent;
 const styles = StyleSheet.create({
   card: {
     width: '100%',
-    borderRadius: 20, // Updated to match design system
+    borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: uiColors.card.background,
     borderWidth: 1,
     borderColor: uiColors.card.border,
+  },
+  cardPressable: {
+    flex: 1,
   },
   cardPressed: {
     transform: [{ scale: 0.98 }],

@@ -1,11 +1,29 @@
 import React, { useEffect, memo } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet, Text as RNText } from 'react-native';
 import { MotiView } from 'moti';
-import { BookOpen } from 'lucide-react-native';
-import { Text } from '@/components/ui';
+import { Text, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
 import { uiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+
+// Simple markdown renderer for bold (**text**) support
+const renderMarkdown = (text: string, baseStyle: any) => {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return (
+    <RNText style={baseStyle}>
+      {parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return (
+            <RNText key={i} style={[baseStyle, { fontWeight: '700', color: '#F9FAFB' }]}>
+              {part.slice(2, -2)}
+            </RNText>
+          );
+        }
+        return part;
+      })}
+    </RNText>
+  );
+};
 
 interface ContentStepProps {
   content: {
@@ -62,7 +80,7 @@ const ContentStepComponent: React.FC<ContentStepProps> = ({ content, onContinue 
           animate={{ opacity: 1, scale: 1 }}
           transition={SPRING_CONFIGS.bouncy}
         >
-          <BookOpen size={48} color={brandColors.purple} />
+          <AppIcon name="courses-example" size={160} />
         </MotiView>
       )}
 
@@ -82,9 +100,7 @@ const ContentStepComponent: React.FC<ContentStepProps> = ({ content, onContinue 
           animate={{ opacity: 1, translateY: 0 }}
           transition={{ ...SPRING_CONFIGS.smooth, delay: STAGGER_DELAYS.normal * 2 }}
         >
-          <Text variant="body" style={styles.body}>
-            {content.body}
-          </Text>
+          {renderMarkdown(content.body, styles.body)}
         </MotiView>
       </View>
 
@@ -108,14 +124,11 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
-    marginBottom: 8,
+    paddingTop: 8,
+    paddingBottom: 16,
   },
   image: {
     width: '100%',

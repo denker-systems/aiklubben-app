@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, Image } from 'react-native';
 import { useAuth } from '@/hooks/useAuth';
 import { brandColors } from '@/config/theme';
 import { ScreenWrapper } from '@/components/layout';
@@ -49,18 +49,14 @@ export const AuthScreen = () => {
   };
 
   return (
-    <ScreenWrapper noPadding contentStyle={{ justifyContent: 'center' }}>
-      <View className="px-8">
-        <View className="items-center mb-12">
-          <View className="w-20 h-20 bg-primary/20 rounded-3xl items-center justify-center mb-4 border border-primary/30">
-            <Text variant="h1" style={{ color: brandColors.purple, fontSize: 32 }}>
-              AI
-            </Text>
-          </View>
-          <Text variant="h1">AI Klubben</Text>
-          <Text variant="body-lg" className="text-muted-foreground mt-2">
-            {isLogin ? 'Välkommen tillbaka' : 'Bli medlem idag'}
-          </Text>
+    <ScreenWrapper noPadding scrollable={false} contentStyle={{ justifyContent: 'center', flex: 1 }}>
+      <View style={{ paddingHorizontal: 32 }}>
+        <View style={{ alignItems: 'center', marginBottom: 48 }}>
+          <Image
+            source={require('../../../assets/logo.png')}
+            style={{ width: 200, height: 200 }}
+            resizeMode="contain"
+          />
         </View>
 
         <View>
@@ -84,7 +80,7 @@ export const AuthScreen = () => {
           />
 
           {error && !error.includes('e-post') && !error.includes('lösenord') && (
-            <Text variant="body-sm" style={{ color: '#EF4444' }} className="text-center mb-4">
+            <Text variant="body-sm" style={{ color: '#EF4444', textAlign: 'center', marginBottom: 16 }}>
               {error}
             </Text>
           )}
@@ -94,7 +90,7 @@ export const AuthScreen = () => {
             size="lg"
             onPress={handleAuth}
             loading={loading}
-            style={{ marginTop: 16 }}
+            style={{ marginTop: 24 }}
           >
             {isLogin ? 'Logga in' : 'Skapa konto'}
           </Button>

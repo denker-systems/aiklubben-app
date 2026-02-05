@@ -24,3 +24,5 @@ export { ParallaxLayer } from './ParallaxLayer';
 export { ContentCard } from './ContentCard';
 export { DailyQuestsCard } from './DailyQuestsCard';
 export { TreasureChestModal } from './TreasureChestModal';
+export { StyledPressable } from './StyledPressable';
+export { AppIcon, registerIcon } from './AppIcon';

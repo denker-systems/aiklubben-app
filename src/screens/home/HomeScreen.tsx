@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { brandColors } from '@/config/theme';
 import { supabase } from '@/config/supabase';
-import { Text, FloatingOrbs, ContentCard, TiltCard } from '@/components/ui';
+import { Text, FloatingOrbs, ContentCard, TiltCard, AppIcon } from '@/components/ui';
 import { useMenu } from '@/contexts/MenuContext';
 import { useAuth } from '@/hooks/useAuth';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
@@ -84,6 +84,7 @@ export const HomeScreen = () => {
       title: 'Kurser',
       subtitle: 'Lär dig AI',
       emoji: '📚',
+      iconName: 'courses',
       gradient: ['#6366f1', '#8b5cf6'] as const,
       screen: 'Courses',
     },
@@ -92,6 +93,7 @@ export const HomeScreen = () => {
       title: 'Nyheter',
       subtitle: 'Senaste nytt',
       emoji: '📰',
+      iconName: 'news',
       gradient: ['#ff3366', '#f43f5e'] as const,
       screen: 'News',
     },
@@ -128,7 +130,7 @@ export const HomeScreen = () => {
                 {getGreeting()},
               </Text>
               <Text variant="h1" style={styles.userName}>
-                {profile?.name?.split(' ')[0] || 'Vännen'} {level.icon}
+                {profile?.name?.split(' ')[0] || 'Vännen'}
               </Text>
             </View>
             <Pressable onPress={() => menuContext?.openMenu()} style={styles.menuButton}>
@@ -151,7 +153,7 @@ export const HomeScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.statEmoji}>⚡</Text>
+                <AppIcon name="xp" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
                 <Text style={styles.statValue}>{stats.totalXP}</Text>
@@ -171,7 +173,7 @@ export const HomeScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.statEmoji}>🔥</Text>
+                <AppIcon name="streak" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
                 <Text style={styles.statValue}>{stats.currentStreak}</Text>
@@ -210,14 +212,9 @@ export const HomeScreen = () => {
             transition={{ ...SPRING_CONFIGS.smooth, delay: 100 }}
           >
             <View style={styles.dailyCardHeader}>
-            <LinearGradient
-              colors={['#10B981', '#059669']}
-              style={styles.dailyCardIconGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <Text style={styles.dailyCardEmoji}>🎯</Text>
-            </LinearGradient>
+            <View style={styles.dailyCardIconContainer}>
+              <AppIcon name="goal" size={120} />
+            </View>
             <View style={styles.dailyCardContent}>
               <Text variant="body" style={styles.dailyCardTitle}>
                 Dagens mål
@@ -249,7 +246,6 @@ export const HomeScreen = () => {
           transition={{ ...SPRING_CONFIGS.smooth, delay: 200 }}
         >
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionEmoji}>✨</Text>
             <Text variant="h3" style={styles.sectionTitle}>
               Snabbstart
             </Text>
@@ -270,19 +266,15 @@ export const HomeScreen = () => {
                   scaleAmount={0.97}
                   style={styles.quickActionCard}
                 >
-                  <LinearGradient
-                    colors={action.gradient}
-                    style={styles.quickActionGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  >
-                    <Text style={styles.quickActionEmoji}>{action.emoji}</Text>
-                  </LinearGradient>
+                  <View style={styles.quickActionIconContainer}>
+                    {action.iconName ? (
+                      <AppIcon name={action.iconName} size={112} />
+                    ) : (
+                      <Text style={styles.quickActionEmoji}>{action.emoji}</Text>
+                    )}
+                  </View>
                   <Text variant="body" style={styles.quickActionTitle}>
                     {action.title}
-                  </Text>
-                  <Text variant="caption" style={styles.quickActionSubtitle}>
-                    {action.subtitle}
                   </Text>
                 </TiltCard>
               </MotiView>
@@ -298,7 +290,6 @@ export const HomeScreen = () => {
           transition={{ ...SPRING_CONFIGS.smooth, delay: 400 }}
         >
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionEmoji}>📊</Text>
             <Text variant="h3" style={styles.sectionTitle}>
               Fortsätt lära
             </Text>
@@ -311,14 +302,9 @@ export const HomeScreen = () => {
             style={styles.continueCard}
           >
             <View style={styles.continueCardContent}>
-              <LinearGradient
-                colors={['#6366f1', '#8b5cf6']}
-                style={styles.continueIconGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Text style={styles.continueEmoji}>📚</Text>
-              </LinearGradient>
+              <View style={styles.continueIconContainer}>
+                <AppIcon name="courses-example" size={96} />
+              </View>
               <View style={styles.continueInfo}>
                 <Text variant="body" style={styles.continueTitle}>
                   Grundkurs i AI
@@ -332,14 +318,6 @@ export const HomeScreen = () => {
                   </Text>
                 </View>
               </View>
-              <LinearGradient
-                colors={['#8B5CF6', '#a855f7']}
-                style={styles.continueButtonGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Text style={styles.continueButtonEmoji}>⚡</Text>
-              </LinearGradient>
             </View>
           </TiltCard>
         </MotiView>
@@ -353,7 +331,6 @@ export const HomeScreen = () => {
             transition={{ ...SPRING_CONFIGS.smooth, delay: 500 }}
           >
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionEmoji}>📰</Text>
               <Text variant="h3" style={styles.sectionTitle}>
                 Senaste nytt
               </Text>
@@ -467,14 +444,14 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   statGradient: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 56,
+    height: 56,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   statEmoji: {
-    fontSize: 22,
+    fontSize: 36,
   },
   statInfo: {
     alignItems: 'flex-start',
@@ -493,22 +470,30 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     backgroundColor: uiColors.card.background,
     borderRadius: uiColors.card.radius,
-    padding: 16,
+    padding: 12,
     borderWidth: 1,
-    borderColor: '#10B981', // Keep green accent border
+    borderColor: uiColors.card.border,
   },
   dailyCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
+    minHeight: 80,
   },
   dailyCardIconGradient: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
+  },
+  dailyCardIconContainer: {
+    width: 120,
+    height: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
   },
   dailyCardEmoji: {
     fontSize: 26,
@@ -590,15 +575,22 @@ const styles = StyleSheet.create({
     borderColor: uiColors.card.border,
   },
   quickActionGradient: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
+    width: 120,
+    height: 120,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  quickActionIconContainer: {
+    width: 120,
+    height: 120,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 14,
   },
   quickActionEmoji: {
-    fontSize: 32,
+    fontSize: 64,
   },
   quickActionTitle: {
     color: '#F9FAFB',
@@ -614,11 +606,18 @@ const styles = StyleSheet.create({
     borderRadius: uiColors.card.radius,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#8B5CF6', // Keep purple accent border
+    borderColor: uiColors.card.border,
   },
   continueCardContent: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  continueIconContainer: {
+    width: 96,
+    height: 96,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
   },
   continueIconGradient: {
     width: 60,
@@ -659,6 +658,12 @@ const styles = StyleSheet.create({
   continuePercent: {
     color: brandColors.purple,
     fontWeight: '600',
+  },
+  continueButtonIcon: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   continueButtonGradient: {
     width: 44,

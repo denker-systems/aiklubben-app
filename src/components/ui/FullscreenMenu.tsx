@@ -7,10 +7,12 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
 import { Text } from './Text';
 import { FloatingOrbs } from './FloatingOrbs';
+import { AppIcon } from './AppIcon';
 
 interface MenuItemData {
   key: string;
   emoji: string;
+  iconName?: string;
   title: string;
   subtitle: string;
   gradient?: readonly [string, string];
@@ -35,6 +37,7 @@ const menuSections: MenuSectionData[] = [
       {
         key: 'Home',
         emoji: '🏠',
+        iconName: 'home',
         title: 'Hem',
         subtitle: 'Tillbaka till startsidan',
         gradient: ['#6366f1', '#8b5cf6'],
@@ -42,6 +45,7 @@ const menuSections: MenuSectionData[] = [
       {
         key: 'News',
         emoji: '📰',
+        iconName: 'news',
         title: 'Nyheter',
         subtitle: 'Senaste inom AI',
         gradient: ['#f97316', '#ea580c'],
@@ -61,6 +65,7 @@ const menuSections: MenuSectionData[] = [
       {
         key: 'Profile',
         emoji: '👤',
+        iconName: 'profile',
         title: 'Min Profil',
         subtitle: 'Hantera ditt medlemskap',
         gradient: ['#8B5CF6', '#a855f7'],
@@ -119,14 +124,22 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
   const { isDark } = useTheme();
   const [showContent, setShowContent] = useState(false);
 
-  console.log('[FullscreenMenu] Rendered', { visible });
+  console.log('[FullscreenMenu] Rendered', { visible, showContent });
 
   useEffect(() => {
     if (visible) {
       console.log('[FullscreenMenu] Menu opened');
       setShowContent(true);
+    } else if (showContent) {
+      // Delay hiding the modal to allow the close animation to finish
+      console.log('[FullscreenMenu] Menu closing, waiting for animation...');
+      const timer = setTimeout(() => {
+        console.log('[FullscreenMenu] Animation done, hiding modal');
+        setShowContent(false);
+      }, 350);
+      return () => clearTimeout(timer);
     }
-  }, [visible, showContent]);
+  }, [visible]);
 
   const handleItemPress = (key: string) => {
     console.log('[FullscreenMenu] Item pressed:', key);
@@ -177,20 +190,21 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
         >
           <View style={styles.headerContent}>
             <View style={styles.logoContainer}>
-              <Text style={styles.logoEmoji}>✨</Text>
               <Text variant="h2" style={styles.menuTitle}>
                 Meny
               </Text>
             </View>
-            <Pressable
-              onPress={() => {
-                console.log('[FullscreenMenu] Close button pressed');
-                onClose();
-              }}
-              style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}
-            >
-              <Text style={styles.closeEmoji}>✕</Text>
-            </Pressable>
+            <View style={styles.closeButton}>
+              <Pressable
+                onPress={() => {
+                  console.log('[FullscreenMenu] Close button pressed');
+                  onClose();
+                }}
+                style={styles.closeButtonPressable}
+              >
+                <Text style={styles.closeEmoji}>✕</Text>
+              </Pressable>
+            </View>
           </View>
         </MotiView>
 
@@ -233,12 +247,14 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
                       delay: visible ? 120 + sectionIndex * 80 + itemIndex * 40 : 0,
                     }}
                   >
-                    <Pressable
-                      style={({ pressed }) => [
+                    <View
+                      style={[
                         styles.menuItem,
                         item.key === 'logout' && styles.logoutItem,
-                        pressed && styles.menuItemPressed,
                       ]}
+                    >
+                    <Pressable
+                      style={styles.menuItemPressable}
                       onPress={() => handleItemPress(item.key)}
                     >
                       <LinearGradient
@@ -247,7 +263,11 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                       >
-                        <Text style={styles.menuItemEmoji}>{item.emoji}</Text>
+                        {item.iconName ? (
+                          <AppIcon name={item.iconName} size={52} />
+                        ) : (
+                          <Text style={styles.menuItemEmoji}>{item.emoji}</Text>
+                        )}
                       </LinearGradient>
                       <View style={styles.menuItemContent}>
                         <Text
@@ -259,6 +279,7 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
                       </View>
                       <Text style={styles.menuItemArrow}>›</Text>
                     </Pressable>
+                    </View>
                   </MotiView>
                 ))}
               </View>
@@ -305,6 +326,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  closeButtonPressable: {
+    flex: 1,
+    width: '100%' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
   closeButtonPressed: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     transform: [{ scale: 0.95 }],
@@ -337,6 +364,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
     borderRadius: 16,
     padding: 14,
+  },
+  menuItemPressable: {
+    flex: 1,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
   },
   menuItemPressed: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',

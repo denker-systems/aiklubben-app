@@ -1,5 +1,5 @@
 import React, { useState, useCallback, memo } from 'react';
-import { View, Pressable, StyleSheet } from 'react-native';
+import { View, Pressable, StyleSheet, ViewStyle } from 'react-native';
 import { MotiView } from 'moti';
 import { Check, X } from 'lucide-react-native';
 import { Text } from '@/components/ui';
@@ -98,16 +98,18 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
               animate={{ opacity: 1, translateX: 0 }}
               transition={{ ...SPRING_CONFIGS.smooth, delay: 50 + index * 60 }}
             >
-              <Pressable
-                onPress={() => handleSelect(index)}
-                disabled={showFeedback}
-                style={({ pressed }) => [
+              <View
+                style={[
                   styles.option,
                   isSelected && !showFeedback && styles.optionSelected,
                   showAsCorrect && styles.optionCorrect,
                   showAsIncorrect && styles.optionIncorrect,
-                  pressed && !showFeedback && styles.optionPressed,
-                ]}
+                ] as ViewStyle[]}
+              >
+              <Pressable
+                onPress={() => handleSelect(index)}
+                disabled={showFeedback}
+                style={styles.optionPressable}
                 accessible={true}
                 accessibilityRole="button"
                 accessibilityLabel={`Alternativ ${getOptionLetter(index)}: ${option}`}
@@ -162,6 +164,7 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
                   {option}
                 </Text>
               </Pressable>
+              </View>
             </MotiView>
           );
         })}
@@ -229,6 +232,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 18,
     minHeight: 72,
+  },
+  optionPressable: {
+    flex: 1,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
   },
   optionSelected: {
     borderColor: brandColors.purple,

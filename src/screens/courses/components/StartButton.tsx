@@ -27,12 +27,14 @@ export const StartButton: React.FC<StartButtonProps> = ({
       {/* Speech bubble pointer */}
       <View style={styles.pointer} />
 
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
-      >
-        <Text style={styles.text}>{label}</Text>
-      </Pressable>
+      <View style={styles.button}>
+        <Pressable
+          onPress={onPress}
+          style={styles.buttonPressable}
+        >
+          <Text style={styles.text}>{label}</Text>
+        </Pressable>
+      </View>
     </MotiView>
   );
 };
@@ -52,6 +54,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
+  },
+  buttonPressable: {
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
   },
   buttonPressed: {
     transform: [{ scale: 0.95 }],

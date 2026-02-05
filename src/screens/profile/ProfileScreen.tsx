@@ -6,8 +6,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/hooks/useAuth';
 import { brandColors } from '@/config/theme';
 import { supabase } from '@/config/supabase';
-import { Text, Badge, FloatingOrbs, TiltCard } from '@/components/ui';
-import { useNavigation } from '@react-navigation/native';
+import { Text, Badge, FloatingOrbs, TiltCard, AppIcon } from '@/components/ui';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { BADGES, getLevelForXP, getXPProgress, getNextLevel } from '@/types/gamification';
 
@@ -89,6 +90,8 @@ export const ProfileScreen = () => {
   const xpProgress = getXPProgress(stats?.totalXP || 0);
   const roleEmoji = profile?.role === 'admin' ? '👑' : level.icon;
 
+  const canGoBack = useNavigationState(state => state.routes.length > 1);
+
   if (loading) {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -101,6 +104,9 @@ export const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
+      <View style={{ paddingTop: insets.top }}>
+        <PageHeader title="Profil" showBack={canGoBack} />
+      </View>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
@@ -108,7 +114,7 @@ export const ProfileScreen = () => {
       >
         {/* Hero Header */}
         <MotiView
-          style={[styles.heroSection, { paddingTop: insets.top + 20 }]}
+          style={[styles.heroSection, { paddingTop: 20 }]}
           from={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={SPRING_CONFIGS.smooth}
@@ -127,9 +133,7 @@ export const ProfileScreen = () => {
               <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
             ) : (
               <View style={styles.avatarPlaceholder}>
-                <Text style={styles.avatarInitial}>
-                  {profile?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
-                </Text>
+                <AppIcon name="profile" size={80} />
               </View>
             )}
             <View style={[styles.levelBadge, { backgroundColor: level.color }]}>
@@ -148,7 +152,6 @@ export const ProfileScreen = () => {
               <Text variant="h2" style={styles.userName}>
                 {profile?.name || 'Användare'}
               </Text>
-              <Text style={styles.roleEmoji}>{roleEmoji}</Text>
             </View>
             <Text variant="body" style={styles.userEmail}>
               {user?.email}
@@ -174,7 +177,7 @@ export const ProfileScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.xpEmoji}>⚡</Text>
+                <AppIcon name="xp" size={36} />
               </LinearGradient>
               <View>
                 <Text style={styles.xpValue}>{stats?.totalXP || 0} XP</Text>
@@ -205,7 +208,7 @@ export const ProfileScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.quickStatEmoji}>🔥</Text>
+                <AppIcon name="streak" size={36} />
               </LinearGradient>
               <View>
                 <Text style={styles.quickStatValue}>{stats?.currentStreak || 0}</Text>
@@ -220,7 +223,7 @@ export const ProfileScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.quickStatEmoji}>📚</Text>
+                <AppIcon name="courses" size={36} />
               </LinearGradient>
               <View>
                 <Text style={styles.quickStatValue}>{stats?.lessonsCompleted || 0}</Text>
@@ -258,7 +261,7 @@ export const ProfileScreen = () => {
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                 >
-                  <Text style={styles.streakCardEmoji}>🔥</Text>
+                  <AppIcon name="streak" size={36} />
                 </LinearGradient>
                 <View>
                   <Text style={styles.streakCardTitle}>Streak</Text>
@@ -267,16 +270,6 @@ export const ProfileScreen = () => {
                 <View style={styles.streakCardValue}>
                   <Text style={styles.streakCardNumber}>{stats?.currentStreak || 0}</Text>
                   <Text style={styles.streakCardDays}>dagar</Text>
-                </View>
-              </View>
-              <View style={styles.streakCardStats}>
-                <View style={styles.streakCardStat}>
-                  <Text style={styles.streakStatLabel}>Längsta streak</Text>
-                  <Text style={styles.streakStatValue}>{stats?.longestStreak || 0} dagar 🌟</Text>
-                </View>
-                <View style={styles.streakCardStat}>
-                  <Text style={styles.streakStatLabel}>Nästa milstolpe</Text>
-                  <Text style={styles.streakStatValue}>7 dagar 🎯</Text>
                 </View>
               </View>
             </TiltCard>
@@ -290,7 +283,6 @@ export const ProfileScreen = () => {
             transition={{ ...SPRING_CONFIGS.smooth, delay: 500 }}
           >
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionEmoji}>✨</Text>
               <Text variant="h3" style={styles.sectionTitle}>
                 Dina Badges
               </Text>

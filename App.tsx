@@ -11,6 +11,9 @@ import { LanguageProvider } from './src/contexts/LanguageContext';
 import { darkTheme, lightTheme } from './src/config/theme';
 
 import './src/styles/global.css';
+import { registerAllIcons } from './src/config/icons';
+
+registerAllIcons();
 
 const queryClient = new QueryClient({
   defaultOptions: {

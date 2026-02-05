@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { View, StyleSheet, Switch, Pressable, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { ScreenWrapper } from '@/components/layout';
 import { Text, Card } from '@/components/ui';
 import { brandColors } from '@/config/theme';
@@ -22,6 +22,7 @@ export const SettingsScreen = () => {
   console.log('[SettingsScreen] Rendered');
   
   const navigation = useNavigation<any>();
+  const canGoBack = useNavigationState(state => state.routes.length > 1);
   const { isDark, toggleTheme, notificationsEnabled, setNotificationsEnabled, colors } = useTheme();
   const { signOut } = useAuth();
 
@@ -73,7 +74,7 @@ export const SettingsScreen = () => {
   }, [signOut]);
 
   return (
-    <ScreenWrapper title="Inställningar" showBack>
+    <ScreenWrapper title="Inställningar" showBack={canGoBack}>
       {/* App Settings */}
       <View style={styles.section}>
         <Text variant="tiny" weight="bold" style={[styles.sectionTitle, { color: colors.text.muted }]}>

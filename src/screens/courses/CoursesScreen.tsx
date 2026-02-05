@@ -16,7 +16,7 @@ import type { RootStackParamList } from '@/types/navigation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/config/supabase';
 import { brandColors } from '@/config/theme';
-import { Text, FloatingOrbs } from '@/components/ui';
+import { Text, FloatingOrbs, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useMenu } from '@/contexts/MenuContext';
 import { getLevelForXP } from '@/types/gamification';
@@ -159,7 +159,7 @@ export const CoursesScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.statEmoji}>⚡</Text>
+                <AppIcon name="xp" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
                 <Text style={styles.statValue}>{userStats.totalXP}</Text>
@@ -179,7 +179,7 @@ export const CoursesScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.statEmoji}>🔥</Text>
+                <AppIcon name="streak" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
                 <Text style={styles.statValue}>{userStats.currentStreak}</Text>
@@ -209,42 +209,6 @@ export const CoursesScreen = () => {
           </View>
         </MotiView>
 
-        {/* Daily Goal Card */}
-        <MotiView
-          style={styles.dailyGoalCard}
-          from={{ opacity: 0, translateX: -30 }}
-          animate={{ opacity: 1, translateX: 0 }}
-          transition={{ ...SPRING_CONFIGS.smooth, delay: 100 }}
-        >
-          <LinearGradient
-            colors={['#10B981', '#059669']}
-            style={styles.dailyGoalIconGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <Text style={styles.dailyGoalEmoji}>🎯</Text>
-          </LinearGradient>
-          <View style={styles.dailyGoalContent}>
-            <Text variant="body" style={styles.dailyGoalTitle}>
-              Dagligt mål
-            </Text>
-            <View style={styles.dailyGoalProgress}>
-              <View style={styles.dailyGoalTrack}>
-                <MotiView
-                  style={[styles.dailyGoalFill, { width: '40%' }]}
-                  from={{ width: '0%' }}
-                  animate={{ width: '40%' }}
-                  transition={{ ...SPRING_CONFIGS.smooth, delay: 500 }}
-                />
-              </View>
-              <Text variant="caption" style={styles.dailyGoalText}>
-                2/5 lektioner
-              </Text>
-            </View>
-          </View>
-          <Text style={styles.fireEmoji}>🔥</Text>
-        </MotiView>
-
         {/* Continue Learning Section */}
         {courses.length > 0 && userProgress[courses[0]?.id] > 0 && (
           <MotiView
@@ -268,14 +232,9 @@ export const CoursesScreen = () => {
               accessibilityHint="Återupptar kursen där du slutade"
             >
               <View style={styles.continueContent}>
-                <LinearGradient
-                  colors={['#6366f1', '#8b5cf6']}
-                  style={styles.continueIconGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <Text style={styles.continueEmoji}>📚</Text>
-                </LinearGradient>
+                <View style={styles.continueIconContainer}>
+                  <AppIcon name="courses-example" size={96} />
+                </View>
                 <View style={styles.continueTextContent}>
                   <Text variant="body" style={styles.continueTitle} numberOfLines={2}>
                     {courses[0].title}
@@ -355,25 +314,18 @@ export const CoursesScreen = () => {
                     delay: 400 + index * 100,
                   }}
                 >
+                  <View style={styles.carouselCard}>
                   <Pressable
                     onPress={() => handleCoursePress(course.id)}
-                    style={({ pressed }) => [
-                      styles.carouselCard,
-                      pressed && styles.carouselCardPressed,
-                    ]}
+                    style={styles.carouselCardPressable}
                     accessible={true}
                     accessibilityRole="button"
                     accessibilityLabel={`${course.title}, ${course.level || 'Alla nivåer'}`}
                     accessibilityHint="Tryck för att öppna kursen"
                   >
-                    <LinearGradient
-                      colors={getLevelInfo(course.level).gradient}
-                      style={styles.carouselIconGradient}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                    >
-                      <Text style={styles.carouselEmoji}>{getLevelInfo(course.level).emoji}</Text>
-                    </LinearGradient>
+                    <View style={styles.carouselIconContainer}>
+                      <AppIcon name="courses-example" size={160} />
+                    </View>
 
                     <Text variant="body" style={styles.carouselTitle} numberOfLines={2}>
                       {course.title}
@@ -414,6 +366,7 @@ export const CoursesScreen = () => {
                       </View>
                     )}
                   </Pressable>
+                  </View>
                 </MotiView>
               )}
             />
@@ -482,9 +435,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   statGradient: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 56,
+    height: 56,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -574,24 +527,32 @@ const styles = StyleSheet.create({
     color: '#F9FAFB',
   },
   continueCard: {
-    backgroundColor: '#1F1F1F',
-    borderRadius: 20,
-    padding: 16,
+    backgroundColor: uiColors.card.background,
+    borderRadius: uiColors.card.radius,
+    padding: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: uiColors.card.border,
   },
   continueContent: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
+    minHeight: 80,
   },
   continueIconGradient: {
-    width: 60,
-    height: 60,
+    width: 56,
+    height: 56,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
+  },
+  continueIconContainer: {
+    width: 96,
+    height: 96,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
   },
   continueEmoji: {
     fontSize: 28,
@@ -752,6 +713,9 @@ const styles = StyleSheet.create({
     padding: 24,
     minHeight: 280,
   },
+  carouselCardPressable: {
+    flex: 1,
+  },
   carouselCardPressed: {
     opacity: 0.9,
     transform: [{ scale: 0.98 }],
@@ -760,6 +724,13 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  carouselIconContainer: {
+    width: 160,
+    height: 160,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
