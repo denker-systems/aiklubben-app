@@ -5,6 +5,8 @@ import Svg, { Circle, G } from 'react-native-svg';
 import { Lock, Star, Check, Sparkles } from 'lucide-react-native';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import * as Haptics from 'expo-haptics';
 
 type LessonStatus = 'locked' | 'available' | 'current' | 'completed';
@@ -64,6 +66,8 @@ const LessonNodeComponent: React.FC<LessonNodeProps> = ({
   delay = 0,
   size = 'medium',
 }) => {
+  const { isDark, colors: themeColors } = useTheme();
+  const { t, ti } = useLanguage();
   const colors = COLORS[status];
   const dimensions = SIZES[size];
   const isInteractive = status !== 'locked';
@@ -77,25 +81,25 @@ const LessonNodeComponent: React.FC<LessonNodeProps> = ({
 
   // Accessibility labels based on status (Rule 07)
   const getAccessibilityLabel = (): string => {
-    const baseLabel = `Lektion ${lessonNumber}`;
+    const baseLabel = ti(t.lessons.lessonOf, { current: lessonNumber, total: '' }).trim();
     switch (status) {
       case 'locked':
-        return `${baseLabel}, låst`;
+        return `${baseLabel}, ${t.lessons.locked}`;
       case 'completed':
-        return `${baseLabel}, slutförd`;
+        return `${baseLabel}, ${t.lessons.completed}`;
       case 'current':
-        return `${baseLabel}, pågående, ${progress}% slutförd`;
+        return `${baseLabel}, ${t.lessons.inProgress}, ${ti(t.lessons.percentComplete, { progress })}`;
       case 'available':
-        return `${baseLabel}, tillgänglig`;
+        return `${baseLabel}, ${t.lessons.available}`;
       default:
         return baseLabel;
     }
   };
 
   const getAccessibilityHint = (): string => {
-    if (status === 'locked') return 'Slutför föregående lektion för att låsa upp';
-    if (status === 'completed') return 'Tryck för att öva igen';
-    return 'Tryck för att starta lektionen';
+    if (status === 'locked') return '';
+    if (status === 'completed') return t.lessons.practiceAgain;
+    return t.lessons.startLesson;
   };
 
   // useCallback for performance (Rule 10)
@@ -228,7 +232,7 @@ const LessonNodeComponent: React.FC<LessonNodeProps> = ({
         )}
       </Pressable>
       {title && (
-        <Text style={styles.lessonTitle}>
+        <Text style={[styles.lessonTitle, { color: themeColors.text.secondary }]}>
           {title}
         </Text>
       )}
@@ -279,7 +283,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   lessonTitle: {
-    color: '#9CA3AF',
     fontSize: 13,
     fontWeight: '600',
     textAlign: 'center',

@@ -2,7 +2,8 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { MotiView } from 'moti';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
 
 interface ProgressDotsProps {
@@ -22,6 +23,9 @@ export const ProgressDots: React.FC<ProgressDotsProps> = ({
   activeColor = brandColors.purple,
   completedColor = '#10B981',
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+
   const getDotSize = () => {
     switch (size) {
       case 'small':
@@ -58,7 +62,7 @@ export const ProgressDots: React.FC<ProgressDotsProps> = ({
                 ? activeColor
                 : isCompleted
                   ? completedColor
-                  : uiColors.glass.medium,
+                  : colors.glass.medium,
               scale: isActive ? 1 : 0.9,
             }}
             transition={SPRING_CONFIGS.snappy}
@@ -77,6 +81,6 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   dot: {
-    backgroundColor: uiColors.glass.medium,
+    // backgroundColor set dynamically via animate
   },
 });

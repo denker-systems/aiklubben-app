@@ -19,6 +19,8 @@ import { sv } from 'date-fns/locale';
 import Markdown from 'react-native-markdown-display';
 import { Text, Badge, AuthorBadge } from '@/components/ui';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -27,6 +29,9 @@ export const NewsDetailScreen = () => {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const { id } = route.params;
+
+  const { isDark, colors } = useTheme();
+  const { t } = useLanguage();
 
   console.log('[NewsDetailScreen] Rendered', { articleId: id });
 
@@ -91,7 +96,7 @@ export const NewsDetailScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
         <View style={styles.loadingContainer}>
           <MotiView
             from={{ opacity: 0, scale: 0.8 }}
@@ -107,12 +112,12 @@ export const NewsDetailScreen = () => {
 
   if (!article) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
         <View style={styles.loadingContainer}>
-          <Text variant="h2">Artikeln kunde inte hittas.</Text>
+          <Text variant="h2">{t.newsDetail.articleNotFound}</Text>
           <Pressable onPress={handleGoBack} style={styles.backLink}>
             <Text variant="body" style={{ color: brandColors.purple }}>
-              Gå tillbaka
+              {t.newsDetail.goBack}
             </Text>
           </Pressable>
         </View>
@@ -130,10 +135,10 @@ export const NewsDetailScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Floating Header */}
       <MotiView
-        style={[styles.floatingHeader, { paddingTop: insets.top + 8, opacity: headerOpacity }]}
+        style={[styles.floatingHeader, { paddingTop: insets.top + 8, opacity: headerOpacity, backgroundColor: isDark ? 'rgba(12, 10, 23, 0.95)' : 'rgba(255, 255, 255, 0.95)' }]}
         animate={{ opacity: headerOpacity }}
       >
         <Pressable onPress={handleGoBack} style={styles.headerBackButton}>
@@ -161,7 +166,7 @@ export const NewsDetailScreen = () => {
               resizeMode="cover"
             />
           ) : (
-            <View style={styles.heroPlaceholder}>
+            <View style={[styles.heroPlaceholder, { backgroundColor: isDark ? '#1A1625' : '#F3F4F6' }]}>
               <Text style={styles.heroEmoji}>{article.news_categories?.emoji || '📰'}</Text>
             </View>
           )}
@@ -171,7 +176,7 @@ export const NewsDetailScreen = () => {
             style={[styles.backButton, { top: insets.top + 16 }]}
             accessible={true}
             accessibilityRole="button"
-            accessibilityLabel="Gå tillbaka till nyheter"
+            accessibilityLabel={t.newsDetail.goBackAccessibility}
           >
             <ArrowLeft size={24} color="#FFFFFF" />
           </Pressable>
@@ -179,7 +184,7 @@ export const NewsDetailScreen = () => {
 
         {/* Content Container */}
         <MotiView
-          style={styles.contentContainer}
+          style={[styles.contentContainer, { backgroundColor: colors.background }]}
           from={{ opacity: 0, translateY: 30 }}
           animate={{ opacity: 1, translateY: 0 }}
           transition={SPRING_CONFIGS.smooth}
@@ -216,8 +221,8 @@ export const NewsDetailScreen = () => {
             transition={{ ...SPRING_CONFIGS.smooth, delay: STAGGER_DELAYS.normal * 2 }}
           >
             <View style={styles.metaItem}>
-              <Calendar size={16} color="#9CA3AF" />
-              <Text variant="caption" style={styles.metaText}>
+              <Calendar size={16} color={colors.text.muted} />
+              <Text variant="caption" style={[styles.metaText, { color: colors.text.muted }]}>
                 {article.published_at
                   ? format(new Date(article.published_at), 'd MMMM yyyy', { locale: sv })
                   : 'Opublicerad'}
@@ -225,8 +230,8 @@ export const NewsDetailScreen = () => {
             </View>
             {article.read_time && (
               <View style={styles.metaItem}>
-                <Clock size={16} color="#9CA3AF" />
-                <Text variant="caption" style={styles.metaText}>
+                <Clock size={16} color={colors.text.muted} />
+                <Text variant="caption" style={[styles.metaText, { color: colors.text.muted }]}>
                   {article.read_time} min läsning
                 </Text>
               </View>
@@ -258,7 +263,7 @@ export const NewsDetailScreen = () => {
               transition={{ ...SPRING_CONFIGS.smooth, delay: STAGGER_DELAYS.normal * 3 }}
             >
               <View style={styles.summaryAccent} />
-              <Text variant="body" style={styles.summaryText}>
+              <Text variant="body" style={[styles.summaryText, { color: colors.text.secondary }]}>
                 {article.summary}
               </Text>
             </MotiView>
@@ -335,7 +340,7 @@ const markdownStyles = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
+    // backgroundColor set dynamically
   },
   loadingContainer: {
     flex: 1,
@@ -356,7 +361,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingBottom: 12,
-    backgroundColor: 'rgba(12, 10, 23, 0.95)',
+    // backgroundColor set dynamically
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(139, 92, 246, 0.1)',
   },
@@ -370,7 +375,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    color: '#F9FAFB',
+    // color from Text component
     textAlign: 'center',
     marginHorizontal: 12,
   },
@@ -389,7 +394,7 @@ const styles = StyleSheet.create({
   heroPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#1A1625',
+    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -412,7 +417,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 24,
     marginTop: -40,
-    backgroundColor: '#0C0A17',
+    // backgroundColor set dynamically
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
   },
@@ -425,7 +430,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   title: {
-    color: '#F9FAFB',
+    // color from Text component
     marginTop: 16,
     marginBottom: 16,
     lineHeight: 36,
@@ -442,7 +447,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   metaText: {
-    color: '#9CA3AF',
+    // color set dynamically
   },
   authorSection: {
     marginBottom: 20,
@@ -462,7 +467,7 @@ const styles = StyleSheet.create({
   },
   summaryText: {
     flex: 1,
-    color: '#D1D5DB',
+    // color set dynamically
     fontStyle: 'italic',
     lineHeight: 24,
   },

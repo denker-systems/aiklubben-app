@@ -5,7 +5,9 @@ import { GripVertical, ArrowUp, ArrowDown } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
 import { StepContainer, QuestionHeader, FeedbackCard, ActionButton } from '../components/shared';
 import { ListOrdered } from 'lucide-react-native';
@@ -28,6 +30,9 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   const [items, setItems] = useState(() => {
     const shuffled = content.items.map((item, i) => ({ item, originalIndex: i }));
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -135,7 +140,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
       <QuestionHeader
         icon={ListOrdered}
         title={content.instruction}
-        subtitle="Använd pilarna för att ordna stegen"
+        subtitle={t.steps.useArrows}
       />
 
       <View style={styles.itemsContainer}>
@@ -158,6 +163,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
               {...panResponder.panHandlers}
               style={[
                 styles.itemRow,
+                { backgroundColor: ui.card.background, borderColor: ui.card.border },
                 isSelected && styles.itemRowSelected,
                 itemState === 'correct' && styles.itemRowCorrect,
                 itemState === 'incorrect' && styles.itemRowIncorrect,
@@ -172,7 +178,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
               </View>
 
               <View style={styles.itemContent}>
-                <GripVertical size={20} color={isDragging ? brandColors.purple : uiColors.text.muted} />
+                <GripVertical size={20} color={isDragging ? brandColors.purple : colors.text.muted} />
                 <Text variant="body" style={styles.itemText}>
                   {item.item}
                 </Text>
@@ -187,7 +193,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
                     (isFirst || showFeedback) && styles.arrowButtonDisabled,
                   ]}
                 >
-                  <ArrowUp size={18} color={isFirst ? uiColors.text.muted : brandColors.purple} />
+                  <ArrowUp size={18} color={isFirst ? colors.text.muted : brandColors.purple} />
                 </Pressable>
                 <Pressable
                   onPress={() => moveItem(index, 'down')}
@@ -197,7 +203,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
                     (isLast || showFeedback) && styles.arrowButtonDisabled,
                   ]}
                 >
-                  <ArrowDown size={18} color={isLast ? uiColors.text.muted : brandColors.purple} />
+                  <ArrowDown size={18} color={isLast ? colors.text.muted : brandColors.purple} />
                 </Pressable>
               </View>
             </Animated.View>
@@ -205,7 +211,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
         })}
       </View>
 
-      {!showFeedback && <ActionButton label="Kontrollera ordningen" onPress={handleCheck} />}
+      {!showFeedback && <ActionButton label={t.steps.checkOrder} onPress={handleCheck} />}
 
       {showFeedback && (
         <FeedbackCard
@@ -214,7 +220,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
           correctAnswer={
             isCorrect ? undefined : correctOrder.map((i) => content.items[i]).join(' → ')
           }
-          correctAnswerLabel="Rätt ordning:"
+          correctAnswerLabel={t.feedback.correctAnswerLabel}
         />
       )}
     </StepContainer>
@@ -229,9 +235,8 @@ const styles = StyleSheet.create({
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderWidth: 2,
-    borderColor: uiColors.card.border,
     borderRadius: 16,
     overflow: 'hidden',
     // iOS shadow (Rule 01)
@@ -284,7 +289,7 @@ const styles = StyleSheet.create({
     minHeight: 56, // Apple HIG: comfortable touch target
   },
   itemText: {
-    color: uiColors.text.primary,
+    // color from Text component
     flex: 1,
     fontSize: 15,
     lineHeight: 22,

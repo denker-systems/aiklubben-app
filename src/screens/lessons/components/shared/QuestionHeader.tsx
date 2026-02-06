@@ -4,7 +4,7 @@ import { MotiView } from 'moti';
 import { LucideIcon } from 'lucide-react-native';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
 import { brandColors } from '@/config/theme';
 
 interface QuestionHeaderProps {
@@ -22,6 +22,8 @@ export const QuestionHeader: React.FC<QuestionHeaderProps> = ({
   subtitle,
   centered = true,
 }) => {
+  const { colors } = useTheme();
+
   return (
     <MotiView
       style={[styles.container, centered && styles.centered]}
@@ -34,11 +36,11 @@ export const QuestionHeader: React.FC<QuestionHeaderProps> = ({
           <Icon size={28} color={iconColor} />
         </View>
       )}
-      <Text variant="h3" style={[styles.title, centered && styles.textCentered]}>
+      <Text variant="h3" style={[styles.title, { color: colors.text.primary }, centered && styles.textCentered]}>
         {title}
       </Text>
       {subtitle && (
-        <Text variant="body" style={[styles.subtitle, centered && styles.textCentered]}>
+        <Text variant="body" style={[styles.subtitle, { color: colors.text.secondary }, centered && styles.textCentered]}>
           {subtitle}
         </Text>
       )}
@@ -62,14 +64,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   title: {
-    color: uiColors.text.primary,
     lineHeight: 28,
   },
   textCentered: {
     textAlign: 'center',
   },
   subtitle: {
-    color: uiColors.text.secondary,
     lineHeight: 22,
   },
 });

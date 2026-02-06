@@ -5,8 +5,10 @@ import { Check, X, RotateCcw } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface WordBankStepProps {
   content: {
@@ -20,6 +22,9 @@ interface WordBankStepProps {
 }
 
 export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation, onAnswer }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   const [selectedWords, setSelectedWords] = useState<(string | null)[]>(
     content.sentence_template.map((part) => (part === null ? null : part)),
   );
@@ -123,7 +128,7 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
       </Text>
 
       {/* Sentence Builder Area */}
-      <View style={styles.sentenceContainer}>
+      <View style={[styles.sentenceContainer, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}>
         <View style={styles.sentenceRow}>
           {selectedWords.map((word, index) => {
             const isBlank = content.sentence_template[index] === null;
@@ -170,14 +175,14 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
       {/* Word Bank */}
       <View style={styles.wordBankContainer}>
         <View style={styles.wordBankHeader}>
-          <Text variant="caption" style={styles.wordBankLabel}>
-            VÄLJ ORD
+          <Text variant="caption" style={[styles.wordBankLabel, { color: colors.text.muted }]}>
+            {t.steps.chooseWords}
           </Text>
           {!showFeedback && usedIndices.size > 0 && (
             <Pressable onPress={handleReset} style={styles.resetButton}>
-              <RotateCcw size={16} color={uiColors.text.muted} />
-              <Text variant="caption" style={styles.resetText}>
-                Återställ
+              <RotateCcw size={16} color={colors.text.muted} />
+              <Text variant="caption" style={[styles.resetText, { color: colors.text.muted }]}>
+                {t.common.reset}
               </Text>
             </Pressable>
           )}
@@ -199,6 +204,7 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
                 <View
                   style={[
                     styles.wordChip,
+                    { backgroundColor: ui.card.background, borderColor: ui.card.border },
                     isUsed && styles.wordChipUsed,
                   ]}
                 >
@@ -211,7 +217,7 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
                   >
                     <Text
                       variant="body"
-                      style={[styles.wordChipText, isUsed && styles.wordChipTextUsed]}
+                      style={[styles.wordChipText, isUsed && [styles.wordChipTextUsed, { color: colors.text.muted }]]}
                     >
                       {word}
                     </Text>
@@ -236,7 +242,7 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
             style={[styles.checkButton, !isComplete && styles.checkButtonDisabled]}
           >
             <Text variant="body" style={styles.checkButtonText}>
-              Kontrollera
+              {t.steps.checkAnswer}
             </Text>
           </Pressable>
         </MotiView>
@@ -260,7 +266,7 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
               variant="body"
               style={[styles.feedbackTitle, { color: isCorrect ? '#10B981' : '#EF4444' }]}
             >
-              {isCorrect ? 'Helt rätt!' : 'Inte riktigt'}
+              {isCorrect ? t.steps.allCorrect : t.steps.notQuite}
             </Text>
           </View>
           {explanation && (
@@ -270,8 +276,8 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
           )}
           {!isCorrect && (
             <View style={styles.correctAnswerContainer}>
-              <Text variant="caption" style={styles.correctAnswerLabel}>
-                Rätt svar:
+              <Text variant="caption" style={[styles.correctAnswerLabel, { color: colors.text.muted }]}>
+                {t.common.correctAnswer}
               </Text>
               <Text variant="body" style={styles.correctAnswerText}>
                 {content.correct_order.map((i) => content.word_bank[i]).join(' ')}
@@ -290,15 +296,14 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   instruction: {
-    color: uiColors.text.primary,
+    // color from Text component
     textAlign: 'center',
   },
   sentenceContainer: {
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderRadius: 20,
     padding: 20,
     borderWidth: 2,
-    borderColor: uiColors.card.border,
   },
   sentenceRow: {
     flexDirection: 'row',
@@ -308,7 +313,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   staticWord: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontSize: 18,
   },
   blankSlot: {
@@ -341,7 +346,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   filledWord: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontSize: 16,
     fontWeight: '600',
   },
@@ -354,7 +359,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   wordBankLabel: {
-    color: uiColors.text.muted,
+    // color set dynamically
     fontWeight: '700',
     letterSpacing: 1,
   },
@@ -365,7 +370,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   resetText: {
-    color: uiColors.text.muted,
+    // color set dynamically
   },
   wordBank: {
     flexDirection: 'row',
@@ -374,9 +379,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   wordChip: {
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderWidth: 2,
-    borderColor: uiColors.card.border,
     borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 14,
@@ -389,12 +393,12 @@ const styles = StyleSheet.create({
     borderColor: brandColors.purple,
   },
   wordChipText: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontSize: 16,
     fontWeight: '500',
   },
   wordChipTextUsed: {
-    color: uiColors.text.muted,
+    // color set dynamically
   },
   checkButton: {
     backgroundColor: brandColors.purple,
@@ -434,7 +438,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   feedbackText: {
-    color: uiColors.text.primary,
+    // color from Text component
     lineHeight: 22,
   },
   correctAnswerContainer: {
@@ -444,7 +448,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   correctAnswerLabel: {
-    color: uiColors.text.muted,
+    // color set dynamically
     marginBottom: 4,
   },
   correctAnswerText: {

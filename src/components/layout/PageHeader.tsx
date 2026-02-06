@@ -22,11 +22,11 @@ export function PageHeader({
   backToTab,
   rightContent,
 }: PageHeaderProps) {
-  const { isDark } = useTheme();
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const menuContext = useMenu();
   const tabNavigation = useTabNavigationSafe();
-  const textColor = isDark ? '#FAFAFA' : '#111827';
+  const textColor = colors.text.primary;
 
   const handleBack = () => {
     if (onBackPress) {
@@ -39,7 +39,7 @@ export function PageHeader({
   };
 
   return (
-    <View style={[styles.header, { backgroundColor: isDark ? '#0C0A17' : '#FFFFFF' }]}>
+    <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border.subtle }]}>
       <View style={styles.leftSection}>
         {showBack && (
           <Pressable style={styles.iconButton} onPress={handleBack}>
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(42, 36, 69, 0.3)',
+    borderBottomColor: 'transparent',
   },
   leftSection: {
     width: 48,

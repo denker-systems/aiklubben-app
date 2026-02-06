@@ -18,6 +18,8 @@ import {
 import { format } from 'date-fns';
 import { sv } from 'date-fns/locale';
 import { SPRING_CONFIGS } from '@/lib/animations';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type Category = 'resurser' | 'plattformar' | 'event';
 
@@ -34,6 +36,8 @@ export const ContentScreen = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const insets = useSafeAreaInsets();
+  const { isDark, colors } = useTheme();
+  const { t } = useLanguage();
   const initialCategory = route.params?.category || 'resurser';
 
   console.log('[ContentScreen] Rendered', { initialCategory });
@@ -45,27 +49,27 @@ export const ContentScreen = () => {
   const categories: CategoryItem[] = [
     {
       id: 'resurser',
-      name: 'Resurser',
+      name: t.content.resources,
       emoji: '📂',
       gradient: ['#6366f1', '#8b5cf6'],
       color: '#8B5CF6',
-      description: 'Artiklar och guider',
+      description: t.content.resourcesDesc,
     },
     {
       id: 'plattformar',
-      name: 'Plattformar',
+      name: t.content.platforms,
       emoji: '🧠',
       gradient: ['#00d8a2', '#0ea5e9'],
       color: '#10B981',
-      description: 'AI-verktyg och tjänster',
+      description: t.content.platformsDesc,
     },
     {
       id: 'event',
-      name: 'Event',
+      name: t.content.events,
       emoji: '🎯',
       gradient: ['#ff3366', '#f43f5e'],
       color: '#EC4899',
-      description: 'Kommande händelser',
+      description: t.content.eventsDesc,
     },
   ];
 
@@ -113,14 +117,14 @@ export const ContentScreen = () => {
   });
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Background Floating Orbs with Parallax */}
       <ParallaxLayer scrollY={scrollY} speed={-0.3} style={styles.backgroundOrbs}>
         <FloatingOrbs variant="default" />
       </ParallaxLayer>
 
       {/* Sticky Header */}
-      <ScreenHeader title="Resurser" subtitle="Utforska verktyg och material" scrollY={scrollY} />
+      <ScreenHeader title={t.content.title} scrollY={scrollY} />
 
       <Animated.ScrollView
         style={styles.scrollView}
@@ -171,10 +175,10 @@ export const ContentScreen = () => {
                   ) : (
                     <Pressable
                       onPress={() => setActiveCategory(cat.id)}
-                      style={styles.categoryPill}
+                      style={[styles.categoryPill, { backgroundColor: colors.glass.light, borderColor: colors.border.default }]}
                     >
                       <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
-                      <Text style={styles.categoryText}>{cat.name}</Text>
+                      <Text style={[styles.categoryText, { color: colors.text.secondary }]}>{cat.name}</Text>
                     </Pressable>
                   )}
                 </MotiView>
@@ -190,7 +194,7 @@ export const ContentScreen = () => {
           animate={{ opacity: 1 }}
           transition={{ ...SPRING_CONFIGS.smooth, delay: 150 }}
         >
-          <Text style={styles.countText}>
+          <Text style={[styles.countText, { color: colors.text.muted }]}>
             {content.length} {activeCat?.name.toUpperCase()}
           </Text>
         </MotiView>
@@ -243,7 +247,6 @@ export const ContentScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
   },
   scrollView: {
     flex: 1,
@@ -261,11 +264,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     marginBottom: 4,
   },
   headerSubtitle: {
-    color: '#9CA3AF',
+    // color from Text component
   },
   menuButton: {
     width: 44,
@@ -299,9 +302,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    // backgroundColor and borderColor set dynamically
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   categoryPillActive: {
     borderRadius: 20,
@@ -317,7 +319,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   categoryText: {
-    color: '#9CA3AF',
+    // color set dynamically
     fontWeight: '600',
   },
   categoryTextActive: {
@@ -349,11 +351,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
   },
   categoryInfoTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     marginBottom: 2,
   },
   categoryInfoDesc: {
-    color: '#9CA3AF',
+    // color from Text component
   },
   contentSection: {
     paddingHorizontal: 20,
@@ -367,7 +369,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#6B7280',
+    // color from Text component
     textAlign: 'center',
   },
   roadmapContainer: {
@@ -499,7 +501,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   countText: {
-    color: '#6B7280',
+    // color set dynamically
     fontSize: 12,
     fontWeight: '600',
     letterSpacing: 1,

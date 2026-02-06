@@ -5,8 +5,10 @@ import { Check, X, Send } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FillBlankStepProps {
   content: {
@@ -26,6 +28,9 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   const [userAnswer, setUserAnswer] = useState('');
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -62,8 +67,8 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
     // No valid content
     return (
       <View style={styles.container}>
-        <Text variant="body" style={{ color: uiColors.text.secondary }}>
-          Ingen text tillgänglig för denna fråga.
+        <Text variant="body" style={{ color: colors.text.secondary }}>
+          {t.steps.noTextAvailable}
         </Text>
       </View>
     );
@@ -86,13 +91,14 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
             <TextInput
               style={[
                 styles.input,
+                { backgroundColor: ui.card.background, borderColor: ui.card.border, color: colors.text.primary },
                 showFeedback && (isCorrect ? styles.inputCorrect : styles.inputIncorrect),
               ]}
               value={userAnswer}
               onChangeText={setUserAnswer}
               onSubmitEditing={checkAnswer}
-              placeholder="Skriv ditt svar..."
-              placeholderTextColor={uiColors.text.muted}
+              placeholder={t.steps.writeAnswer}
+              placeholderTextColor={colors.text.muted}
               editable={!showFeedback}
               autoCapitalize="none"
               autoCorrect={false}
@@ -150,8 +156,8 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
           animate={{ opacity: 1, translateY: 0 }}
           transition={{ ...SPRING_CONFIGS.smooth, delay: 200 }}
         >
-          <Text variant="body" style={styles.correctAnswerLabel}>
-            Rätt svar:
+          <Text variant="body" style={[styles.correctAnswerLabel, { color: colors.text.secondary }]}>
+            {t.steps.correctAnswer}
           </Text>
           <Text variant="body" style={styles.correctAnswerText}>
             {correctAnswer}
@@ -187,7 +193,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   text: {
-    color: uiColors.text.primary,
+    // color from Text component
   },
   inputRow: {
     flexDirection: 'row',
@@ -200,13 +206,11 @@ const styles = StyleSheet.create({
     minWidth: 150,
   },
   input: {
-    backgroundColor: uiColors.card.background,
+    // backgroundColor, borderColor, color set dynamically
     borderWidth: 2,
-    borderColor: uiColors.card.border,
     borderRadius: 12,
     padding: 12,
     paddingRight: 48,
-    color: uiColors.text.primary,
     fontSize: 18,
     fontWeight: '600',
   },
@@ -232,7 +236,7 @@ const styles = StyleSheet.create({
     borderColor: '#8B5CF6',
   },
   correctAnswerLabel: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     marginBottom: 4,
   },
   correctAnswerText: {
@@ -254,7 +258,7 @@ const styles = StyleSheet.create({
     borderColor: '#EF4444',
   },
   feedbackText: {
-    color: uiColors.text.primary,
+    // color from Text component
   },
   checkButton: {
     borderRadius: 16,

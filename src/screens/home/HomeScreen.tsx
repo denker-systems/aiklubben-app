@@ -11,7 +11,9 @@ import { useMenu } from '@/contexts/MenuContext';
 import { useAuth } from '@/hooks/useAuth';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
 import { getLevelForXP } from '@/types/gamification';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const HomeScreen = () => {
   console.log('[HomeScreen] Rendered');
@@ -19,6 +21,9 @@ export const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const menuContext = useMenu();
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [stats] = useState({ totalXP: 150, currentStreak: 3 });
@@ -73,16 +78,16 @@ export const HomeScreen = () => {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'God morgon';
-    if (hour < 18) return 'God eftermiddag';
-    return 'God kväll';
+    if (hour < 12) return t.greetings.morning;
+    if (hour < 18) return t.greetings.afternoon;
+    return t.greetings.evening;
   };
 
   const quickActions = [
     {
       id: 'courses',
-      title: 'Kurser',
-      subtitle: 'Lär dig AI',
+      title: t.home.coursesAction,
+      subtitle: t.home.coursesSubtitle,
       emoji: '📚',
       iconName: 'courses',
       gradient: ['#6366f1', '#8b5cf6'] as const,
@@ -90,8 +95,8 @@ export const HomeScreen = () => {
     },
     {
       id: 'news',
-      title: 'Nyheter',
-      subtitle: 'Senaste nytt',
+      title: t.home.newsAction,
+      subtitle: t.home.newsSubtitle,
       emoji: '📰',
       iconName: 'news',
       gradient: ['#ff3366', '#f43f5e'] as const,
@@ -99,8 +104,8 @@ export const HomeScreen = () => {
     },
     {
       id: 'resources',
-      title: 'Resurser',
-      subtitle: 'Verktyg & guider',
+      title: t.home.resourcesAction,
+      subtitle: t.home.resourcesSubtitle,
       emoji: '📂',
       gradient: ['#00d8a2', '#0ea5e9'] as const,
       screen: 'Content',
@@ -108,7 +113,7 @@ export const HomeScreen = () => {
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
@@ -126,23 +131,23 @@ export const HomeScreen = () => {
 
           <View style={styles.headerContent}>
             <View style={styles.headerLeft}>
-              <Text variant="body" style={styles.greeting}>
+              <Text variant="body" style={[styles.greeting, { color: colors.text.secondary }]}>
                 {getGreeting()},
               </Text>
               <Text variant="h1" style={styles.userName}>
-                {profile?.name?.split(' ')[0] || 'Vännen'}
+                {profile?.name?.split(' ')[0] || t.common.friend}
               </Text>
             </View>
-            <Pressable onPress={() => menuContext?.openMenu()} style={styles.menuButton}>
-              <View style={styles.menuLine} />
-              <View style={[styles.menuLine, styles.menuLineShort]} />
+            <Pressable onPress={() => menuContext?.openMenu()} style={[styles.menuButton, { backgroundColor: colors.glass.light }]}>
+              <View style={[styles.menuLine, { backgroundColor: colors.text.secondary }]} />
+              <View style={[styles.menuLine, styles.menuLineShort, { backgroundColor: colors.text.secondary }]} />
             </Pressable>
           </View>
 
           {/* Stats Row with Emojis */}
           <View style={styles.statsRow}>
             <MotiView
-              style={styles.statBadge}
+              style={[styles.statBadge, { backgroundColor: colors.glass.light }]}
               from={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ ...SPRING_CONFIGS.bouncy, delay: 200 }}
@@ -156,13 +161,13 @@ export const HomeScreen = () => {
                 <AppIcon name="xp" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={styles.statValue}>{stats.totalXP}</Text>
-                <Text style={styles.statLabel}>XP</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>{stats.totalXP}</Text>
+                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>XP</Text>
               </View>
             </MotiView>
 
             <MotiView
-              style={styles.statBadge}
+              style={[styles.statBadge, { backgroundColor: colors.glass.light }]}
               from={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ ...SPRING_CONFIGS.bouncy, delay: 300 }}
@@ -176,13 +181,13 @@ export const HomeScreen = () => {
                 <AppIcon name="streak" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={styles.statValue}>{stats.currentStreak}</Text>
-                <Text style={styles.statLabel}>dagar</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>{stats.currentStreak}</Text>
+                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>dagar</Text>
               </View>
             </MotiView>
 
             <MotiView
-              style={styles.statBadge}
+              style={[styles.statBadge, { backgroundColor: colors.glass.light }]}
               from={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ ...SPRING_CONFIGS.bouncy, delay: 400 }}
@@ -196,8 +201,8 @@ export const HomeScreen = () => {
                 <Text style={styles.statEmoji}>🎯</Text>
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={styles.statValue}>Lvl {level.level}</Text>
-                <Text style={styles.statLabel}>{level.name.split(' ')[0]}</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>Lvl {level.level}</Text>
+                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>{level.name.split(' ')[0]}</Text>
               </View>
             </MotiView>
           </View>
@@ -206,7 +211,7 @@ export const HomeScreen = () => {
         {/* Daily Progress Card */}
         <Pressable onPress={() => navigation.navigate('Courses')}>
           <MotiView
-            style={styles.dailyCard}
+            style={[styles.dailyCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
             from={{ opacity: 0, translateX: -30 }}
             animate={{ opacity: 1, translateX: 0 }}
             transition={{ ...SPRING_CONFIGS.smooth, delay: 100 }}
@@ -217,17 +222,17 @@ export const HomeScreen = () => {
             </View>
             <View style={styles.dailyCardContent}>
               <Text variant="body" style={styles.dailyCardTitle}>
-                Dagens mål
+                {t.home.dailyGoal}
               </Text>
               <Text variant="caption" style={styles.dailyCardSubtitle}>
-                Fortsätt lära dig!
+                {t.home.keepLearning}
               </Text>
             </View>
             <View style={styles.dailyCardProgress}>
               <Text style={styles.dailyCardPercent}>40%</Text>
             </View>
           </View>
-            <View style={styles.dailyProgressTrack}>
+            <View style={[styles.dailyProgressTrack, { backgroundColor: colors.glass.medium }]}>
               <MotiView
                 style={styles.dailyProgressFill}
                 from={{ width: '0%' }}
@@ -247,7 +252,7 @@ export const HomeScreen = () => {
         >
           <View style={styles.sectionHeader}>
             <Text variant="h3" style={styles.sectionTitle}>
-              Snabbstart
+              {t.home.quickStart}
             </Text>
           </View>
 
@@ -264,7 +269,7 @@ export const HomeScreen = () => {
                   onPress={() => navigation.navigate(action.screen)}
                   tiltAmount={3}
                   scaleAmount={0.97}
-                  style={styles.quickActionCard}
+                  style={[styles.quickActionCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
                 >
                   <View style={styles.quickActionIconContainer}>
                     {action.iconName ? (
@@ -291,7 +296,7 @@ export const HomeScreen = () => {
         >
           <View style={styles.sectionHeader}>
             <Text variant="h3" style={styles.sectionTitle}>
-              Fortsätt lära
+              {t.home.continueLearning}
             </Text>
           </View>
 
@@ -299,7 +304,7 @@ export const HomeScreen = () => {
             onPress={() => navigation.navigate('Courses')}
             tiltAmount={2}
             scaleAmount={0.98}
-            style={styles.continueCard}
+            style={[styles.continueCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
           >
             <View style={styles.continueCardContent}>
               <View style={styles.continueIconContainer}>
@@ -307,10 +312,10 @@ export const HomeScreen = () => {
               </View>
               <View style={styles.continueInfo}>
                 <Text variant="body" style={styles.continueTitle}>
-                  Grundkurs i AI
+                  {t.home.basicCourse}
                 </Text>
                 <View style={styles.continueProgress}>
-                  <View style={styles.continueProgressTrack}>
+                  <View style={[styles.continueProgressTrack, { backgroundColor: colors.glass.medium }]}>
                     <View style={[styles.continueProgressFill, { width: '35%' }]} />
                   </View>
                   <Text variant="caption" style={styles.continuePercent}>
@@ -332,10 +337,10 @@ export const HomeScreen = () => {
           >
             <View style={styles.sectionHeader}>
               <Text variant="h3" style={styles.sectionTitle}>
-                Senaste nytt
+                {t.home.latestNews}
               </Text>
               <Pressable onPress={() => navigation.navigate('News')} style={styles.seeAllButton}>
-                <Text style={styles.seeAllText}>Se alla →</Text>
+                <Text style={styles.seeAllText}>{t.common.seeAll}</Text>
               </Pressable>
             </View>
 
@@ -371,7 +376,6 @@ export const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
   },
   scrollView: {
     flex: 1,
@@ -406,17 +410,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   greeting: {
-    color: '#9CA3AF',
+    // color set dynamically
     marginBottom: 4,
   },
   userName: {
-    color: '#F9FAFB',
+    // color from Text component
   },
   menuButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
@@ -424,7 +428,7 @@ const styles = StyleSheet.create({
   menuLine: {
     width: 20,
     height: 2,
-    backgroundColor: '#9CA3AF',
+    // backgroundColor set dynamically
     borderRadius: 1,
   },
   menuLineShort: {
@@ -438,7 +442,7 @@ const styles = StyleSheet.create({
   statBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    // backgroundColor set dynamically
     borderRadius: 16,
     paddingRight: 14,
     gap: 10,
@@ -457,22 +461,21 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   statValue: {
-    color: '#F9FAFB',
+    // color set dynamically
     fontSize: 16,
     fontWeight: '700',
   },
   statLabel: {
-    color: '#9CA3AF',
+    // color set dynamically
     fontSize: 11,
   },
   dailyCard: {
     marginHorizontal: 20,
     marginBottom: 24,
-    backgroundColor: uiColors.card.background,
-    borderRadius: uiColors.card.radius,
+    // backgroundColor and borderColor set dynamically
+    borderRadius: 20,
     padding: 12,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
   },
   dailyCardHeader: {
     flexDirection: 'row',
@@ -502,7 +505,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dailyCardTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     fontWeight: '600',
   },
   dailyCardSubtitle: {
@@ -523,7 +526,7 @@ const styles = StyleSheet.create({
   },
   dailyProgressTrack: {
     height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    // backgroundColor set dynamically
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -546,7 +549,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   sectionTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     flex: 1,
   },
   seeAllButton: {
@@ -567,12 +570,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   quickActionCard: {
-    backgroundColor: uiColors.card.background,
-    borderRadius: uiColors.card.radius,
+    // backgroundColor and borderColor set dynamically
+    borderRadius: 20,
     padding: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: uiColors.card.border,
   },
   quickActionGradient: {
     width: 120,
@@ -593,20 +595,19 @@ const styles = StyleSheet.create({
     fontSize: 64,
   },
   quickActionTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     fontWeight: '600',
     marginBottom: 4,
   },
   quickActionSubtitle: {
-    color: '#9CA3AF',
+    // color from Text component
     fontSize: 11,
   },
   continueCard: {
-    backgroundColor: uiColors.card.background,
-    borderRadius: uiColors.card.radius,
+    // backgroundColor and borderColor set dynamically
+    borderRadius: 20,
     padding: 18,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
   },
   continueCardContent: {
     flexDirection: 'row',
@@ -634,7 +635,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   continueTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     fontWeight: '600',
     marginBottom: 8,
   },
@@ -646,7 +647,7 @@ const styles = StyleSheet.create({
   continueProgressTrack: {
     flex: 1,
     height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    // backgroundColor set dynamically
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -681,11 +682,10 @@ const styles = StyleSheet.create({
   newsCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: uiColors.card.background,
-    borderRadius: uiColors.card.radius,
+    // backgroundColor and borderColor set dynamically
+    borderRadius: 20,
     padding: 14,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
   },
   newsIconGradient: {
     width: 48,
@@ -700,18 +700,18 @@ const styles = StyleSheet.create({
   },
   newsArrow: {
     fontSize: 28,
-    color: '#6B7280',
+    // color set dynamically
     fontWeight: '300',
   },
   newsContent: {
     flex: 1,
   },
   newsTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     fontWeight: '600',
     marginBottom: 4,
   },
   newsSummary: {
-    color: '#9CA3AF',
+    // color from Text component
   },
 });

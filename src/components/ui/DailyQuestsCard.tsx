@@ -4,8 +4,10 @@ import { MotiView } from 'moti';
 import { CheckCircle, Circle, Gift } from 'lucide-react-native';
 import { Text } from './Text';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { DailyQuest } from '@/types/gamification';
 
 interface DailyQuestsCardProps {
@@ -14,6 +16,8 @@ interface DailyQuestsCardProps {
 }
 
 const QuestItem: React.FC<{ quest: DailyQuest; index: number }> = memo(({ quest, index }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
   const progress = Math.min(quest.progress / quest.target, 1);
 
   return (
@@ -21,9 +25,9 @@ const QuestItem: React.FC<{ quest: DailyQuest; index: number }> = memo(({ quest,
       from={{ opacity: 0, translateX: -20 }}
       animate={{ opacity: 1, translateX: 0 }}
       transition={{ ...SPRING_CONFIGS.snappy, delay: index * 50 }}
-      style={styles.questItem}
+      style={[styles.questItem, { backgroundColor: colors.glass.light }]}
     >
-      <View style={styles.questIcon}>
+      <View style={[styles.questIcon, { backgroundColor: colors.glass.medium }]}>
         <Text style={styles.questEmoji}>{quest.icon}</Text>
       </View>
 
@@ -37,13 +41,13 @@ const QuestItem: React.FC<{ quest: DailyQuest; index: number }> = memo(({ quest,
           </View>
         </View>
 
-        <Text variant="caption" style={styles.questDescription}>
+        <Text variant="caption" style={[styles.questDescription, { color: colors.text.muted }]}>
           {quest.description}
         </Text>
 
         {/* Progress bar */}
         <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
+          <View style={[styles.progressBar, { backgroundColor: colors.glass.medium }]}>
             <MotiView
               animate={{ width: `${progress * 100}%` }}
               transition={SPRING_CONFIGS.smooth}
@@ -53,7 +57,7 @@ const QuestItem: React.FC<{ quest: DailyQuest; index: number }> = memo(({ quest,
               ]}
             />
           </View>
-          <Text style={styles.progressText}>
+          <Text style={[styles.progressText, { color: colors.text.muted }]}>
             {quest.progress}/{quest.target}
           </Text>
         </View>
@@ -63,7 +67,7 @@ const QuestItem: React.FC<{ quest: DailyQuest; index: number }> = memo(({ quest,
         {quest.completed ? (
           <CheckCircle size={24} color="#10B981" fill="#10B981" />
         ) : (
-          <Circle size={24} color={uiColors.text.muted} />
+          <Circle size={24} color={colors.text.muted} />
         )}
       </View>
     </MotiView>
@@ -73,6 +77,9 @@ const QuestItem: React.FC<{ quest: DailyQuest; index: number }> = memo(({ quest,
 QuestItem.displayName = 'QuestItem';
 
 export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = memo(({ quests }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   const completedCount = quests.filter((q) => q.completed).length;
   const allCompleted = completedCount === quests.length;
 
@@ -81,21 +88,21 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = memo(({ quests })
       from={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={SPRING_CONFIGS.bouncy}
-      style={styles.container}
+      style={[styles.container, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
     >
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Gift size={20} color={brandColors.purple} />
           <Text variant="h4" weight="bold" style={styles.headerTitle}>
-            Dagens Uppdrag
+            {t.components.dailyQuests}
           </Text>
         </View>
         <View
-          style={[styles.completionBadge, allCompleted && styles.completionBadgeComplete]}
+          style={[styles.completionBadge, { backgroundColor: colors.glass.light }, allCompleted && styles.completionBadgeComplete]}
         >
           <Text
-            style={[styles.completionText, allCompleted && styles.completionTextComplete]}
+            style={[styles.completionText, { color: colors.text.secondary }, allCompleted && styles.completionTextComplete]}
           >
             {completedCount}/{quests.length}
           </Text>
@@ -117,7 +124,7 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = memo(({ quests })
           transition={SPRING_CONFIGS.bouncy}
           style={styles.bonusMessage}
         >
-          <Text style={styles.bonusText}>🎉 Alla uppdrag slutförda! +50 Bonus XP</Text>
+          <Text style={styles.bonusText}>{t.components.allQuestsComplete}</Text>
         </MotiView>
       )}
     </MotiView>
@@ -128,11 +135,10 @@ DailyQuestsCard.displayName = 'DailyQuestsCard';
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
   },
   header: {
     flexDirection: 'row',
@@ -146,10 +152,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   headerTitle: {
-    color: uiColors.text.primary,
+    // color from Text component
   },
   completionBadge: {
-    backgroundColor: uiColors.glass.light,
+    // backgroundColor set dynamically
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
@@ -158,7 +164,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(16, 185, 129, 0.2)',
   },
   completionText: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     fontSize: 12,
     fontWeight: '600',
   },
@@ -172,7 +178,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: uiColors.glass.light,
+    // backgroundColor set dynamically
     borderRadius: 12,
     padding: 12,
   },
@@ -180,7 +186,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 10,
-    backgroundColor: uiColors.glass.medium,
+    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -197,7 +203,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   questTitle: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontSize: 14,
   },
   xpBadge: {
@@ -212,7 +218,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   questDescription: {
-    color: uiColors.text.muted,
+    // color set dynamically
     fontSize: 12,
     marginBottom: 6,
   },
@@ -224,7 +230,7 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 4,
-    backgroundColor: uiColors.glass.medium,
+    // backgroundColor set dynamically
     borderRadius: 2,
     overflow: 'hidden',
   },
@@ -233,7 +239,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   progressText: {
-    color: uiColors.text.muted,
+    // color set dynamically
     fontSize: 10,
     fontWeight: '500',
     minWidth: 24,

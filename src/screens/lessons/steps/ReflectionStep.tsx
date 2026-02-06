@@ -3,7 +3,9 @@ import { View, TextInput, StyleSheet } from 'react-native';
 import { MotiView } from 'moti';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ReflectionStepProps {
   content: {
@@ -15,6 +17,9 @@ interface ReflectionStepProps {
 }
 
 export const ReflectionStep: React.FC<ReflectionStepProps> = ({ content, onAnswer }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t, ti } = useLanguage();
   const [text, setText] = useState('');
 
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
@@ -41,11 +46,11 @@ export const ReflectionStep: React.FC<ReflectionStepProps> = ({ content, onAnswe
 
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: ui.card.background, borderColor: ui.card.border, color: colors.text.primary }]}
           value={text}
           onChangeText={handleTextChange}
           placeholder={content.placeholder}
-          placeholderTextColor={uiColors.text.muted}
+          placeholderTextColor={colors.text.muted}
           multiline
           numberOfLines={8}
           textAlignVertical="top"
@@ -53,20 +58,20 @@ export const ReflectionStep: React.FC<ReflectionStepProps> = ({ content, onAnswe
         />
 
         <View style={styles.footer}>
-          <Text variant="caption" style={[styles.wordCount, isValid && styles.wordCountValid]}>
-            {wordCount} / {minWords} ord
+          <Text variant="caption" style={[styles.wordCount, { color: colors.text.muted }, isValid && styles.wordCountValid]}>
+            {wordCount} / {minWords}
           </Text>
           {!isValid && (
-            <Text variant="caption" style={styles.hint}>
-              Skriv minst {minWords} ord
+            <Text variant="caption" style={[styles.hint, { color: colors.text.muted }]}>
+              {ti(t.steps.writeMinWords, { count: minWords })}
             </Text>
           )}
         </View>
       </View>
 
       <View style={styles.infoBox}>
-        <Text variant="caption" style={styles.infoText}>
-          💡 Det finns inget rätt eller fel svar. Ta dig tid att reflektera över frågan.
+        <Text variant="caption" style={[styles.infoText, { color: colors.text.secondary }]}>
+          {t.steps.reflectionInfo}
         </Text>
       </View>
     </MotiView>
@@ -79,19 +84,17 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   prompt: {
-    color: uiColors.text.primary,
+    // color from Text component
     marginBottom: 8,
   },
   inputContainer: {
     gap: 12,
   },
   input: {
-    backgroundColor: uiColors.card.background,
+    // backgroundColor, borderColor, color set dynamically
     borderWidth: 2,
-    borderColor: uiColors.card.border,
     borderRadius: 16,
     padding: 16,
-    color: uiColors.text.primary,
     fontSize: 16,
     lineHeight: 24,
     minHeight: 200,
@@ -102,14 +105,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   wordCount: {
-    color: uiColors.text.muted,
+    // color set dynamically
   },
   wordCountValid: {
     color: '#10B981',
     fontWeight: '600',
   },
   hint: {
-    color: uiColors.text.muted,
+    // color set dynamically
   },
   infoBox: {
     backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -119,7 +122,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(139, 92, 246, 0.2)',
   },
   infoText: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     lineHeight: 20,
   },
 });

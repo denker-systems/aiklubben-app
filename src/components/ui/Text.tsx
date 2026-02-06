@@ -8,7 +8,7 @@ interface CustomTextProps extends TextProps {
 }
 
 export function Text({ variant = 'body', weight, style, children, ...props }: CustomTextProps) {
-  const { isDark } = useTheme();
+  const { colors } = useTheme();
 
   const getVariantStyle = (): TextStyle => {
     switch (variant) {
@@ -48,7 +48,7 @@ export function Text({ variant = 'body', weight, style, children, ...props }: Cu
 
   return (
     <RNText
-      style={[{ color: isDark ? '#F9FAFB' : '#111827' }, getVariantStyle(), fontWeightStyle, style]}
+      style={[{ color: colors.text.primary }, getVariantStyle(), fontWeightStyle, style]}
       {...props}
     >
       {children}

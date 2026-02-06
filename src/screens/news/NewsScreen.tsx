@@ -14,7 +14,9 @@ import {
   getHeaderHeight,
   FloatingOrbs,
 } from '@/components/ui';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { format } from 'date-fns';
 import { sv } from 'date-fns/locale';
 import { SPRING_CONFIGS } from '@/lib/animations';
@@ -27,6 +29,9 @@ export const NewsScreen = () => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
 
   const scrollY = useSharedValue(0);
   const scrollHandler = useAnimatedScrollHandler({
@@ -86,7 +91,7 @@ export const NewsScreen = () => {
   const headerHeight = getHeaderHeight(insets);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Background Floating Orbs with Parallax */}
       <ParallaxLayer scrollY={scrollY} speed={-0.3} style={styles.backgroundOrbs}>
         <FloatingOrbs variant="default" />
@@ -94,8 +99,7 @@ export const NewsScreen = () => {
 
       {/* Sticky Header */}
       <ScreenHeader
-        title="Nyheter"
-        subtitle="Senaste inom AI"
+        title={t.news.title}
         scrollY={scrollY}
         showOrbs={true}
         orbsVariant="header"
@@ -118,7 +122,7 @@ export const NewsScreen = () => {
           animate={{ opacity: 1 }}
           transition={{ ...SPRING_CONFIGS.smooth, delay: 150 }}
         >
-          <Text style={styles.countText}>{news.length} ARTIKLAR</Text>
+          <Text style={styles.countText}>{news.length} {t.news.articles}</Text>
         </MotiView>
 
         {/* News Cards */}
@@ -153,8 +157,8 @@ export const NewsScreen = () => {
                       elevation={isFeatured ? 4 : 2}
                       style={{
                         ...styles.newsCard,
-                        backgroundColor: uiColors.card.background,
-                        borderColor: uiColors.card.border,
+                        backgroundColor: ui.card.background,
+                        borderColor: ui.card.border,
                         borderWidth: 1,
                         ...getLayeredShadow(isFeatured ? 4 : 2),
                       }}
@@ -195,7 +199,6 @@ export const NewsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
   },
   scrollView: {
     flex: 1,
@@ -206,7 +209,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   countText: {
-    color: '#6B7280',
+    // color set dynamically by Text component
     fontSize: 12,
     fontWeight: '600',
     letterSpacing: 1,
@@ -223,7 +226,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#6B7280',
+    // color from Text component
     textAlign: 'center',
   },
   cardList: {
@@ -257,7 +260,7 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   cardTitle: {
-    color: '#FFFFFF',
+    // color from Text component
     fontSize: 18,
     fontWeight: '700',
     lineHeight: 24,
@@ -268,13 +271,13 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
   cardSummary: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    // color set dynamically
     fontSize: 15,
     lineHeight: 22,
     marginBottom: 12,
   },
   cardDate: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    // color set dynamically
     fontSize: 14,
     fontWeight: '600',
   },

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, Image, ScrollView, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, Image, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,12 +7,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { brandColors } from '@/config/theme';
 import { supabase } from '@/config/supabase';
 import { Text, Badge, FloatingOrbs, TiltCard, AppIcon } from '@/components/ui';
-import { PageHeader } from '@/components/layout/PageHeader';
+import { useMenu } from '@/contexts/MenuContext';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { BADGES, getLevelForXP, getXPProgress, getNextLevel } from '@/types/gamification';
-
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const ProfileScreen = () => {
   console.log('[ProfileScreen] Rendered');
@@ -20,6 +21,10 @@ export const ProfileScreen = () => {
   const { user, signOut } = useAuth();
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
+  const menuContext = useMenu();
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -94,7 +99,7 @@ export const ProfileScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={brandColors.purple} />
         </View>
@@ -103,9 +108,17 @@ export const ProfileScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={{ paddingTop: insets.top }}>
-        <PageHeader title="Profil" showBack={canGoBack} />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Header matching other screens */}
+      <View style={[styles.headerRow, { paddingTop: insets.top + 16 }]}>
+        <Text variant="h1" style={styles.headerTitle}>{t.profile.title}</Text>
+        <Pressable
+          onPress={() => menuContext?.openMenu()}
+          style={[styles.menuButton, { backgroundColor: colors.glass.light }]}
+        >
+          <View style={[styles.menuLine, { backgroundColor: colors.text.secondary }]} />
+          <View style={[styles.menuLine, styles.menuLineShort, { backgroundColor: colors.text.secondary }]} />
+        </Pressable>
       </View>
       <ScrollView
         style={styles.scrollView}
@@ -136,7 +149,7 @@ export const ProfileScreen = () => {
                 <AppIcon name="profile" size={80} />
               </View>
             )}
-            <View style={[styles.levelBadge, { backgroundColor: level.color }]}>
+            <View style={[styles.levelBadge, { backgroundColor: level.color, borderColor: colors.background }]}>
               <Text style={styles.levelBadgeText}>{level.level}</Text>
             </View>
           </MotiView>
@@ -150,10 +163,10 @@ export const ProfileScreen = () => {
           >
             <View style={styles.nameRow}>
               <Text variant="h2" style={styles.userName}>
-                {profile?.name || 'Användare'}
+                {profile?.name || t.common.user}
               </Text>
             </View>
-            <Text variant="body" style={styles.userEmail}>
+            <Text variant="body" style={[styles.userEmail, { color: colors.text.secondary }]}>
               {user?.email}
             </Text>
 
@@ -180,12 +193,12 @@ export const ProfileScreen = () => {
                 <AppIcon name="xp" size={36} />
               </LinearGradient>
               <View>
-                <Text style={styles.xpValue}>{stats?.totalXP || 0} XP</Text>
-                <Text style={styles.xpLabel}>Nästa nivå: {nextLevel?.minXP || 'Max'} XP</Text>
+                <Text style={[styles.xpValue, { color: colors.text.primary }]}>{stats?.totalXP || 0} XP</Text>
+                <Text style={[styles.xpLabel, { color: colors.text.secondary }]}>{t.profile.nextLevel} {nextLevel?.minXP || 'Max'} XP</Text>
               </View>
             </View>
             <View style={styles.xpProgressContainer}>
-              <View style={styles.xpProgressTrack}>
+              <View style={[styles.xpProgressTrack, { backgroundColor: colors.glass.medium }]}>
                 <View style={[styles.xpProgressFill, { width: `${xpProgress.percentage}%` }]} />
               </View>
             </View>
@@ -196,7 +209,7 @@ export const ProfileScreen = () => {
         <View style={styles.content}>
           {/* Quick Stats Row */}
           <MotiView
-            style={styles.quickStatsRow}
+            style={[styles.quickStatsRow, { backgroundColor: colors.glass.light }]}
             from={{ opacity: 0, translateX: -30 }}
             animate={{ opacity: 1, translateX: 0 }}
             transition={{ ...SPRING_CONFIGS.smooth, delay: 300 }}
@@ -211,11 +224,11 @@ export const ProfileScreen = () => {
                 <AppIcon name="streak" size={36} />
               </LinearGradient>
               <View>
-                <Text style={styles.quickStatValue}>{stats?.currentStreak || 0}</Text>
-                <Text style={styles.quickStatLabel}>dagar</Text>
+                <Text style={[styles.quickStatValue, { color: colors.text.primary }]}>{stats?.currentStreak || 0}</Text>
+                <Text style={[styles.quickStatLabel, { color: colors.text.secondary }]}>{t.common.days}</Text>
               </View>
             </View>
-            <View style={styles.quickStatDivider} />
+            <View style={[styles.quickStatDivider, { backgroundColor: colors.glass.medium }]} />
             <View style={styles.quickStat}>
               <LinearGradient
                 colors={['#3B82F6', '#2563EB']}
@@ -226,11 +239,11 @@ export const ProfileScreen = () => {
                 <AppIcon name="courses" size={36} />
               </LinearGradient>
               <View>
-                <Text style={styles.quickStatValue}>{stats?.lessonsCompleted || 0}</Text>
-                <Text style={styles.quickStatLabel}>lektioner</Text>
+                <Text style={[styles.quickStatValue, { color: colors.text.primary }]}>{stats?.lessonsCompleted || 0}</Text>
+                <Text style={[styles.quickStatLabel, { color: colors.text.secondary }]}>{t.common.lessons}</Text>
               </View>
             </View>
-            <View style={styles.quickStatDivider} />
+            <View style={[styles.quickStatDivider, { backgroundColor: colors.glass.medium }]} />
             <View style={styles.quickStat}>
               <LinearGradient
                 colors={['#F59E0B', '#D97706']}
@@ -241,8 +254,8 @@ export const ProfileScreen = () => {
                 <Text style={styles.quickStatEmoji}>🏆</Text>
               </LinearGradient>
               <View>
-                <Text style={styles.quickStatValue}>{stats?.badgesEarned?.length || 0}</Text>
-                <Text style={styles.quickStatLabel}>badges</Text>
+                <Text style={[styles.quickStatValue, { color: colors.text.primary }]}>{stats?.badgesEarned?.length || 0}</Text>
+                <Text style={[styles.quickStatLabel, { color: colors.text.secondary }]}>{t.common.badges}</Text>
               </View>
             </View>
           </MotiView>
@@ -264,12 +277,12 @@ export const ProfileScreen = () => {
                   <AppIcon name="streak" size={36} />
                 </LinearGradient>
                 <View>
-                  <Text style={styles.streakCardTitle}>Streak</Text>
-                  <Text style={styles.streakCardSubtitle}>Håll igång!</Text>
+                  <Text style={[styles.streakCardTitle, { color: colors.text.primary }]}>{t.profile.streak}</Text>
+                  <Text style={styles.streakCardSubtitle}>{t.profile.keepGoing}</Text>
                 </View>
                 <View style={styles.streakCardValue}>
                   <Text style={styles.streakCardNumber}>{stats?.currentStreak || 0}</Text>
-                  <Text style={styles.streakCardDays}>dagar</Text>
+                  <Text style={[styles.streakCardDays, { color: colors.text.secondary }]}>{t.common.days}</Text>
                 </View>
               </View>
             </TiltCard>
@@ -284,7 +297,7 @@ export const ProfileScreen = () => {
           >
             <View style={styles.sectionHeader}>
               <Text variant="h3" style={styles.sectionTitle}>
-                Dina Badges
+                {t.profile.yourBadges}
               </Text>
             </View>
             <View style={styles.badgesGrid}>
@@ -293,14 +306,14 @@ export const ProfileScreen = () => {
                 return (
                   <MotiView
                     key={badge.id}
-                    style={[styles.badgeItem, !isUnlocked && styles.badgeItemLocked]}
+                    style={[styles.badgeItem, { backgroundColor: ui.card.background, borderColor: ui.card.border }, !isUnlocked && styles.badgeItemLocked]}
                     from={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ ...SPRING_CONFIGS.bouncy, delay: 550 + index * 50 }}
                   >
                     <Text style={styles.badgeEmoji}>{badge.icon}</Text>
-                    <Text style={styles.badgeName} numberOfLines={1}>
-                      {badge.name}
+                    <Text style={[styles.badgeName, { color: colors.text.primary }]} numberOfLines={1}>
+                      {(t.badges as any)[badge.id]?.name || badge.name}
                     </Text>
                   </MotiView>
                 );
@@ -319,7 +332,7 @@ export const ProfileScreen = () => {
               onPress={() => navigation.navigate('Settings')}
               tiltAmount={2}
               scaleAmount={0.98}
-              style={styles.actionButton}
+              style={[styles.actionButton, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
             >
               <LinearGradient
                 colors={['#8B5CF6', '#6366f1']}
@@ -330,21 +343,21 @@ export const ProfileScreen = () => {
                 <Text style={styles.actionEmoji}>⚙️</Text>
               </LinearGradient>
               <View style={styles.actionContent}>
-                <Text variant="body" style={styles.actionTitle}>
-                  Inställningar
+                <Text variant="body" style={[styles.actionTitle, { color: colors.text.primary }]}>
+                  {t.profile.settings}
                 </Text>
-                <Text variant="caption" style={styles.actionSubtitle}>
-                  Konto och app-inställningar
+                <Text variant="caption" style={[styles.actionSubtitle, { color: colors.text.secondary }]}>
+                  {t.profile.settingsSubtitle}
                 </Text>
               </View>
-              <Text style={styles.actionArrow}>›</Text>
+              <Text style={[styles.actionArrow, { color: colors.text.muted }]}>›</Text>
             </TiltCard>
 
             <TiltCard
               onPress={() => signOut()}
               tiltAmount={2}
               scaleAmount={0.98}
-              style={[styles.actionButton, styles.logoutButton]}
+              style={[styles.actionButton, { backgroundColor: ui.card.background, borderColor: ui.card.border }, styles.logoutButton]}
             >
               <LinearGradient
                 colors={['#EF4444', '#DC2626']}
@@ -356,13 +369,13 @@ export const ProfileScreen = () => {
               </LinearGradient>
               <View style={styles.actionContent}>
                 <Text variant="body" style={[styles.actionTitle, { color: '#EF4444' }]}>
-                  Logga ut
+                  {t.profile.logout}
                 </Text>
-                <Text variant="caption" style={styles.actionSubtitle}>
-                  Avsluta din session
+                <Text variant="caption" style={[styles.actionSubtitle, { color: colors.text.secondary }]}>
+                  {t.profile.endSession}
                 </Text>
               </View>
-              <Text style={styles.actionArrow}>›</Text>
+              <Text style={[styles.actionArrow, { color: colors.text.muted }]}>›</Text>
             </TiltCard>
           </MotiView>
         </View>
@@ -374,7 +387,7 @@ export const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
+    // backgroundColor set dynamically
   },
   loadingContainer: {
     flex: 1,
@@ -383,6 +396,34 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+  },
+  headerTitle: {
+    // color from Text component
+  },
+  menuButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    // backgroundColor set dynamically
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  menuLine: {
+    width: 20,
+    height: 2,
+    // backgroundColor set dynamically
+    borderRadius: 1,
+  },
+  menuLineShort: {
+    width: 14,
   },
   heroSection: {
     alignItems: 'center',
@@ -442,7 +483,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: '#0C0A17',
+    // borderColor set dynamically
   },
   levelBadgeText: {
     color: '#FFFFFF',
@@ -459,13 +500,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   userName: {
-    color: '#F9FAFB',
+    // color from Text component
   },
   roleEmoji: {
     fontSize: 24,
   },
   userEmail: {
-    color: '#9CA3AF',
+    // color set dynamically
     marginTop: 4,
   },
   badgeRow: {
@@ -493,12 +534,12 @@ const styles = StyleSheet.create({
     fontSize: 26,
   },
   xpValue: {
-    color: '#F9FAFB',
+    // color set dynamically
     fontSize: 24,
     fontWeight: '700',
   },
   xpLabel: {
-    color: '#9CA3AF',
+    // color set dynamically
     fontSize: 13,
   },
   xpProgressContainer: {
@@ -506,7 +547,7 @@ const styles = StyleSheet.create({
   },
   xpProgressTrack: {
     height: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    // backgroundColor set dynamically
     borderRadius: 5,
     overflow: 'hidden',
   },
@@ -521,7 +562,7 @@ const styles = StyleSheet.create({
   },
   quickStatsRow: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    // backgroundColor set dynamically
     borderRadius: 20,
     padding: 16,
     alignItems: 'center',
@@ -535,7 +576,7 @@ const styles = StyleSheet.create({
   quickStatDivider: {
     width: 1,
     height: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    // backgroundColor set dynamically
   },
   quickStatGradient: {
     width: 44,
@@ -548,17 +589,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   quickStatValue: {
-    color: '#F9FAFB',
+    // color set dynamically
     fontSize: 18,
     fontWeight: '700',
   },
   quickStatLabel: {
-    color: '#9CA3AF',
+    // color set dynamically
     fontSize: 12,
   },
   streakCard: {
     backgroundColor: 'rgba(249, 115, 22, 0.1)',
-    borderRadius: uiColors.card.radius,
+    borderRadius: 20,
     padding: 16,
     borderWidth: 1,
     borderColor: 'rgba(249, 115, 22, 0.2)',
@@ -581,7 +622,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
   },
   streakCardTitle: {
-    color: '#F9FAFB',
+    // color set dynamically
     fontSize: 18,
     fontWeight: '700',
   },
@@ -599,7 +640,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   streakCardDays: {
-    color: '#9CA3AF',
+    // color set dynamically
     fontSize: 12,
   },
   streakCardStats: {
@@ -613,12 +654,12 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   streakStatLabel: {
-    color: '#9CA3AF',
+    // color set dynamically
     fontSize: 12,
     marginBottom: 4,
   },
   streakStatValue: {
-    color: '#F9FAFB',
+    // color set dynamically
     fontSize: 14,
     fontWeight: '600',
   },
@@ -634,7 +675,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   sectionTitle: {
-    color: '#F9FAFB',
+    // color from Text component
   },
   badgesGrid: {
     flexDirection: 'row',
@@ -643,12 +684,11 @@ const styles = StyleSheet.create({
   },
   badgeItem: {
     width: '30%',
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderRadius: 16,
     padding: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: uiColors.card.border,
   },
   badgeItemLocked: {
     opacity: 0.5,
@@ -658,7 +698,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   badgeName: {
-    color: '#F9FAFB',
+    // color set dynamically
     fontSize: 11,
     fontWeight: '600',
     textAlign: 'center',
@@ -670,11 +710,10 @@ const styles = StyleSheet.create({
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderRadius: 20,
     padding: 20,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
     gap: 16,
   },
   logoutButton: {
@@ -693,20 +732,20 @@ const styles = StyleSheet.create({
   },
   actionArrow: {
     fontSize: 28,
-    color: '#6B7280',
+    // color set dynamically
     fontWeight: '300',
   },
   actionContent: {
     flex: 1,
   },
   actionTitle: {
-    color: '#F9FAFB',
+    // color set dynamically
     fontWeight: '700',
     fontSize: 16,
     marginBottom: 4,
   },
   actionSubtitle: {
-    color: '#9CA3AF',
+    // color set dynamically
     fontSize: 13,
   },
 });

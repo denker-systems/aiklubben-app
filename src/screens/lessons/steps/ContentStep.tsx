@@ -3,18 +3,20 @@ import { View, Image, StyleSheet, Text as RNText } from 'react-native';
 import { MotiView } from 'moti';
 import { Text, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Simple markdown renderer for bold (**text**) support
-const renderMarkdown = (text: string, baseStyle: any) => {
+const renderMarkdown = (text: string, baseStyle: any, boldColor: string) => {
   const parts = text.split(/(\*\*.*?\*\*)/g);
   return (
     <RNText style={baseStyle}>
       {parts.map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           return (
-            <RNText key={i} style={[baseStyle, { fontWeight: '700', color: '#F9FAFB' }]}>
+            <RNText key={i} style={[baseStyle, { fontWeight: '700', color: boldColor }]}>
               {part.slice(2, -2)}
             </RNText>
           );
@@ -36,6 +38,9 @@ interface ContentStepProps {
 }
 
 const ContentStepComponent: React.FC<ContentStepProps> = ({ content, onContinue }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   console.log('[ContentStep] Rendered', { title: content.title });
 
   const handleContinue = () => {
@@ -70,7 +75,7 @@ const ContentStepComponent: React.FC<ContentStepProps> = ({ content, onContinue 
             resizeMode="cover"
             accessible={true}
             accessibilityRole="image"
-            accessibilityLabel={`Illustration för ${content.title}`}
+            accessibilityLabel={`${content.title}`}
           />
         </MotiView>
       ) : (
@@ -100,7 +105,7 @@ const ContentStepComponent: React.FC<ContentStepProps> = ({ content, onContinue 
           animate={{ opacity: 1, translateY: 0 }}
           transition={{ ...SPRING_CONFIGS.smooth, delay: STAGGER_DELAYS.normal * 2 }}
         >
-          {renderMarkdown(content.body, styles.body)}
+          {renderMarkdown(content.body, [styles.body, { color: colors.text.secondary }], colors.text.primary)}
         </MotiView>
       </View>
 
@@ -110,8 +115,8 @@ const ContentStepComponent: React.FC<ContentStepProps> = ({ content, onContinue 
         animate={{ opacity: 1 }}
         transition={{ ...SPRING_CONFIGS.smooth, delay: 800 }}
       >
-        <Text variant="caption" style={styles.readText}>
-          📖 Läs och tryck på Fortsätt
+        <Text variant="caption" style={[styles.readText, { color: colors.text.muted }]}>
+          {t.lessons.readAndContinue}
         </Text>
       </MotiView>
     </MotiView>
@@ -140,13 +145,13 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   title: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontSize: 24,
     fontWeight: '700',
     lineHeight: 32,
   },
   body: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     fontSize: 17,
     lineHeight: 28,
   },
@@ -155,7 +160,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   readText: {
-    color: uiColors.text.muted,
+    // color from Text component
     fontSize: 14,
   },
 });

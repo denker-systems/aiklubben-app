@@ -6,7 +6,8 @@ import { LucideIcon } from 'lucide-react-native';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { brandColors } from '@/config/theme';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 
 type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost';
 
@@ -41,6 +42,8 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   size = 'medium',
   style,
 }) => {
+  const { isDark, colors: themeColors } = useTheme();
+  const ui = getUiColors(isDark);
   const colors = disabled ? variantColors.secondary : variantColors[variant];
   const isGhost = variant === 'ghost';
 
@@ -70,17 +73,17 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         >
           {isGhost ? (
             <MotiView
-              style={[styles.ghostContent, getSizeStyles()]}
+              style={[styles.ghostContent, getSizeStyles(), { borderColor: ui.card.border }]}
               animate={{ scale: disabled ? 1 : 1 }}
             >
               {Icon && iconPosition === 'left' && (
-                <Icon size={size === 'small' ? 16 : 20} color={uiColors.text.secondary} />
+                <Icon size={size === 'small' ? 16 : 20} color={themeColors.text.secondary} />
               )}
-              <Text variant="body" style={[styles.ghostLabel, size === 'small' && styles.labelSmall]}>
+              <Text variant="body" style={[styles.ghostLabel, { color: themeColors.text.secondary }]}>
                 {label}
               </Text>
               {Icon && iconPosition === 'right' && (
-                <Icon size={size === 'small' ? 16 : 20} color={uiColors.text.secondary} />
+                <Icon size={size === 'small' ? 16 : 20} color={themeColors.text.secondary} />
               )}
             </MotiView>
           ) : (
@@ -134,7 +137,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     borderWidth: 2,
-    borderColor: uiColors.card.border,
+    // borderColor set dynamically
     borderRadius: 16,
   },
   small: {
@@ -155,7 +158,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   ghostLabel: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     fontWeight: '600',
     fontSize: 16,
   },

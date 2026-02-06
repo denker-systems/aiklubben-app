@@ -5,7 +5,8 @@ import { Check, X, Image as ImageIcon } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
 import { StepContainer, QuestionHeader, FeedbackCard } from '../components/shared';
 
@@ -33,6 +34,8 @@ export const ImageChoiceStep: React.FC<ImageChoiceStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const columns = content.columns || 2;
@@ -81,6 +84,7 @@ export const ImageChoiceStep: React.FC<ImageChoiceStepProps> = ({
               <View
                 style={[
                   styles.option,
+                  { backgroundColor: ui.card.background, borderColor: ui.card.border },
                   isSelected && styles.optionSelected,
                   showAsCorrect && styles.optionCorrect,
                   showAsIncorrect && styles.optionIncorrect,
@@ -91,7 +95,7 @@ export const ImageChoiceStep: React.FC<ImageChoiceStepProps> = ({
                 disabled={showFeedback}
                 style={styles.optionPressable}
               >
-                <View style={styles.imageContainer}>
+                <View style={[styles.imageContainer, { backgroundColor: colors.glass.light }]}>
                   {option.image_url ? (
                     <Image
                       source={{ uri: option.image_url }}
@@ -102,7 +106,7 @@ export const ImageChoiceStep: React.FC<ImageChoiceStepProps> = ({
                     <Text style={styles.emoji}>{option.emoji}</Text>
                   ) : (
                     <View style={styles.placeholder}>
-                      <ImageIcon size={32} color={uiColors.text.muted} />
+                      <ImageIcon size={32} color={colors.text.muted} />
                     </View>
                   )}
 
@@ -171,9 +175,8 @@ const styles = StyleSheet.create({
   },
   option: {
     flex: 1,
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderWidth: 3,
-    borderColor: uiColors.card.border,
     borderRadius: 20,
     padding: 12,
     alignItems: 'center',
@@ -206,7 +209,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: uiColors.glass.light,
+    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -238,7 +241,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EF4444',
   },
   label: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',

@@ -4,7 +4,8 @@ import { MotiView } from 'moti';
 import { Text } from './Text';
 import { GradientIconBadge } from './GradientIconBadge';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 
 type GradientColors = readonly [string, string, ...string[]];
 
@@ -31,6 +32,9 @@ const SectionHeaderComponent = memo(function SectionHeader({
   delay = 0,
   style,
 }: SectionHeaderProps) {
+  const { isDark } = useTheme();
+  const ui = getUiColors(isDark);
+
   const transitionConfig = useMemo(
     () => ({
       ...SPRING_CONFIGS.smooth,
@@ -58,7 +62,7 @@ const SectionHeaderComponent = memo(function SectionHeader({
       </View>
 
       {action && onActionPress && (
-        <Pressable onPress={onActionPress} style={styles.actionButton}>
+        <Pressable onPress={onActionPress} style={[styles.actionButton, { backgroundColor: ui.glass.strong, borderColor: ui.glass.stroke }]}>
           <Text style={styles.actionText}>{action}</Text>
         </Pressable>
       )}
@@ -94,19 +98,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    color: '#F9FAFB',
+    // color from Text component
   },
   subtitle: {
-    color: '#9CA3AF',
+    // color from Text component
     marginTop: 2,
   },
   actionButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: uiColors.glass.strong, // Use centralized glass color
+    // backgroundColor and borderColor set dynamically
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: uiColors.glass.stroke,
   },
   actionText: {
     color: '#8B5CF6',

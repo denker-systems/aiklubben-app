@@ -29,16 +29,16 @@ export function Input({
   multiline = false,
   numberOfLines = 1,
 }: InputProps) {
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
 
   return (
     <View style={[styles.container, style]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <Text style={[styles.label, { color: colors.text.primary }]}>{label}</Text>}
       <RNTextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
+        placeholderTextColor={colors.text.muted}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
@@ -48,9 +48,9 @@ export function Input({
         style={[
           styles.input,
           {
-            backgroundColor: isDark ? '#121023' : '#F3F4F6',
-            color: isDark ? '#F9FAFB' : '#111827',
-            borderColor: error ? '#EF4444' : isDark ? '#2A2445' : '#E5E7EB',
+            backgroundColor: isDark ? colors.surface : '#F3F4F6',
+            color: colors.text.primary,
+            borderColor: error ? colors.error : colors.border.default,
             height: multiline ? 'auto' : 56,
             minHeight: multiline ? 100 : 56,
             paddingTop: multiline ? 16 : 0,
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    color: '#F9FAFB',
+    // color set dynamically
     marginBottom: 8,
     marginLeft: 4,
     fontSize: 14,

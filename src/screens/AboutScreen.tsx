@@ -3,12 +3,14 @@ import { ScreenWrapper } from '@/components/layout';
 import { Text, Card } from '@/components/ui';
 import { View, StyleSheet } from 'react-native';
 import { brandColors } from '@/config/theme';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const AboutScreen = () => {
   console.log('[AboutScreen] Rendered');
-  
+  const { t } = useLanguage();
+
   return (
-    <ScreenWrapper title="Om AI Klubben" showBack>
+    <ScreenWrapper title={t.about.title} showBack>
       <View style={styles.header}>
         <View style={styles.logoContainer}>
           <Text variant="h1" style={styles.logoText}>
@@ -16,7 +18,7 @@ export const AboutScreen = () => {
           </Text>
         </View>
         <Text variant="h1" weight="bold">
-          AI Klubben
+          {t.about.appName}
         </Text>
         <Text variant="body" className="text-muted-foreground">
           Version 1.0.0
@@ -25,22 +27,19 @@ export const AboutScreen = () => {
 
       <Card variant="glass" style={styles.card}>
         <Text variant="h3" weight="bold" style={{ marginBottom: 12 }}>
-          Vår Vision
+          {t.about.visionTitle}
         </Text>
         <Text variant="body" className="text-muted-foreground" style={{ lineHeight: 24 }}>
-          AI Klubben skapades med målet att demokratisera tillgången till kunskap om artificiell
-          intelligens. Vi tror att AI är ett kraftfullt verktyg som bör vara tillgängligt för alla,
-          inte bara tekniska experter.
+          {t.about.visionText}
         </Text>
       </Card>
 
       <Card variant="glass" style={styles.card}>
         <Text variant="h3" weight="bold" style={{ marginBottom: 12 }}>
-          Vad vi erbjuder
+          {t.about.offerTitle}
         </Text>
         <Text variant="body" className="text-muted-foreground" style={{ lineHeight: 24 }}>
-          Genom vår plattform erbjuder vi kurerat innehåll, utbildningsmaterial och ett community
-          för alla som vill utforska möjligheterna med AI i sin vardag och sitt arbete.
+          {t.about.offerText}
         </Text>
       </Card>
     </ScreenWrapper>

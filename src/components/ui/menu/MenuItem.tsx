@@ -15,15 +15,15 @@ interface MenuItemProps {
 }
 
 export function MenuItem({ icon: Icon, title, subtitle, onPress }: MenuItemProps) {
-  const { isDark } = useTheme();
-  const textColor = isDark ? '#FAFAFA' : '#171717';
-  const mutedColor = '#9CA3AF';
+  const { isDark, colors } = useTheme();
+  const textColor = colors.text.primary;
+  const mutedColor = colors.text.muted;
   const iconBgColor = isDark ? 'rgba(139, 92, 246, 0.15)' : 'rgba(139, 92, 246, 0.1)';
   const iconColor = brandColors.purple;
 
   return (
     <Pressable
-      style={({ pressed }) => [pressed && { backgroundColor: isDark ? '#1D1933' : '#F3F4F6' }]}
+      style={({ pressed }) => [pressed && { backgroundColor: colors.glass.pressed }]}
       onPress={onPress}
     >
       <View style={styles.container}>
@@ -42,7 +42,7 @@ export function MenuItem({ icon: Icon, title, subtitle, onPress }: MenuItemProps
           )}
         </View>
 
-        <ChevronRight size={20} color="#4B5563" style={styles.chevron} />
+        <ChevronRight size={20} color={colors.text.muted} style={styles.chevron} />
       </View>
     </Pressable>
   );

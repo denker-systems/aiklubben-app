@@ -2,29 +2,26 @@ import React from 'react';
 import { ScreenWrapper } from '@/components/layout';
 import { Text } from '@/components/ui';
 import { View } from 'react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const PrivacyScreen = () => {
   console.log('[PrivacyScreen] Rendered');
+  const { t } = useLanguage();
   
   return (
-    <ScreenWrapper title="Integritetspolicy" showBack>
+    <ScreenWrapper title={t.privacy.title} showBack>
       <View style={{ gap: 24 }}>
-        <Section title="Vår inställning till integritet">
-          AI Klubben värnar om din integritet. Vi samlar endast in den information som är nödvändig
-          för att tillhandahålla våra tjänster och förbättra din upplevelse.
+        <Section title={t.privacy.privacyTitle}>
+          {t.privacy.privacyText}
         </Section>
-        <Section title="Data vi samlar in">
-          Vi samlar in information som du tillhandahåller direkt, till exempel när du skapar ett
-          konto eller kontaktar supporten. Detta inkluderar namn, e-postadress och
-          användarstatistik.
+        <Section title={t.privacy.dataTitle}>
+          {t.privacy.dataText}
         </Section>
-        <Section title="Hur vi använder din data">
-          Din data används för att personalisera ditt innehåll, skicka viktiga uppdateringar och
-          analysera användningen av appen för att kunna göra förbättringar.
+        <Section title={t.privacy.usageTitle}>
+          {t.privacy.usageText}
         </Section>
-        <Section title="Dina rättigheter">
-          Du har rätt att begära utdrag av din data, rätta felaktig information eller begära att din
-          data raderas permanent från våra system.
+        <Section title={t.privacy.rightsTitle}>
+          {t.privacy.rightsText}
         </Section>
       </View>
     </ScreenWrapper>

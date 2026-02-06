@@ -4,7 +4,9 @@ import { MotiView } from 'moti';
 import { Check, X, Lightbulb } from 'lucide-react-native';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
 
 interface FeedbackCardProps {
@@ -21,10 +23,13 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({
   title,
   explanation,
   correctAnswer,
-  correctAnswerLabel = 'Rätt svar:',
+  correctAnswerLabel,
   delay = 0,
 }) => {
-  const defaultTitle = isCorrect ? 'Helt rätt! 🎉' : 'Inte riktigt';
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
+  const defaultTitle = isCorrect ? t.feedback.correct : t.feedback.incorrect;
   const color = isCorrect ? '#10B981' : '#EF4444';
 
   return (
@@ -49,8 +54,8 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({
 
       {!isCorrect && correctAnswer && (
         <View style={styles.correctAnswerBox}>
-          <Text variant="caption" style={styles.correctAnswerLabel}>
-            {correctAnswerLabel}
+          <Text variant="caption" style={[styles.correctAnswerLabel, { color: colors.text.muted }]}>
+            {correctAnswerLabel || t.feedback.correctAnswerLabel}
           </Text>
           <Text variant="body" style={styles.correctAnswerText}>
             {correctAnswer}
@@ -61,7 +66,7 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({
       {explanation && (
         <View style={styles.explanationBox}>
           <Lightbulb size={16} color={brandColors.purple} />
-          <Text variant="body" style={styles.explanationText}>
+          <Text variant="body" style={[styles.explanationText, { color: colors.text.secondary }]}>
             {explanation}
           </Text>
         </View>
@@ -109,7 +114,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(139, 92, 246, 0.2)',
   },
   correctAnswerLabel: {
-    color: uiColors.text.muted,
+    // color set dynamically
     marginBottom: 4,
     fontSize: 12,
   },
@@ -125,7 +130,7 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   explanationText: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     flex: 1,
     lineHeight: 22,
   },

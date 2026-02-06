@@ -5,7 +5,9 @@ import { AlertTriangle, Check, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
 import { StepContainer, QuestionHeader, FeedbackCard } from '../components/shared';
 
@@ -32,6 +34,9 @@ export const SpotErrorStep: React.FC<SpotErrorStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   const [selectedLines, setSelectedLines] = useState<Set<number>>(new Set());
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -93,18 +98,18 @@ export const SpotErrorStep: React.FC<SpotErrorStepProps> = ({
         icon={AlertTriangle}
         iconColor="#EF4444"
         title={content.instruction}
-        subtitle="Tryck på raden/raderna som innehåller fel"
+        subtitle={t.steps.tapToHighlight}
       />
 
       {content.context && (
         <View style={styles.contextBox}>
-          <Text variant="body" style={styles.contextText}>
+          <Text variant="body" style={[styles.contextText, { color: colors.text.secondary }]}>
             {content.context}
           </Text>
         </View>
       )}
 
-      <View style={styles.codeContainer}>
+      <View style={[styles.codeContainer, { borderColor: ui.card.border }]}>
         {content.lines.map((line, index) => {
           const state = getLineState(line.lineNumber);
 
@@ -184,7 +189,7 @@ export const SpotErrorStep: React.FC<SpotErrorStepProps> = ({
       {selectedLines.size > 0 && !showFeedback && (
         <Pressable onPress={handleCheck} style={styles.checkButton}>
           <Text style={styles.checkButtonText}>
-            Kontrollera ({selectedLines.size} {selectedLines.size === 1 ? 'rad' : 'rader'} vald)
+            {t.steps.checkAnswer} ({selectedLines.size} {selectedLines.size === 1 ? t.steps.linesSingular : t.steps.linesPlural})
           </Text>
         </Pressable>
       )}
@@ -193,8 +198,8 @@ export const SpotErrorStep: React.FC<SpotErrorStepProps> = ({
         <FeedbackCard
           isCorrect={isCorrect}
           explanation={explanation}
-          correctAnswer={isCorrect ? undefined : `Rad ${correctLineNumbers.join(', ')}`}
-          correctAnswerLabel="Fel på rad:"
+          correctAnswer={isCorrect ? undefined : `${t.feedback.line} ${correctLineNumbers.join(', ')}`}
+          correctAnswerLabel={t.feedback.errorOnLine}
         />
       )}
     </StepContainer>
@@ -210,7 +215,7 @@ const styles = StyleSheet.create({
     borderLeftColor: '#3B82F6',
   },
   contextText: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     fontSize: 14,
     lineHeight: 20,
   },
@@ -219,7 +224,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     borderWidth: 2,
-    borderColor: uiColors.card.border,
+    // borderColor set dynamically
   },
   codeLine: {
     flexDirection: 'row',

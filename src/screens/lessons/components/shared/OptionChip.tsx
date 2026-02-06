@@ -4,7 +4,8 @@ import { MotiView } from 'moti';
 import { Check, X } from 'lucide-react-native';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
 
 type ChipState = 'default' | 'selected' | 'correct' | 'incorrect' | 'disabled' | 'used';
@@ -30,6 +31,8 @@ export const OptionChip: React.FC<OptionChipProps> = ({
   index = 0,
   style,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
   const isDisabled = disabled || state === 'disabled' || state === 'used';
 
   const getStateStyles = () => {
@@ -69,7 +72,7 @@ export const OptionChip: React.FC<OptionChipProps> = ({
       }}
       transition={{ ...SPRING_CONFIGS.snappy, delay: index * 30 }}
     >
-      <View style={[styles.chip, getSizeStyles(), getStateStyles(), style]}>
+      <View style={[styles.chip, { backgroundColor: ui.card.background, borderColor: ui.card.border }, getSizeStyles(), getStateStyles(), style]}>
         <Pressable
           onPress={onPress}
           disabled={isDisabled}
@@ -110,9 +113,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: uiColors.card.background,
     borderWidth: 2,
-    borderColor: uiColors.card.border,
     borderRadius: 16,
   },
   chipPressable: {
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
   },
   used: {
     borderColor: 'transparent',
-    backgroundColor: uiColors.glass.light,
+    // backgroundColor overridden dynamically for 'used' state
   },
   disabled: {
     opacity: 0.5,
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   label: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontWeight: '500',
   },
   labelSmall: {
@@ -171,6 +172,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   labelUsed: {
-    color: uiColors.text.muted,
+    // color set dynamically
   },
 });

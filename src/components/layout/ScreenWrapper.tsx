@@ -33,9 +33,9 @@ export function ScreenWrapper({
   refreshing = false,
 }: ScreenWrapperProps) {
   const insets = useSafeAreaInsets();
-  const { isDark } = useTheme();
+  const { colors } = useTheme();
 
-  const backgroundColor = isDark ? '#0C0A17' : '#F9FAFB';
+  const backgroundColor = colors.background;
 
   const containerStyle = [styles.container, { backgroundColor, paddingTop: insets.top }, style];
 

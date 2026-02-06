@@ -3,7 +3,8 @@ import { View, StyleSheet, Image, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from './Text';
 import { TiltCard } from './TiltCard';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 
 interface ContentCardProps {
   title: string;
@@ -30,6 +31,8 @@ export function ContentCard({
   showOptions = false,
   variant = 'compact',
 }: ContentCardProps) {
+  const { isDark } = useTheme();
+  const ui = getUiColors(isDark);
   const isCompact = variant === 'compact';
 
   return (
@@ -37,7 +40,7 @@ export function ContentCard({
       onPress={onPress}
       tiltAmount={2}
       scaleAmount={0.98}
-      style={[styles.card, isCompact ? styles.cardCompact : styles.cardSpacious]}
+      style={[styles.card, { backgroundColor: ui.card.background, borderColor: ui.card.border }, isCompact ? styles.cardCompact : styles.cardSpacious]}
     >
       {emoji && (
         <LinearGradient
@@ -94,10 +97,9 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -138,7 +140,7 @@ const styles = StyleSheet.create({
     paddingRight: 120,
   },
   title: {
-    color: '#F9FAFB',
+    // color from Text component
     fontWeight: '600',
   },
   titleCompact: {
@@ -152,11 +154,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   subtitle: {
-    color: '#9CA3AF',
+    // color from Text component
     fontSize: 13,
   },
   date: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    // color set dynamically
     fontSize: 13,
     fontWeight: '600',
     marginTop: 4,
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
   },
   arrow: {
     fontSize: 28,
-    color: '#6B7280',
+    // color set dynamically
     fontWeight: '300',
   },
   optionsButton: {
@@ -191,7 +193,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   optionsText: {
-    color: 'rgba(255, 255, 255, 0.6)',
+    // color set dynamically
     fontSize: 16,
     fontWeight: '600',
   },

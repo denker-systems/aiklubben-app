@@ -3,8 +3,10 @@ import { View, StyleSheet } from 'react-native';
 import { MotiView } from 'moti';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 import { Heart, Zap } from 'lucide-react-native';
 
@@ -21,13 +23,16 @@ export const LessonProgress: React.FC<LessonProgressProps> = ({
   lives,
   streak,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t, ti } = useLanguage();
   const progress = ((currentStep + 1) / totalSteps) * 100;
   const maxLives = 3;
 
   return (
     <View style={styles.container}>
       <View style={styles.topRow}>
-        <View style={styles.track}>
+        <View style={[styles.track, { backgroundColor: colors.glass.light }]}>
           <MotiView
             style={styles.fill}
             from={{ width: '0%' }}
@@ -67,8 +72,8 @@ export const LessonProgress: React.FC<LessonProgressProps> = ({
         </View>
       </View>
 
-      <Text variant="caption" style={styles.stepText}>
-        STEG {currentStep + 1} AV {totalSteps}
+      <Text variant="caption" style={[styles.stepText, { color: colors.text.secondary }]}>
+        {ti(t.lessons.stepOf, { current: String(currentStep + 1), total: String(totalSteps) })}
       </Text>
     </View>
   );
@@ -87,7 +92,6 @@ const styles = StyleSheet.create({
   track: {
     flex: 1,
     height: 12,
-    backgroundColor: uiColors.glass.light,
     borderRadius: 6,
     overflow: 'hidden',
   },
@@ -121,7 +125,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   stepText: {
-    color: uiColors.text.muted,
     fontWeight: '700',
     letterSpacing: 1,
   },

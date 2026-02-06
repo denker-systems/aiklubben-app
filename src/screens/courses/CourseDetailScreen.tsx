@@ -7,6 +7,7 @@ import { supabase } from '@/config/supabase';
 import { brandColors } from '@/config/theme';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
+import { useTheme } from '@/contexts/ThemeContext';
 import { UnitHeader, LessonPath } from './components';
 
 interface Lesson {
@@ -24,6 +25,7 @@ export const CourseDetailScreen = () => {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const { id } = route.params;
+  const { colors } = useTheme();
 
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -139,7 +141,7 @@ export const CourseDetailScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
         <View style={styles.loadingContainer}>
           <MotiView
             from={{ opacity: 0, scale: 0.8 }}
@@ -155,7 +157,7 @@ export const CourseDetailScreen = () => {
 
   if (!course) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
         <View style={styles.loadingContainer}>
           <Text variant="h2">Kursen kunde inte hittas.</Text>
           <Pressable onPress={() => navigation.goBack()} style={styles.backLink}>
@@ -169,7 +171,7 @@ export const CourseDetailScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Sticky Unit Header */}
       <View style={{ paddingTop: insets.top }}>
         <UnitHeader
@@ -199,7 +201,6 @@ export const CourseDetailScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
   },
   loadingContainer: {
     flex: 1,

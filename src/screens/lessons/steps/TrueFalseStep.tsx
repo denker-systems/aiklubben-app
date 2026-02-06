@@ -5,7 +5,9 @@ import { Check, X, ThumbsUp, ThumbsDown } from 'lucide-react-native';
 // LinearGradient available if needed
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import * as Haptics from 'expo-haptics';
 
 // Screen dimensions available if needed
@@ -25,6 +27,10 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
+
   console.log('[TrueFalseStep] Rendered', { statement: content.statement, correctAnswer });
   
   const [selectedAnswer, setSelectedAnswer] = useState<boolean | null>(null);
@@ -65,7 +71,7 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
     >
       {/* Question Card */}
       <View style={styles.questionCard}>
-        <Text variant="h2" style={styles.statement}>
+        <Text variant="h2" style={[styles.statement, { color: colors.text.primary }]}>
           {content.statement}
         </Text>
       </View>
@@ -117,11 +123,12 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
             <Text
               style={[
                 styles.buttonText,
+                { color: colors.text.primary },
                 (selectedAnswer === true || (showFeedback && correctAnswer === true)) &&
                   styles.buttonTextSelected,
               ]}
             >
-              Sant
+              {t.steps.trueLabel}
             </Text>
           </Pressable>
           </View>
@@ -172,11 +179,12 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
             <Text
               style={[
                 styles.buttonText,
+                { color: colors.text.primary },
                 (selectedAnswer === false || (showFeedback && correctAnswer === false)) &&
                   styles.buttonTextSelected,
               ]}
             >
-              Falskt
+              {t.steps.falseLabel}
             </Text>
           </Pressable>
           </View>
@@ -203,10 +211,10 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
                 isCorrect ? styles.feedbackTitleCorrect : styles.feedbackTitleIncorrect,
               ]}
             >
-              {isCorrect ? 'Rätt!' : 'Fel svar'}
+              {isCorrect ? t.steps.correctFeedback : t.steps.incorrectFeedback}
             </Text>
           </View>
-          <Text variant="body" style={styles.feedbackText}>
+          <Text variant="body" style={[styles.feedbackText, { color: colors.text.secondary }]}>
             {explanation}
           </Text>
         </MotiView>
@@ -228,7 +236,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(139, 92, 246, 0.2)',
   },
   statement: {
-    color: uiColors.text.primary,
+    // color set dynamically
     textAlign: 'center',
     fontSize: 20,
     lineHeight: 28,
@@ -289,7 +297,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: {
-    color: uiColors.text.primary,
+    // color set dynamically
     fontWeight: '700',
     fontSize: 18,
   },
@@ -327,7 +335,7 @@ const styles = StyleSheet.create({
     borderColor: '#EF4444',
   },
   feedbackText: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     lineHeight: 22,
   },
 });

@@ -18,8 +18,8 @@ interface MenuSectionProps {
 }
 
 export function MenuSection({ title, items, onItemPress }: MenuSectionProps) {
-  const { isDark } = useTheme();
-  const sectionTitleColor = isDark ? '#4B5563' : '#9CA3AF';
+  const { colors } = useTheme();
+  const sectionTitleColor = colors.text.muted;
 
   return (
     <View style={styles.section}>

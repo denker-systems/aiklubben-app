@@ -5,11 +5,13 @@ import { ScreenWrapper } from '@/components/layout';
 import { Text, Card } from '@/components/ui';
 import { brandColors } from '@/config/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
 import {
   Bell,
   Lock,
   Moon,
+  Globe,
   CircleUser,
   ChevronRight,
   Info,
@@ -24,6 +26,7 @@ export const SettingsScreen = () => {
   const navigation = useNavigation<any>();
   const canGoBack = useNavigationState(state => state.routes.length > 1);
   const { isDark, toggleTheme, notificationsEnabled, setNotificationsEnabled, colors } = useTheme();
+  const { t, locale, setLocale } = useLanguage();
   const { signOut } = useAuth();
 
   const handleProfileSettings = useCallback(() => {
@@ -34,19 +37,19 @@ export const SettingsScreen = () => {
   const handleChangePassword = useCallback(() => {
     console.log('[SettingsScreen] handleChangePassword');
     Alert.alert(
-      'Byt lösenord',
-      'Vi skickar en länk till din e-post för att återställa ditt lösenord.',
+      t.settings.changePassword,
+      t.settings.changePasswordMessage,
       [
-        { text: 'Avbryt', style: 'cancel' },
+        { text: t.common.cancel, style: 'cancel' },
         {
-          text: 'Skicka länk',
+          text: t.settings.changePasswordSendLink,
           onPress: () => {
-            Alert.alert('Skickat!', 'Kolla din e-post för att återställa lösenordet.');
+            Alert.alert(t.settings.changePasswordSent, t.settings.changePasswordSentMessage);
           },
         },
       ]
     );
-  }, []);
+  }, [t]);
 
   const handlePrivacySettings = useCallback(() => {
     navigation.navigate('Privacy');
@@ -61,29 +64,29 @@ export const SettingsScreen = () => {
   }, [navigation]);
 
   const handleLogout = useCallback(() => {
-    Alert.alert('Logga ut', 'Är du säker på att du vill logga ut?', [
-      { text: 'Avbryt', style: 'cancel' },
+    Alert.alert(t.settings.logoutConfirmTitle, t.settings.logoutConfirmMessage, [
+      { text: t.common.cancel, style: 'cancel' },
       {
-        text: 'Logga ut',
+        text: t.settings.logoutConfirmTitle,
         style: 'destructive',
         onPress: async () => {
           await signOut();
         },
       },
     ]);
-  }, [signOut]);
+  }, [signOut, t]);
 
   return (
-    <ScreenWrapper title="Inställningar" showBack={canGoBack}>
+    <ScreenWrapper title={t.settings.title} showBack={canGoBack}>
       {/* App Settings */}
       <View style={styles.section}>
         <Text variant="tiny" weight="bold" style={[styles.sectionTitle, { color: colors.text.muted }]}>
-          APP-INSTÄLLNINGAR
+          {t.settings.appSettings}
         </Text>
         <Card variant="glass" noPadding>
           <SettingsRow
             icon={Bell}
-            title="Aviseringar"
+            title={t.settings.notifications}
             colors={colors}
             right={
               <Switch
@@ -96,9 +99,8 @@ export const SettingsScreen = () => {
           />
           <SettingsRow
             icon={Moon}
-            title="Mörkt läge"
+            title={t.settings.darkMode}
             colors={colors}
-            isLast
             right={
               <Switch
                 value={isDark}
@@ -108,32 +110,48 @@ export const SettingsScreen = () => {
               />
             }
           />
+          <SettingsRow
+            icon={Globe}
+            title={t.settings.language}
+            colors={colors}
+            isLast
+            right={
+              <Pressable
+                onPress={() => setLocale(locale === 'sv' ? 'en' : 'sv')}
+                style={styles.languageToggle}
+              >
+                <Text variant="body" style={{ color: brandColors.purple, fontWeight: '600' }}>
+                  {locale === 'sv' ? t.settings.swedish : t.settings.english}
+                </Text>
+              </Pressable>
+            }
+          />
         </Card>
       </View>
 
       {/* Account & Security */}
       <View style={styles.section}>
         <Text variant="tiny" weight="bold" style={[styles.sectionTitle, { color: colors.text.muted }]}>
-          KONTO & SÄKERHET
+          {t.settings.accountSecurity}
         </Text>
         <Card variant="glass" noPadding>
           <SettingsRow
             icon={CircleUser}
-            title="Profilinställningar"
+            title={t.settings.profileSettings}
             colors={colors}
             showArrow
             onPress={handleProfileSettings}
           />
           <SettingsRow
             icon={Lock}
-            title="Byt lösenord"
+            title={t.settings.changePassword}
             colors={colors}
             showArrow
             onPress={handleChangePassword}
           />
           <SettingsRow
             icon={Shield}
-            title="Integritetsinställningar"
+            title={t.settings.privacySettings}
             colors={colors}
             showArrow
             isLast
@@ -145,19 +163,19 @@ export const SettingsScreen = () => {
       {/* Support */}
       <View style={styles.section}>
         <Text variant="tiny" weight="bold" style={[styles.sectionTitle, { color: colors.text.muted }]}>
-          HJÄLP & SUPPORT
+          {t.settings.helpSupport}
         </Text>
         <Card variant="glass" noPadding>
           <SettingsRow
             icon={HelpCircle}
-            title="Support"
+            title={t.settings.support}
             colors={colors}
             showArrow
             onPress={handleSupport}
           />
           <SettingsRow
             icon={Info}
-            title="Om appen"
+            title={t.settings.aboutApp}
             colors={colors}
             showArrow
             isLast
@@ -169,11 +187,11 @@ export const SettingsScreen = () => {
       {/* About App */}
       <View style={styles.section}>
         <Text variant="tiny" weight="bold" style={[styles.sectionTitle, { color: colors.text.muted }]}>
-          OM APPEN
+          {t.settings.aboutSection}
         </Text>
         <Card variant="glass" noPadding>
           <SettingsRow
-            title="Version"
+            title={t.common.version}
             colors={colors}
             isLast
             right={
@@ -190,7 +208,7 @@ export const SettingsScreen = () => {
         <Card variant="glass" noPadding>
           <SettingsRow
             icon={LogOut}
-            title="Logga ut"
+            title={t.profile.logout}
             colors={colors}
             isLast
             onPress={handleLogout}
@@ -289,5 +307,9 @@ const styles = StyleSheet.create({
     width: 32,
     marginRight: 12,
     alignItems: 'center',
+  },
+  languageToggle: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
   },
 });

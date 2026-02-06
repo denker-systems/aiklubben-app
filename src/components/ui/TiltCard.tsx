@@ -2,7 +2,8 @@ import React, { memo, useCallback } from 'react';
 import { Pressable, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 
 interface TiltCardProps {
   children: React.ReactNode;
@@ -33,6 +34,8 @@ const TiltCardComponent = memo(function TiltCard({
   scaleAmount = 0.98,
   elevation = 2,
 }: TiltCardProps) {
+  const { isDark } = useTheme();
+  const ui = getUiColors(isDark);
   const pressed = useSharedValue(false);
   const rotateX = useSharedValue(0);
 
@@ -63,7 +66,7 @@ const TiltCardComponent = memo(function TiltCard({
   const shadowStyle = getShadowStyle(elevation);
 
   return (
-    <Animated.View style={[styles.container, shadowStyle, animatedStyle]}>
+    <Animated.View style={[styles.container, { backgroundColor: ui.card.background }, shadowStyle, animatedStyle]}>
       <Pressable
         onPress={onPress}
         onPressIn={handlePressIn}
@@ -93,7 +96,7 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 20, // Match design system
     overflow: 'visible',
-    backgroundColor: uiColors.card.background, // Default background
+    // backgroundColor set dynamically
   },
   pressable: {
     flex: 1,

@@ -4,8 +4,8 @@ import { MotiView } from 'moti';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from './Text';
 import { SPRING_CONFIGS } from '@/lib/animations';
-
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 
 type GradientColors = readonly [string, string, ...string[]];
 
@@ -40,8 +40,11 @@ const LargeCardComponent = memo(function LargeCard({
   style,
   children,
 }: LargeCardProps) {
+  const { isDark } = useTheme();
+  const ui = getUiColors(isDark);
+
   const cardContent = (
-    <View style={[styles.card, { height }, style]}>
+    <View style={[styles.card, { height, backgroundColor: ui.card.background, borderColor: ui.card.border }, style]}>
     <Pressable
       style={styles.cardPressable}
       onPress={onPress}
@@ -154,9 +157,8 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 20,
     overflow: 'hidden',
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderWidth: 1,
-    borderColor: uiColors.card.border,
   },
   cardPressable: {
     flex: 1,

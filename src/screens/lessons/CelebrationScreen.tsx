@@ -6,8 +6,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Text, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -66,6 +68,10 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
   newLevel,
   onContinue,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t, ti } = useLanguage();
+
   console.log('[CelebrationScreen] Rendered', { 
     xpEarned, 
     bonusXP, 
@@ -96,7 +102,7 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Confetti Effect */}
       {showConfetti && (
         <View style={styles.confettiContainer}>
@@ -152,19 +158,19 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
         >
           <Text variant="h1" style={styles.title}>
             {leveledUp
-              ? `Level Up! ${newLevel?.icon || '🌟'}`
+              ? `${t.lessons.levelUp} ${newLevel?.icon || '🌟'}`
               : isPerfect
-                ? 'Perfekt! 🎉'
-                : 'Bra jobbat! ✨'}
+                ? t.lessons.perfect
+                : t.lessons.wellDone}
           </Text>
           <Text variant="body" style={styles.subtitle}>
-            {leveledUp ? `Du är nu ${newLevel?.name}!` : 'Du klarade lektionen!'}
+            {leveledUp ? ti(t.lessons.youAreNow, { level: newLevel?.name || '' }) : t.lessons.lessonComplete}
           </Text>
         </MotiView>
 
         <View style={styles.stats}>
           <MotiView
-            style={styles.statCard}
+            style={[styles.statCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
             from={{ opacity: 0, translateX: -20 }}
             animate={{ opacity: 1, translateX: 0 }}
             transition={{ ...SPRING_CONFIGS.smooth, delay: 600 }}
@@ -182,13 +188,13 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
                 +{totalXP}
               </Text>
               <Text variant="caption" style={styles.statLabel}>
-                {bonusXP > 0 ? `${xpEarned} + ${bonusXP} bonus` : 'XP Earned'}
+                {bonusXP > 0 ? `${xpEarned} + ${bonusXP} bonus` : t.lessons.xpEarned}
               </Text>
             </View>
           </MotiView>
 
           <MotiView
-            style={styles.statCard}
+            style={[styles.statCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
             from={{ opacity: 0, translateX: 20 }}
             animate={{ opacity: 1, translateX: 0 }}
             transition={{ ...SPRING_CONFIGS.smooth, delay: 700 }}
@@ -206,7 +212,7 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
                 {percentage}%
               </Text>
               <Text variant="caption" style={styles.statLabel}>
-                Rätt svar
+                {t.lessons.correctAnswers}
               </Text>
             </View>
           </MotiView>
@@ -228,8 +234,8 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
             >
               <Text style={styles.streakEmoji}>🔥</Text>
               <View style={styles.streakContent}>
-                <Text style={styles.streakValue}>{streak} dagars streak!</Text>
-                <Text style={styles.streakLabel}>Fortsätt imorgon för att behålla den</Text>
+                <Text style={styles.streakValue}>{ti(t.lessons.streakDays, { count: streak })}</Text>
+                <Text style={styles.streakLabel}>{t.lessons.streakKeep}</Text>
               </View>
             </LinearGradient>
           </MotiView>
@@ -252,7 +258,7 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
               end={{ x: 1, y: 1 }}
             >
               <Text variant="body" style={styles.buttonText}>
-                Fortsätt →
+                {t.lessons.continueButton}
               </Text>
             </LinearGradient>
           </Pressable>
@@ -265,7 +271,6 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -303,11 +308,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    color: uiColors.text.primary,
+    // color from Text component
     textAlign: 'center',
   },
   subtitle: {
-    color: uiColors.text.secondary,
+    // color from Text component
     textAlign: 'center',
     marginTop: 8,
   },
@@ -321,11 +326,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderRadius: 20,
     padding: 20,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
   },
   statIconGradient: {
     width: 56,
@@ -335,11 +339,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   statValue: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontWeight: '700',
   },
   statLabel: {
-    color: uiColors.text.secondary,
+    // color from Text component
     marginTop: 4,
   },
   buttonContainer: {

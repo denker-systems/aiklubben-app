@@ -112,25 +112,40 @@ export const gradients = {
   dark_overlay: ['transparent', 'rgba(12, 10, 23, 0.7)', 'rgba(12, 10, 23, 0.95)'] as const,
 };
 
-export const uiColors = {
-  // Glass effects
-  glass: {
-    light: 'rgba(255, 255, 255, 0.05)',
-    medium: 'rgba(255, 255, 255, 0.08)',
-    strong: 'rgba(255, 255, 255, 0.15)',
-    pressed: 'rgba(255, 255, 255, 0.1)',
-    stroke: 'rgba(255, 255, 255, 0.1)',
-  },
-  // Text opacities
-  text: {
-    primary: '#F9FAFB',
-    secondary: '#9CA3AF',
-    muted: '#6B7280',
-  },
-  // Standard Card Style (from Profile Badges)
-  card: {
-    background: '#1F1F1F', // Solid gray with 100% opacity
-    border: 'rgba(255, 255, 255, 0.1)', // Subtle border for definition
-    radius: 20, // Consistent rounded corners
-  },
-};
+// Theme-aware UI colors - use this via useTheme().colors or getUiColors(isDark)
+export const getUiColors = (isDark: boolean) => ({
+  glass: isDark
+    ? {
+        light: 'rgba(255, 255, 255, 0.05)',
+        medium: 'rgba(255, 255, 255, 0.08)',
+        strong: 'rgba(255, 255, 255, 0.15)',
+        pressed: 'rgba(255, 255, 255, 0.1)',
+        stroke: 'rgba(255, 255, 255, 0.1)',
+      }
+    : {
+        light: 'rgba(0, 0, 0, 0.03)',
+        medium: 'rgba(0, 0, 0, 0.05)',
+        strong: 'rgba(0, 0, 0, 0.1)',
+        pressed: 'rgba(0, 0, 0, 0.06)',
+        stroke: 'rgba(0, 0, 0, 0.1)',
+      },
+  text: isDark
+    ? { primary: '#F9FAFB', secondary: '#9CA3AF', muted: '#6B7280' }
+    : { primary: '#111827', secondary: '#4B5563', muted: '#9CA3AF' },
+  card: isDark
+    ? {
+        background: '#1F1F1F',
+        border: 'rgba(255, 255, 255, 0.1)',
+        radius: 20,
+      }
+    : {
+        background: '#FFFFFF',
+        border: 'rgba(0, 0, 0, 0.08)',
+        radius: 20,
+      },
+});
+
+export type UiColors = ReturnType<typeof getUiColors>;
+
+// @deprecated - Use getUiColors(isDark) instead for theme support
+export const uiColors = getUiColors(true);

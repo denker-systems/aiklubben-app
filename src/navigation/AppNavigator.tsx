@@ -3,6 +3,7 @@ import {
   createNavigationContainerRef,
   NavigationContainer,
   DarkTheme,
+  DefaultTheme,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
@@ -27,6 +28,7 @@ import { MenuProvider, useMenu } from '@/contexts/MenuContext';
 import { TabNavigationProvider, useTabNavigation } from '@/contexts/TabNavigationContext';
 import { RootStackParamList } from '@/types/navigation';
 import { brandColors } from '@/config/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -34,6 +36,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const AppNavigatorContent = () => {
   const { user, loading, signOut } = useAuth();
   const { activeTab, setActiveTab } = useTabNavigation();
+  const { isDark, colors } = useTheme();
   const [isTabBarVisible, setIsTabBarVisible] = useState(true);
   const menuContext = useMenu();
 
@@ -64,7 +67,7 @@ const AppNavigatorContent = () => {
   if (loading) {
     console.log('[AppNavigator] Showing loading screen');
     return (
-      <View style={styles.loadingContainer}>
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={brandColors.purple} />
       </View>
     );
@@ -118,15 +121,16 @@ const AppNavigatorContent = () => {
     }
   };
 
+  const baseTheme = isDark ? DarkTheme : DefaultTheme;
   const navigationTheme = {
-    ...DarkTheme,
+    ...baseTheme,
     colors: {
-      ...DarkTheme.colors,
+      ...baseTheme.colors,
       primary: brandColors.purple,
-      background: brandColors.deepDark,
-      card: brandColors.darkBg,
-      text: '#F9FAFB',
-      border: brandColors.border,
+      background: colors.background,
+      card: colors.surface,
+      text: colors.text.primary,
+      border: colors.border.default,
     },
   };
 
@@ -191,6 +195,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: brandColors.deepDark,
   },
 });

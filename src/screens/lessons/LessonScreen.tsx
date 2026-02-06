@@ -12,7 +12,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { Text } from '@/components/ui';
 import { brandColors } from '@/config/theme';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { getLevelForXP, XP_VALUES } from '@/types/gamification';
 
 // Components
@@ -85,6 +87,9 @@ export const LessonScreen = () => {
   const navigation = useNavigation<LessonNavigationProp>();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
 
   const { lessonId, courseId } = route.params;
 
@@ -451,7 +456,7 @@ export const LessonScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={brandColors.purple} />
         </View>
@@ -461,7 +466,7 @@ export const LessonScreen = () => {
 
   if (!lesson) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
         <Text variant="body" style={styles.errorText}>
           Kunde inte ladda lektionen
         </Text>
@@ -496,18 +501,18 @@ export const LessonScreen = () => {
   const currentStep = lesson.lesson_steps[currentStepIndex];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 16, borderBottomColor: ui.card.border }]}>
         <Pressable
           onPress={handleExit}
-          style={styles.exitButton}
+          style={[styles.exitButton, { backgroundColor: ui.card.background }]}
           accessible={true}
           accessibilityRole="button"
-          accessibilityLabel="Avsluta lektion"
-          accessibilityHint="Öppnar dialogruta för att bekräfta avslut"
+          accessibilityLabel={t.lessons.exitLessonAccessibility}
+          accessibilityHint={t.lessons.exitLessonHint}
         >
-          <X size={24} color={uiColors.text.primary} />
+          <X size={24} color={colors.text.primary} />
         </Pressable>
 
         <LessonProgress
@@ -650,7 +655,7 @@ export const LessonScreen = () => {
       </ScrollView>
 
       {/* Bottom Action Button */}
-      <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 16 }]}>
+      <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 16, borderTopColor: ui.card.border, backgroundColor: colors.background }]}>
         <Pressable
           onPress={handleNext}
           disabled={!canContinue}
@@ -663,7 +668,7 @@ export const LessonScreen = () => {
             end={{ x: 1, y: 1 }}
           >
             <Text variant="body" style={styles.continueText}>
-              {currentStepIndex < lesson.lesson_steps.length - 1 ? 'Fortsätt' : 'Slutför'}
+              {currentStepIndex < lesson.lesson_steps.length - 1 ? t.common.continue : t.lessons.finishLesson}
             </Text>
           </LinearGradient>
         </Pressable>
@@ -678,19 +683,18 @@ export const LessonScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
   },
   header: {
     paddingHorizontal: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: uiColors.card.border,
+    // borderBottomColor set dynamically
   },
   exitButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: uiColors.card.background,
+    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -707,7 +711,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     textAlign: 'center',
     padding: 20,
   },
@@ -715,8 +719,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: uiColors.card.border,
-    backgroundColor: '#0C0A17',
+    // borderTopColor and backgroundColor set dynamically
   },
   continueButton: {
     borderRadius: 20,

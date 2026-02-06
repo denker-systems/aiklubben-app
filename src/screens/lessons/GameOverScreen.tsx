@@ -5,8 +5,9 @@ import { HeartOff, RefreshCcw, Home } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
-// brandColors available if needed
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface GameOverScreenProps {
   onRetry: () => void;
@@ -14,8 +15,12 @@ interface GameOverScreenProps {
 }
 
 export const GameOverScreen: React.FC<GameOverScreenProps> = ({ onRetry, onExit }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <MotiView
         style={styles.content}
         from={{ opacity: 0, scale: 0.8 }}
@@ -28,10 +33,10 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ onRetry, onExit 
 
         <View style={styles.textContainer}>
           <Text variant="h1" style={styles.title}>
-            Slut på liv!
+            {t.lessons.outOfLives}
           </Text>
           <Text variant="body" style={styles.subtitle}>
-            Oroa dig inte, du kan försöka igen eller komma tillbaka senare.
+            {t.lessons.gameOverMessage}
           </Text>
         </View>
 
@@ -41,7 +46,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ onRetry, onExit 
             style={styles.retryButton}
             accessible={true}
             accessibilityRole="button"
-            accessibilityLabel="Försök igen från början"
+            accessibilityLabel={t.lessons.retryAccessibility}
           >
             <LinearGradient
               colors={['#8B5CF6', '#6366f1']}
@@ -51,21 +56,21 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ onRetry, onExit 
             >
               <RefreshCcw size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
               <Text variant="body" style={styles.buttonText}>
-                Försök igen
+                {t.lessons.retryButton}
               </Text>
             </LinearGradient>
           </Pressable>
 
           <Pressable
             onPress={onExit}
-            style={styles.exitButton}
+            style={[styles.exitButton, { borderColor: ui.card.border }]}
             accessible={true}
             accessibilityRole="button"
-            accessibilityLabel="Avsluta och gå tillbaka till kursen"
+            accessibilityLabel={t.lessons.exitAccessibility}
           >
-            <Home size={20} color={uiColors.text.secondary} style={{ marginRight: 8 }} />
-            <Text variant="body" style={styles.exitButtonText}>
-              Avsluta
+            <Home size={20} color={colors.text.secondary} style={{ marginRight: 8 }} />
+            <Text variant="body" style={[styles.exitButtonText, { color: colors.text.secondary }]}>
+              {t.lessons.exitButton}
             </Text>
           </Pressable>
         </View>
@@ -77,7 +82,6 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ onRetry, onExit 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
@@ -106,7 +110,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subtitle: {
-    color: uiColors.text.secondary,
+    // color from Text component
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -137,10 +141,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
+    // borderColor set dynamically
   },
   exitButtonText: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     fontWeight: '600',
   },
 });

@@ -4,6 +4,7 @@ import { MotiView } from 'moti';
 import { Lock, Check } from 'lucide-react-native';
 import { Text } from './Text';
 import { SPRING_CONFIGS } from '@/lib/animations';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { Badge } from '@/types/gamification';
 
 interface AchievementBadgeProps {
@@ -21,6 +22,7 @@ export function AchievementBadge({
   onPress,
   size = 'md',
 }: AchievementBadgeProps) {
+  const { t } = useLanguage();
   const sizes = {
     sm: { container: 56, icon: 24, text: 10 },
     md: { container: 72, icon: 32, text: 12 },
@@ -29,6 +31,7 @@ export function AchievementBadge({
 
   const s = sizes[size];
   const progressPercentage = Math.min((progress / badge.requirement) * 100, 100);
+  const badgeName = (t.badges as any)[badge.id]?.name || badge.name;
 
   return (
     <Pressable onPress={onPress} disabled={!onPress}>
@@ -125,7 +128,7 @@ export function AchievementBadge({
           },
         ]}
       >
-        {badge.name}
+        {badgeName}
       </Text>
     </Pressable>
   );
@@ -172,7 +175,12 @@ interface BadgeUnlockModalProps {
 }
 
 export function BadgeUnlockOverlay({ badge, visible, onClose }: BadgeUnlockModalProps) {
+  const { t } = useLanguage();
   if (!visible || !badge) return null;
+
+  const badgeT = (t.badges as any)[badge.id];
+  const badgeName = badgeT?.name || badge.name;
+  const badgeDesc = badgeT?.description || badge.description;
 
   return (
     <MotiView
@@ -189,7 +197,7 @@ export function BadgeUnlockOverlay({ badge, visible, onClose }: BadgeUnlockModal
         animate={{ scale: 1, opacity: 1 }}
         transition={SPRING_CONFIGS.celebratory}
       >
-        <Text style={styles.unlockTitle}>🎉 Ny Badge!</Text>
+        <Text style={styles.unlockTitle}>{t.components.newBadge}</Text>
 
         <MotiView
           style={[styles.unlockBadge, { borderColor: badge.color }]}
@@ -201,17 +209,17 @@ export function BadgeUnlockOverlay({ badge, visible, onClose }: BadgeUnlockModal
         </MotiView>
 
         <Text variant="h2" style={styles.unlockName}>
-          {badge.name}
+          {badgeName}
         </Text>
         <Text variant="body" style={styles.unlockDescription}>
-          {badge.description}
+          {badgeDesc}
         </Text>
 
         <Pressable
           style={[styles.unlockButton, { backgroundColor: badge.color }]}
           onPress={onClose}
         >
-          <Text style={styles.unlockButtonText}>Fantastiskt!</Text>
+          <Text style={styles.unlockButtonText}>{t.components.awesome}</Text>
         </Pressable>
       </MotiView>
     </MotiView>

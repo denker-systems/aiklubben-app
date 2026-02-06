@@ -4,7 +4,8 @@ import { Card } from './Card';
 import { Text } from './Text';
 import { ChevronRight } from 'lucide-react-native';
 import { brandColors } from '@/config/theme';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 
 interface ImageCardProps {
   title: string;
@@ -31,6 +32,8 @@ export function ImageCard({
   style,
   variant = 'vertical',
 }: ImageCardProps) {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
   const isHorizontal = variant === 'horizontal';
 
   return (
@@ -92,14 +95,12 @@ export function ImageCard({
 const styles = StyleSheet.create({
   verticalContainer: {
     width: '100%',
-    backgroundColor: uiColors.card.background,
-    borderColor: uiColors.card.border,
+    // backgroundColor and borderColor set dynamically
   },
   horizontalContainer: {
     flexDirection: 'row',
     height: 120,
-    backgroundColor: uiColors.card.background,
-    borderColor: uiColors.card.border,
+    // backgroundColor and borderColor set dynamically
   },
   verticalImage: {
     width: '100%',
@@ -136,14 +137,14 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 6,
-    color: uiColors.text.primary,
+    // color from Text component
   },
   date: {
-    color: uiColors.text.secondary,
+    // color from Text component
     marginBottom: 8,
   },
   description: {
-    color: uiColors.text.secondary,
+    // color from Text component
     marginBottom: 12,
   },
   footer: {

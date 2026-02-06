@@ -6,7 +6,9 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
 
 interface SliderStepProps {
@@ -31,6 +33,9 @@ export const SliderStep: React.FC<SliderStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t, ti } = useLanguage();
   const [value, setValue] = useState(Math.round((content.min + content.max) / 2));
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -114,13 +119,14 @@ export const SliderStep: React.FC<SliderStepProps> = ({
           disabled={value <= content.min || showFeedback}
           style={[
             styles.controlButton,
+            { backgroundColor: ui.card.background, borderColor: ui.card.border },
             (value <= content.min || showFeedback) && styles.controlButtonDisabled,
           ]}
         >
-          <Text style={styles.controlButtonText}>−</Text>
+          <Text style={[styles.controlButtonText, { color: colors.text.primary }]}>−</Text>
         </Pressable>
 
-        <View style={styles.sliderTrack}>
+        <View style={[styles.sliderTrack, { backgroundColor: colors.glass.light }]}>
           <MotiView
             style={[styles.sliderFill]}
             animate={{ width: `${percentage}%` }}
@@ -138,10 +144,11 @@ export const SliderStep: React.FC<SliderStepProps> = ({
           disabled={value >= content.max || showFeedback}
           style={[
             styles.controlButton,
+            { backgroundColor: ui.card.background, borderColor: ui.card.border },
             (value >= content.max || showFeedback) && styles.controlButtonDisabled,
           ]}
         >
-          <Text style={styles.controlButtonText}>+</Text>
+          <Text style={[styles.controlButtonText, { color: colors.text.primary }]}>+</Text>
         </Pressable>
       </View>
 
@@ -157,10 +164,10 @@ export const SliderStep: React.FC<SliderStepProps> = ({
                 disabled={showFeedback}
                 style={[styles.labelItem, { left: `${labelPercentage}%` }]}
               >
-                <View style={[styles.labelDot, value === label.value && styles.labelDotActive]} />
+                <View style={[styles.labelDot, { backgroundColor: colors.text.muted }, value === label.value && styles.labelDotActive]} />
                 <Text
                   variant="caption"
-                  style={[styles.labelText, value === label.value && styles.labelTextActive]}
+                  style={[styles.labelText, { color: colors.text.muted }, value === label.value && styles.labelTextActive]}
                 >
                   {label.label}
                 </Text>
@@ -172,11 +179,11 @@ export const SliderStep: React.FC<SliderStepProps> = ({
 
       {/* Min/Max Labels */}
       <View style={styles.rangeLabels}>
-        <Text variant="caption" style={styles.rangeLabel}>
+        <Text variant="caption" style={[styles.rangeLabel, { color: colors.text.muted }]}>
           {content.min}
           {content.unit}
         </Text>
-        <Text variant="caption" style={styles.rangeLabel}>
+        <Text variant="caption" style={[styles.rangeLabel, { color: colors.text.muted }]}>
           {content.max}
           {content.unit}
         </Text>
@@ -186,7 +193,7 @@ export const SliderStep: React.FC<SliderStepProps> = ({
       {!showFeedback && (
         <Pressable onPress={handleCheck} style={styles.checkButton}>
           <Text variant="body" style={styles.checkButtonText}>
-            Kontrollera
+            {t.steps.checkAnswer}
           </Text>
         </Pressable>
       )}
@@ -209,13 +216,13 @@ export const SliderStep: React.FC<SliderStepProps> = ({
               variant="body"
               style={[styles.feedbackTitle, { color: isCorrect ? '#10B981' : '#EF4444' }]}
             >
-              {isCorrect ? 'Rätt!' : 'Inte riktigt'}
+              {isCorrect ? t.feedback.correct : t.feedback.incorrect}
             </Text>
           </View>
 
           {!isCorrect && (
             <Text variant="body" style={styles.correctValue}>
-              Rätt svar: {correctAnswer}
+              {ti(t.steps.correctAnswerIs, { answer: String(correctAnswer) })}
               {content.unit}
             </Text>
           )}
@@ -243,7 +250,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   question: {
-    color: uiColors.text.primary,
+    // color from Text component
     textAlign: 'center',
     flex: 1,
   },
@@ -276,9 +283,8 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderWidth: 2,
-    borderColor: uiColors.card.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -286,14 +292,14 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   controlButtonText: {
-    color: uiColors.text.primary,
+    // color set dynamically
     fontSize: 28,
     fontWeight: '600',
   },
   sliderTrack: {
     flex: 1,
     height: 12,
-    backgroundColor: uiColors.glass.light,
+    // backgroundColor set dynamically
     borderRadius: 6,
     position: 'relative',
   },
@@ -336,13 +342,13 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: uiColors.text.muted,
+    // backgroundColor set dynamically
   },
   labelDotActive: {
     backgroundColor: brandColors.purple,
   },
   labelText: {
-    color: uiColors.text.muted,
+    // color set dynamically
     fontSize: 12,
   },
   labelTextActive: {
@@ -355,7 +361,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 72,
   },
   rangeLabel: {
-    color: uiColors.text.muted,
+    // color set dynamically
   },
   checkButton: {
     backgroundColor: brandColors.purple,
@@ -396,7 +402,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   feedbackText: {
-    color: uiColors.text.primary,
+    // color from Text component
     lineHeight: 22,
   },
 });

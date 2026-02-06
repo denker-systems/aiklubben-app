@@ -3,7 +3,9 @@ import { View, Modal, Pressable, StyleSheet } from 'react-native';
 import { MotiView } from 'moti';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ExitModalProps {
   visible: boolean;
@@ -12,32 +14,36 @@ interface ExitModalProps {
 }
 
 export const ExitModal: React.FC<ExitModalProps> = ({ visible, onCancel, onConfirm }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
+
   return (
     <Modal visible={visible} transparent animationType="fade">
       <Pressable style={styles.overlay} onPress={onCancel}>
         <MotiView
-          style={styles.modal}
+          style={[styles.modal, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
           from={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={SPRING_CONFIGS.bouncy}
         >
-          <Text variant="h3" style={styles.title}>
-            Avsluta lektionen?
+          <Text variant="h3" style={[styles.title, { color: colors.text.primary }]}>
+            {t.lessons.exitTitle}
           </Text>
-          <Text variant="body" style={styles.message}>
-            Din framsteg kommer inte att sparas om du avslutar nu.
+          <Text variant="body" style={[styles.message, { color: colors.text.secondary }]}>
+            {t.lessons.exitMessage}
           </Text>
 
           <View style={styles.buttons}>
             <Pressable
               onPress={onCancel}
-              style={styles.cancelButton}
+              style={[styles.cancelButton, { backgroundColor: colors.glass.medium }]}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel="Fortsätt med lektionen"
+              accessibilityLabel={t.lessons.continueAccessibility}
             >
-              <Text variant="body" style={styles.cancelText}>
-                Fortsätt
+              <Text variant="body" style={[styles.cancelText, { color: colors.text.primary }]}>
+                {t.lessons.exitContinue}
               </Text>
             </Pressable>
             <Pressable
@@ -45,10 +51,10 @@ export const ExitModal: React.FC<ExitModalProps> = ({ visible, onCancel, onConfi
               style={styles.confirmButton}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel="Avsluta lektionen utan att spara"
+              accessibilityLabel={t.lessons.exitConfirmAccessibility}
             >
               <Text variant="body" style={styles.confirmText}>
-                Avsluta
+                {t.lessons.exitConfirm}
               </Text>
             </Pressable>
           </View>
@@ -67,21 +73,17 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modal: {
-    backgroundColor: uiColors.card.background,
     borderRadius: 24,
     padding: 24,
     width: '100%',
     maxWidth: 400,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
   },
   title: {
-    color: uiColors.text.primary,
     marginBottom: 12,
     textAlign: 'center',
   },
   message: {
-    color: uiColors.text.secondary,
     textAlign: 'center',
     marginBottom: 24,
   },
@@ -91,7 +93,6 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: uiColors.glass.medium,
     borderRadius: 16,
     padding: 16,
     minHeight: 52,
@@ -99,7 +100,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cancelText: {
-    color: uiColors.text.primary,
     fontWeight: '600',
   },
   confirmButton: {

@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { MotiPressable } from 'moti/interactions';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { AppIcon } from './AppIcon';
@@ -15,14 +16,6 @@ interface TabItem {
   label: string;
 }
 
-const tabs: TabItem[] = [
-  { key: 'Home', emoji: '🏠', iconName: 'home', label: 'Hem' },
-  { key: 'News', emoji: '📰', iconName: 'news', label: 'Nyheter' },
-  { key: 'Courses', emoji: '📚', iconName: 'courses', label: 'Kurser' },
-  { key: 'Content', emoji: '📂', label: 'Resurser' },
-  { key: 'Profile', emoji: '👤', iconName: 'profile', label: 'Profil' },
-];
-
 interface FloatingTabBarProps {
   activeTab: string;
   onTabPress: (key: string) => void;
@@ -30,7 +23,16 @@ interface FloatingTabBarProps {
 
 export function FloatingTabBar({ activeTab, onTabPress }: FloatingTabBarProps) {
   const insets = useSafeAreaInsets();
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
+  const { t } = useLanguage();
+
+  const tabs: TabItem[] = [
+    { key: 'Home', emoji: '🏠', iconName: 'home', label: t.tabs.home },
+    { key: 'News', emoji: '📰', iconName: 'news', label: t.tabs.news },
+    { key: 'Courses', emoji: '📚', iconName: 'courses', label: t.tabs.courses },
+    { key: 'Content', emoji: '📂', label: t.tabs.content },
+    { key: 'Profile', emoji: '👤', iconName: 'profile', label: t.tabs.profile },
+  ];
 
   console.log('[FloatingTabBar] Rendered', { activeTab });
 
@@ -45,7 +47,7 @@ export function FloatingTabBar({ activeTab, onTabPress }: FloatingTabBarProps) {
         from={{ opacity: 0, translateY: 50 }}
         animate={{ opacity: 1, translateY: 0 }}
         transition={SPRING_CONFIGS.smooth}
-        style={[styles.tabContainer, { backgroundColor: isDark ? '#1D1933' : '#FFFFFF' }]}
+        style={[styles.tabContainer, { backgroundColor: isDark ? '#1D1933' : '#FFFFFF', borderColor: isDark ? 'rgba(139, 92, 246, 0.25)' : 'rgba(0, 0, 0, 0.08)' }]}
       >
         {tabs.map((tab, index) => {
           const isActive = activeTab === tab.key;

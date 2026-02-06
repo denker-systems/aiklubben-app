@@ -5,8 +5,9 @@ import { FolderOpen, Check, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
-// brandColors available if needed
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   StepContainer,
   QuestionHeader,
@@ -39,6 +40,9 @@ export const CategorySortStep: React.FC<CategorySortStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t, ti } = useLanguage();
   const [assignments, setAssignments] = useState<Record<string, string>>({});
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -114,14 +118,14 @@ export const CategorySortStep: React.FC<CategorySortStepProps> = ({
         icon={FolderOpen}
         iconColor="#3B82F6"
         title={content.instruction}
-        subtitle={selectedItem ? `Välj kategori för "${selectedItem}"` : 'Välj ett objekt först'}
+        subtitle={selectedItem ? ti(t.steps.chooseCategoryFor, { item: selectedItem }) : t.steps.chooseItemFirst}
       />
 
       {/* Unassigned Items */}
       {unassignedItems.length > 0 && (
         <View style={styles.itemsSection}>
-          <Text variant="caption" style={styles.sectionLabel}>
-            ATT SORTERA
+          <Text variant="caption" style={[styles.sectionLabel, { color: colors.text.muted }]}>
+            {t.steps.toSort}
           </Text>
           <View style={styles.itemsGrid}>
             {unassignedItems.map((item, index) => (
@@ -158,7 +162,7 @@ export const CategorySortStep: React.FC<CategorySortStepProps> = ({
                 disabled={showFeedback || !selectedItem}
                 style={[
                   styles.categoryCard,
-                  { borderColor: selectedItem ? category.color : uiColors.card.border },
+                  { backgroundColor: ui.card.background, borderColor: selectedItem ? category.color : ui.card.border },
                   selectedItem && styles.categoryCardActive,
                 ]}
               >
@@ -167,15 +171,15 @@ export const CategorySortStep: React.FC<CategorySortStepProps> = ({
                   <Text variant="body" style={[styles.categoryName, { color: category.color }]}>
                     {category.name}
                   </Text>
-                  <Text variant="caption" style={styles.categoryCount}>
+                  <Text variant="caption" style={[styles.categoryCount, { color: colors.text.muted, backgroundColor: colors.glass.light }]}>
                     {categoryItems.length}
                   </Text>
                 </View>
 
                 <View style={styles.categoryItems}>
                   {categoryItems.length === 0 ? (
-                    <Text variant="caption" style={styles.emptyText}>
-                      {selectedItem ? 'Tryck för att lägga till' : 'Tomt'}
+                    <Text variant="caption" style={[styles.emptyText, { color: colors.text.muted }]}>
+                      {selectedItem ? t.steps.tapToAdd : t.steps.empty}
                     </Text>
                   ) : (
                     categoryItems.map((item) => {
@@ -187,6 +191,7 @@ export const CategorySortStep: React.FC<CategorySortStepProps> = ({
                           disabled={showFeedback}
                           style={[
                             styles.assignedItem,
+                            { backgroundColor: colors.glass.light },
                             state === 'correct' && styles.assignedItemCorrect,
                             state === 'incorrect' && styles.assignedItemIncorrect,
                           ]}
@@ -210,7 +215,7 @@ export const CategorySortStep: React.FC<CategorySortStepProps> = ({
       </View>
 
       {!showFeedback && (
-        <ActionButton label="Kontrollera" onPress={handleCheck} disabled={!allAssigned} />
+        <ActionButton label={t.steps.checkAnswer} onPress={handleCheck} disabled={!allAssigned} />
       )}
 
       {showFeedback && <FeedbackCard isCorrect={isCorrect} explanation={explanation} />}
@@ -223,7 +228,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   sectionLabel: {
-    color: uiColors.text.muted,
+    // color set dynamically
     fontWeight: '700',
     letterSpacing: 1,
   },
@@ -236,7 +241,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   categoryCard: {
-    backgroundColor: uiColors.card.background,
+    // backgroundColor set dynamically
     borderRadius: 16,
     borderWidth: 2,
     overflow: 'hidden',
@@ -259,8 +264,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   categoryCount: {
-    color: uiColors.text.muted,
-    backgroundColor: uiColors.glass.light,
+    // color and backgroundColor set dynamically
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -275,14 +279,14 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   emptyText: {
-    color: uiColors.text.muted,
+    // color set dynamically
     fontStyle: 'italic',
   },
   assignedItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: uiColors.glass.light,
+    // backgroundColor set dynamically
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 10,
@@ -294,7 +298,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(239, 68, 68, 0.15)',
   },
   assignedItemText: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontWeight: '500',
   },
 });

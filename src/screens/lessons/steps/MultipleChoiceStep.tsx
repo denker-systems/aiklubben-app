@@ -4,7 +4,9 @@ import { MotiView } from 'moti';
 import { Check, X } from 'lucide-react-native';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
 import * as Haptics from 'expo-haptics';
 
@@ -26,6 +28,10 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
+
   console.log('[MultipleChoiceStep] Rendered', { 
     question: content.question, 
     optionsCount: content.options.length, 
@@ -78,7 +84,7 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
     >
       {/* Question Card */}
       <View style={styles.questionCard}>
-        <Text variant="h2" style={styles.question}>
+        <Text variant="h2" style={[styles.question, { color: colors.text.primary }]}>
           {content.question}
         </Text>
       </View>
@@ -101,6 +107,7 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
               <View
                 style={[
                   styles.option,
+                  { backgroundColor: ui.card.background, borderColor: ui.card.border },
                   isSelected && !showFeedback && styles.optionSelected,
                   showAsCorrect && styles.optionCorrect,
                   showAsIncorrect && styles.optionIncorrect,
@@ -113,7 +120,7 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
                 accessible={true}
                 accessibilityRole="button"
                 accessibilityLabel={`Alternativ ${getOptionLetter(index)}: ${option}`}
-                accessibilityHint={showFeedback ? undefined : 'Tryck för att välja detta svar'}
+                accessibilityHint={showFeedback ? undefined : t.steps.tapToSelect}
                 accessibilityState={{
                   selected: isSelected,
                   disabled: showFeedback,
@@ -190,10 +197,10 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
                 isCorrect ? styles.feedbackTitleCorrect : styles.feedbackTitleIncorrect,
               ]}
             >
-              {isCorrect ? 'Rätt!' : 'Fel svar'}
+              {isCorrect ? t.steps.correctFeedback : t.steps.incorrectFeedback}
             </Text>
           </View>
-          <Text variant="body" style={styles.feedbackText}>
+          <Text variant="body" style={[styles.feedbackText, { color: colors.text.secondary }]}>
             {explanation}
           </Text>
         </MotiView>
@@ -215,7 +222,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(139, 92, 246, 0.2)',
   },
   question: {
-    color: uiColors.text.primary,
+    // color set dynamically
     fontSize: 20,
     lineHeight: 28,
     fontWeight: '600',
@@ -226,9 +233,8 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderWidth: 3,
-    borderColor: uiColors.card.border,
     borderRadius: 20,
     padding: 18,
     minHeight: 72,
@@ -286,13 +292,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   optionText: {
-    color: uiColors.text.primary,
+    // color from Text component
     flex: 1,
     fontSize: 16,
     lineHeight: 22,
   },
   optionTextSelected: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontWeight: '600',
   },
   optionTextCorrect: {
@@ -334,7 +340,7 @@ const styles = StyleSheet.create({
     borderColor: '#EF4444',
   },
   feedbackText: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     lineHeight: 22,
   },
 });

@@ -20,7 +20,9 @@ import { Text, FloatingOrbs, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useMenu } from '@/contexts/MenuContext';
 import { getLevelForXP } from '@/types/gamification';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH * 0.75;
@@ -43,6 +45,9 @@ export const CoursesScreen = () => {
   const navigation = useNavigation<CoursesNavigationProp>();
   const insets = useSafeAreaInsets();
   const menuContext = useMenu();
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [userProgress, setUserProgress] = useState<Record<string, number>>({});
@@ -110,7 +115,7 @@ export const CoursesScreen = () => {
   const level = getLevelForXP(userStats.totalXP);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
@@ -129,26 +134,26 @@ export const CoursesScreen = () => {
           <View style={styles.headerContent}>
             <View>
               <Text variant="h1" style={styles.headerTitle}>
-                Kurser
+                {t.courses.title}
               </Text>
             </View>
             <Pressable
               onPress={handleOpenMenu}
-              style={styles.menuButton}
+              style={[styles.menuButton, { backgroundColor: colors.glass.light }]}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel="Öppna meny"
-              accessibilityHint="Öppnar navigationsmenyn"
+              accessibilityLabel={t.menu.openMenu}
+              accessibilityHint={t.menu.openMenuHint}
             >
-              <View style={styles.menuLine} />
-              <View style={[styles.menuLine, styles.menuLineShort]} />
+              <View style={[styles.menuLine, { backgroundColor: colors.text.secondary }]} />
+              <View style={[styles.menuLine, styles.menuLineShort, { backgroundColor: colors.text.secondary }]} />
             </Pressable>
           </View>
 
           {/* Quick Stats with Emojis */}
           <View style={styles.statsRow}>
             <MotiView
-              style={styles.statBadge}
+              style={[styles.statBadge, { backgroundColor: colors.glass.light }]}
               from={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ ...SPRING_CONFIGS.bouncy, delay: 200 }}
@@ -162,13 +167,13 @@ export const CoursesScreen = () => {
                 <AppIcon name="xp" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={styles.statValue}>{userStats.totalXP}</Text>
-                <Text style={styles.statLabel}>XP</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>{userStats.totalXP}</Text>
+                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>XP</Text>
               </View>
             </MotiView>
 
             <MotiView
-              style={styles.statBadge}
+              style={[styles.statBadge, { backgroundColor: colors.glass.light }]}
               from={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ ...SPRING_CONFIGS.bouncy, delay: 300 }}
@@ -182,13 +187,13 @@ export const CoursesScreen = () => {
                 <AppIcon name="streak" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={styles.statValue}>{userStats.currentStreak}</Text>
-                <Text style={styles.statLabel}>dagar</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>{userStats.currentStreak}</Text>
+                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>dagar</Text>
               </View>
             </MotiView>
 
             <MotiView
-              style={styles.statBadge}
+              style={[styles.statBadge, { backgroundColor: colors.glass.light }]}
               from={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ ...SPRING_CONFIGS.bouncy, delay: 400 }}
@@ -202,8 +207,8 @@ export const CoursesScreen = () => {
                 <Text style={styles.statEmoji}>🌟</Text>
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={styles.statValue}>Lvl {level.level}</Text>
-                <Text style={styles.statLabel}>{level.name.split(' ')[0]}</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>Lvl {level.level}</Text>
+                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>{level.name.split(' ')[0]}</Text>
               </View>
             </MotiView>
           </View>
@@ -219,17 +224,17 @@ export const CoursesScreen = () => {
           >
             <View style={styles.sectionHeader}>
               <Text variant="h3" style={styles.sectionTitle}>
-                Fortsätt lära
+                {t.courses.continueLearning}
               </Text>
             </View>
 
             <Pressable
-              style={styles.continueCard}
+              style={[styles.continueCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
               onPress={() => handleCoursePress(courses[0].id)}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel={`Fortsätt med ${courses[0].title}`}
-              accessibilityHint="Återupptar kursen där du slutade"
+              accessibilityLabel={`${t.common.continue} ${courses[0].title}`}
+              accessibilityHint=""
             >
               <View style={styles.continueContent}>
                 <View style={styles.continueIconContainer}>
@@ -240,7 +245,7 @@ export const CoursesScreen = () => {
                     {courses[0].title}
                   </Text>
                   <View style={styles.continueProgressRow}>
-                    <View style={styles.continueProgressTrack}>
+                    <View style={[styles.continueProgressTrack, { backgroundColor: colors.glass.medium }]}>
                       <View
                         style={[
                           styles.continueProgressFill,
@@ -260,7 +265,7 @@ export const CoursesScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.continueButtonText}>Fortsätt →</Text>
+                <Text style={styles.continueButtonText}>{t.lessons.continueButton}</Text>
               </LinearGradient>
             </Pressable>
           </MotiView>
@@ -275,10 +280,10 @@ export const CoursesScreen = () => {
         >
           <View style={styles.sectionHeaderPadded}>
             <Text variant="h3" style={styles.sectionTitle}>
-              Alla kurser
+              {t.courses.allCourses}
             </Text>
-            <Text variant="caption" style={styles.carouselHint}>
-              Svep för fler →
+            <Text variant="caption" style={[styles.carouselHint, { color: colors.text.muted }]}>
+              {t.courses.swipeForMore}
             </Text>
           </View>
 
@@ -314,14 +319,14 @@ export const CoursesScreen = () => {
                     delay: 400 + index * 100,
                   }}
                 >
-                  <View style={styles.carouselCard}>
+                  <View style={[styles.carouselCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}>
                   <Pressable
                     onPress={() => handleCoursePress(course.id)}
                     style={styles.carouselCardPressable}
                     accessible={true}
                     accessibilityRole="button"
-                    accessibilityLabel={`${course.title}, ${course.level || 'Alla nivåer'}`}
-                    accessibilityHint="Tryck för att öppna kursen"
+                    accessibilityLabel={`${course.title}, ${course.level || t.courses.allLevels}`}
+                    accessibilityHint={t.courses.tapToOpenCourse}
                   >
                     <View style={styles.carouselIconContainer}>
                       <AppIcon name="courses-example" size={160} />
@@ -338,21 +343,21 @@ export const CoursesScreen = () => {
                     <View style={styles.carouselMeta}>
                       <View style={styles.carouselMetaRow}>
                         <Text style={styles.carouselMetaIcon}>⏱</Text>
-                        <Text variant="caption" style={styles.carouselMetaText}>
+                        <Text variant="caption" style={[styles.carouselMetaText, { color: colors.text.secondary }]}>
                           {course.duration || 30} min
                         </Text>
                       </View>
                       <View style={styles.carouselMetaRow}>
                         <Text style={styles.carouselMetaIcon}>⚡</Text>
-                        <Text variant="caption" style={styles.carouselMetaText}>
+                        <Text variant="caption" style={[styles.carouselMetaText, { color: colors.text.secondary }]}>
                           +50 XP
                         </Text>
                       </View>
                     </View>
 
                     {userProgress[course.id] > 0 && (
-                      <View style={styles.carouselProgress}>
-                        <View style={styles.carouselProgressTrack}>
+                      <View style={[styles.carouselProgress, { borderTopColor: colors.border.default }]}>
+                        <View style={[styles.carouselProgressTrack, { backgroundColor: colors.glass.medium }]}>
                           <View
                             style={[
                               styles.carouselProgressFill,
@@ -380,7 +385,6 @@ export const CoursesScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
   },
   scrollView: {
     flex: 1,
@@ -397,17 +401,17 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     marginBottom: 4,
   },
   headerSubtitle: {
-    color: '#9CA3AF',
+    // color from Text component
   },
   menuButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
@@ -415,7 +419,7 @@ const styles = StyleSheet.create({
   menuLine: {
     width: 20,
     height: 2,
-    backgroundColor: '#9CA3AF',
+    // backgroundColor set dynamically
     borderRadius: 1,
   },
   menuLineShort: {
@@ -429,7 +433,7 @@ const styles = StyleSheet.create({
   statBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    // backgroundColor set dynamically
     borderRadius: 16,
     paddingRight: 14,
     gap: 10,
@@ -448,12 +452,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   statValue: {
-    color: '#F9FAFB',
+    // color set dynamically
     fontSize: 16,
     fontWeight: '700',
   },
   statLabel: {
-    color: '#9CA3AF',
+    // color set dynamically
     fontSize: 11,
   },
   dailyGoalCard: {
@@ -524,14 +528,13 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   sectionTitle: {
-    color: '#F9FAFB',
+    // color from Text component
   },
   continueCard: {
-    backgroundColor: uiColors.card.background,
-    borderRadius: uiColors.card.radius,
+    // backgroundColor and borderColor set dynamically
+    borderRadius: 20,
     padding: 12,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
   },
   continueContent: {
     flexDirection: 'row',
@@ -561,7 +564,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   continueTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     fontWeight: '600',
     marginBottom: 8,
   },
@@ -573,7 +576,7 @@ const styles = StyleSheet.create({
   continueProgressTrack: {
     flex: 1,
     height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    // backgroundColor set dynamically
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -606,16 +609,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#6B7280',
+    // color from Text component
     textAlign: 'center',
   },
   coursesList: {
     gap: 12,
   },
   courseCard: {
-    backgroundColor: uiColors.card.background,
-    borderRadius: uiColors.card.radius,
-    borderColor: uiColors.card.border,
+    // backgroundColor and borderColor set dynamically
+    borderRadius: 20,
     borderWidth: 1,
     overflow: 'hidden',
   },
@@ -637,19 +639,19 @@ const styles = StyleSheet.create({
   },
   courseArrow: {
     fontSize: 32,
-    color: '#6B7280',
+    // color set dynamically
     fontWeight: '300',
   },
   courseInfo: {
     flex: 1,
   },
   courseTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     fontWeight: '600',
     marginBottom: 4,
   },
   courseExcerpt: {
-    color: '#9CA3AF',
+    // color from Text component
     marginBottom: 8,
   },
   courseMeta: {
@@ -675,7 +677,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   metaText: {
-    color: '#9CA3AF',
+    // color set dynamically
   },
   courseProgressBar: {
     height: 3,
@@ -697,7 +699,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   carouselHint: {
-    color: '#6B7280',
+    // color set dynamically
     fontStyle: 'italic',
   },
   carouselContent: {
@@ -706,10 +708,9 @@ const styles = StyleSheet.create({
   },
   carouselCard: {
     width: CARD_WIDTH,
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: uiColors.card.border,
     padding: 24,
     minHeight: 280,
   },
@@ -739,13 +740,13 @@ const styles = StyleSheet.create({
     fontSize: 42,
   },
   carouselTitle: {
-    color: '#F9FAFB',
+    // color from Text component
     fontWeight: '700',
     fontSize: 18,
     marginBottom: 8,
   },
   carouselExcerpt: {
-    color: '#9CA3AF',
+    // color from Text component
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 16,
@@ -765,7 +766,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   carouselMetaText: {
-    color: '#9CA3AF',
+    // color set dynamically
     fontSize: 13,
   },
   carouselProgress: {
@@ -775,12 +776,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    // borderTopColor set dynamically
   },
   carouselProgressTrack: {
     flex: 1,
     height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    // backgroundColor set dynamically
     borderRadius: 3,
     overflow: 'hidden',
   },

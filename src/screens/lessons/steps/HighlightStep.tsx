@@ -5,8 +5,10 @@ import { Highlighter } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { StepContainer, QuestionHeader, FeedbackCard, ActionButton } from '../components/shared';
 
 interface HighlightStepProps {
@@ -26,6 +28,9 @@ export const HighlightStep: React.FC<HighlightStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t, ti } = useLanguage();
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -87,10 +92,10 @@ export const HighlightStep: React.FC<HighlightStepProps> = ({
         icon={Highlighter}
         iconColor="#F59E0B"
         title={content.instruction}
-        subtitle="Tryck på orden för att markera dem"
+        subtitle={t.steps.tapToHighlight}
       />
 
-      <View style={styles.textContainer}>
+      <View style={[styles.textContainer, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}>
         <View style={styles.wordsContainer}>
           {content.words.map((word, index) => {
             const state = getWordState(index);
@@ -132,14 +137,14 @@ export const HighlightStep: React.FC<HighlightStepProps> = ({
       {selectedIndices.size > 0 && !showFeedback && (
         <View style={styles.selectionInfo}>
           <Text variant="caption" style={styles.selectionText}>
-            {selectedIndices.size} ord markerade
+            {ti(t.steps.wordsHighlighted, { count: selectedIndices.size })}
           </Text>
         </View>
       )}
 
       {!showFeedback && (
         <ActionButton
-          label="Kontrollera"
+          label={t.steps.checkAnswer}
           onPress={handleCheck}
           disabled={selectedIndices.size === 0}
         />
@@ -152,7 +157,7 @@ export const HighlightStep: React.FC<HighlightStepProps> = ({
           correctAnswer={
             isCorrect ? undefined : correctIndices.map((i) => content.words[i]).join(', ')
           }
-          correctAnswerLabel="Rätt ord:"
+          correctAnswerLabel={t.steps.correctWords}
         />
       )}
     </StepContainer>
@@ -161,11 +166,10 @@ export const HighlightStep: React.FC<HighlightStepProps> = ({
 
 const styles = StyleSheet.create({
   textContainer: {
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderRadius: 20,
     padding: 20,
     borderWidth: 2,
-    borderColor: uiColors.card.border,
   },
   wordsContainer: {
     flexDirection: 'row',
@@ -198,7 +202,7 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
   },
   wordText: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontSize: 17,
     lineHeight: 24,
   },

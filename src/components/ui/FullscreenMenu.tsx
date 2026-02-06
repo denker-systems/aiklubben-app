@@ -4,6 +4,7 @@ import { MotiView } from 'moti';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
 import { Text } from './Text';
 import { FloatingOrbs } from './FloatingOrbs';
@@ -30,98 +31,99 @@ interface FullscreenMenuProps {
   onLogout?: () => void;
 }
 
-const menuSections: MenuSectionData[] = [
-  {
-    title: 'Huvudmeny',
-    items: [
-      {
-        key: 'Home',
-        emoji: '🏠',
-        iconName: 'home',
-        title: 'Hem',
-        subtitle: 'Tillbaka till startsidan',
-        gradient: ['#6366f1', '#8b5cf6'],
-      },
-      {
-        key: 'News',
-        emoji: '📰',
-        iconName: 'news',
-        title: 'Nyheter',
-        subtitle: 'Senaste inom AI',
-        gradient: ['#f97316', '#ea580c'],
-      },
-      {
-        key: 'Content',
-        emoji: '📚',
-        title: 'Innehåll',
-        subtitle: 'Kurser och resurser',
-        gradient: ['#10B981', '#059669'],
-      },
-    ],
-  },
-  {
-    title: 'Mitt konto',
-    items: [
-      {
-        key: 'Profile',
-        emoji: '👤',
-        iconName: 'profile',
-        title: 'Min Profil',
-        subtitle: 'Hantera ditt medlemskap',
-        gradient: ['#8B5CF6', '#a855f7'],
-      },
-      {
-        key: 'Settings',
-        emoji: '⚙️',
-        title: 'Inställningar',
-        subtitle: 'App- och kontoinställningar',
-        gradient: ['#6B7280', '#4B5563'],
-      },
-    ],
-  },
-  {
-    title: 'Support & Info',
-    items: [
-      {
-        key: 'Support',
-        emoji: '💬',
-        title: 'Support',
-        subtitle: 'Kontakta oss',
-        gradient: ['#3B82F6', '#2563EB'],
-      },
-      {
-        key: 'Privacy',
-        emoji: '🔒',
-        title: 'Integritetspolicy',
-        subtitle: 'Hur vi hanterar din data',
-        gradient: ['#14B8A6', '#0D9488'],
-      },
-      {
-        key: 'About',
-        emoji: 'ℹ️',
-        title: 'Om AI Klubben',
-        subtitle: 'Lär känna oss bättre',
-        gradient: ['#8B5CF6', '#6366f1'],
-      },
-    ],
-  },
-  {
-    title: '',
-    items: [
-      {
-        key: 'logout',
-        emoji: '🚪',
-        title: 'Logga ut',
-        subtitle: 'Avsluta din session',
-        gradient: ['#EF4444', '#DC2626'],
-      },
-    ],
-  },
-];
-
 export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: FullscreenMenuProps) {
   const insets = useSafeAreaInsets();
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
+  const { t } = useLanguage();
+
+  const menuSections: MenuSectionData[] = [
+    {
+      title: t.menu.mainMenu,
+      items: [
+        {
+          key: 'Home',
+          emoji: '🏠',
+          iconName: 'home',
+          title: t.nav.home,
+          subtitle: t.menu.homeSubtitle,
+          gradient: ['#6366f1', '#8b5cf6'],
+        },
+        {
+          key: 'News',
+          emoji: '📰',
+          iconName: 'news',
+          title: t.nav.news,
+          subtitle: t.menu.newsSubtitle,
+          gradient: ['#f97316', '#ea580c'],
+        },
+        {
+          key: 'Content',
+          emoji: '📚',
+          title: t.menu.contentTitle,
+          subtitle: t.menu.contentSubtitle,
+          gradient: ['#10B981', '#059669'],
+        },
+      ],
+    },
+    {
+      title: t.menu.myAccount,
+      items: [
+        {
+          key: 'Profile',
+          emoji: '👤',
+          iconName: 'profile',
+          title: t.menu.myProfile,
+          subtitle: t.menu.myProfileSubtitle,
+          gradient: ['#8B5CF6', '#a855f7'],
+        },
+        {
+          key: 'Settings',
+          emoji: '⚙️',
+          title: t.settings.title,
+          subtitle: t.menu.settingsSubtitle,
+          gradient: ['#6B7280', '#4B5563'],
+        },
+      ],
+    },
+    {
+      title: t.menu.supportInfo,
+      items: [
+        {
+          key: 'Support',
+          emoji: '💬',
+          title: t.supportScreen.title,
+          subtitle: t.menu.supportSubtitle,
+          gradient: ['#3B82F6', '#2563EB'],
+        },
+        {
+          key: 'Privacy',
+          emoji: '🔒',
+          title: t.privacy.title,
+          subtitle: t.menu.privacySubtitle,
+          gradient: ['#14B8A6', '#0D9488'],
+        },
+        {
+          key: 'About',
+          emoji: 'ℹ️',
+          title: t.about.title,
+          subtitle: t.menu.aboutSubtitle,
+          gradient: ['#8B5CF6', '#6366f1'],
+        },
+      ],
+    },
+    {
+      title: '',
+      items: [
+        {
+          key: 'logout',
+          emoji: '🚪',
+          title: t.profile.logout,
+          subtitle: t.menu.logoutSubtitle,
+          gradient: ['#EF4444', '#DC2626'],
+        },
+      ],
+    },
+  ];
   const [showContent, setShowContent] = useState(false);
 
   console.log('[FullscreenMenu] Rendered', { visible, showContent });
@@ -154,7 +156,7 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
     }
   };
 
-  const backgroundColor = isDark ? '#0C0A17' : '#FFFFFF';
+  const backgroundColor = colors.background;
 
   return (
     <Modal
@@ -190,11 +192,11 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
         >
           <View style={styles.headerContent}>
             <View style={styles.logoContainer}>
-              <Text variant="h2" style={styles.menuTitle}>
-                Meny
+              <Text variant="h2" style={[styles.menuTitle, { color: colors.text.primary }]}>
+                {t.menu.title}
               </Text>
             </View>
-            <View style={styles.closeButton}>
+            <View style={[styles.closeButton, { backgroundColor: colors.glass.medium }]}>
               <Pressable
                 onPress={() => {
                   console.log('[FullscreenMenu] Close button pressed');
@@ -202,7 +204,7 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
                 }}
                 style={styles.closeButtonPressable}
               >
-                <Text style={styles.closeEmoji}>✕</Text>
+                <Text style={[styles.closeEmoji, { color: colors.text.secondary }]}>✕</Text>
               </Pressable>
             </View>
           </View>
@@ -231,7 +233,7 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
               }}
             >
               {section.title && (
-                <Text style={styles.sectionTitle}>{section.title.toUpperCase()}</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text.muted }]}>{section.title.toUpperCase()}</Text>
               )}
               <View style={styles.sectionItems}>
                 {section.items.map((item, itemIndex) => (
@@ -250,6 +252,7 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
                     <View
                       style={[
                         styles.menuItem,
+                        { backgroundColor: colors.glass.strong },
                         item.key === 'logout' && styles.logoutItem,
                       ]}
                     >
@@ -275,9 +278,9 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
                         >
                           {item.title}
                         </Text>
-                        <Text style={styles.menuItemSubtitle}>{item.subtitle}</Text>
+                        <Text style={[styles.menuItemSubtitle, { color: colors.text.muted }]}>{item.subtitle}</Text>
                       </View>
-                      <Text style={styles.menuItemArrow}>›</Text>
+                      <Text style={[styles.menuItemArrow, { color: colors.text.secondary }]}>›</Text>
                     </Pressable>
                     </View>
                   </MotiView>
@@ -316,13 +319,13 @@ const styles = StyleSheet.create({
     fontSize: 26,
   },
   menuTitle: {
-    color: '#F9FAFB',
+    // color set dynamically by Text component
   },
   closeButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -338,7 +341,7 @@ const styles = StyleSheet.create({
   },
   closeEmoji: {
     fontSize: 18,
-    color: '#9CA3AF',
+    // color set dynamically
   },
   scrollView: {
     flex: 1,
@@ -350,7 +353,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#6B7280',
+    // color set dynamically
     letterSpacing: 1,
     marginBottom: 12,
     marginTop: 24,
@@ -361,7 +364,7 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    // backgroundColor set dynamically
     borderRadius: 16,
     padding: 14,
   },
@@ -394,7 +397,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItemTitle: {
-    color: '#F9FAFB',
+    // color set dynamically by Text component
     fontSize: 16,
     fontWeight: '600',
   },
@@ -402,13 +405,13 @@ const styles = StyleSheet.create({
     color: '#EF4444',
   },
   menuItemSubtitle: {
-    color: '#6B7280',
+    // color set dynamically
     fontSize: 13,
     marginTop: 2,
   },
   menuItemArrow: {
     fontSize: 28,
-    color: '#4B5563',
+    // color set dynamically
     fontWeight: '300',
   },
 });

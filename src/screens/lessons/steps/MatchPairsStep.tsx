@@ -5,7 +5,9 @@ import { Check, Link } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
 
 interface Pair {
@@ -33,6 +35,9 @@ export const MatchPairsStep: React.FC<MatchPairsStepProps> = ({
   explanation,
   onAnswer,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   const [selected, setSelected] = useState<SelectedItem | null>(null);
   const [matches, setMatches] = useState<Map<number, number>>(new Map());
   const [showFeedback, setShowFeedback] = useState(false);
@@ -135,15 +140,15 @@ export const MatchPairsStep: React.FC<MatchPairsStepProps> = ({
 
       {/* Progress */}
       <View style={styles.progressContainer}>
-        <View style={styles.progressTrack}>
+        <View style={[styles.progressTrack, { backgroundColor: colors.glass.light }]}>
           <MotiView
             style={styles.progressFill}
             animate={{ width: `${(matches.size / content.pairs.length) * 100}%` }}
             transition={SPRING_CONFIGS.smooth}
           />
         </View>
-        <Text variant="caption" style={styles.progressText}>
-          {matches.size} / {content.pairs.length} matchade
+        <Text variant="caption" style={[styles.progressText, { color: colors.text.muted }]}>
+          {matches.size} / {content.pairs.length} {t.steps.matched}
         </Text>
       </View>
 
@@ -168,6 +173,7 @@ export const MatchPairsStep: React.FC<MatchPairsStepProps> = ({
                   disabled={isMatched || showFeedback}
                   style={[
                     styles.matchItem,
+                    { backgroundColor: ui.card.background, borderColor: ui.card.border },
                     styles.matchItemLeft,
                     isSelected && styles.matchItemSelected,
                     isMatched && styles.matchItemMatched,
@@ -176,7 +182,7 @@ export const MatchPairsStep: React.FC<MatchPairsStepProps> = ({
                 >
                   <Text
                     variant="body"
-                    style={[styles.matchItemText, isMatched && styles.matchItemTextMatched]}
+                    style={[styles.matchItemText, isMatched && [styles.matchItemTextMatched, { color: colors.text.secondary }]]}
                   >
                     {pair.left}
                   </Text>
@@ -222,6 +228,7 @@ export const MatchPairsStep: React.FC<MatchPairsStepProps> = ({
                   disabled={isMatched || showFeedback}
                   style={[
                     styles.matchItem,
+                    { backgroundColor: ui.card.background, borderColor: ui.card.border },
                     styles.matchItemRight,
                     isSelected && styles.matchItemSelected,
                     isMatched && styles.matchItemMatched,
@@ -231,7 +238,7 @@ export const MatchPairsStep: React.FC<MatchPairsStepProps> = ({
                   {isMatched && <Check size={18} color="#10B981" strokeWidth={3} />}
                   <Text
                     variant="body"
-                    style={[styles.matchItemText, isMatched && styles.matchItemTextMatched]}
+                    style={[styles.matchItemText, isMatched && [styles.matchItemTextMatched, { color: colors.text.secondary }]]}
                   >
                     {pair.right}
                   </Text>
@@ -253,7 +260,7 @@ export const MatchPairsStep: React.FC<MatchPairsStepProps> = ({
           <View style={styles.feedbackHeader}>
             <Check size={24} color="#10B981" strokeWidth={3} />
             <Text variant="body" style={[styles.feedbackTitle, { color: '#10B981' }]}>
-              Alla par matchade! 🎉
+              {t.steps.allPairsMatched}
             </Text>
           </View>
           {explanation && (
@@ -279,7 +286,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   instruction: {
-    color: uiColors.text.primary,
+    // color from Text component
     textAlign: 'center',
   },
   progressContainer: {
@@ -287,7 +294,7 @@ const styles = StyleSheet.create({
   },
   progressTrack: {
     height: 8,
-    backgroundColor: uiColors.glass.light,
+    // backgroundColor set dynamically
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -297,7 +304,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   progressText: {
-    color: uiColors.text.muted,
+    // color set dynamically
     textAlign: 'center',
   },
   matchingArea: {
@@ -329,9 +336,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: uiColors.card.background,
+    // backgroundColor and borderColor set dynamically
     borderWidth: 2,
-    borderColor: uiColors.card.border,
     borderRadius: 14,
     padding: 16,
     minHeight: 56,
@@ -355,12 +361,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(239, 68, 68, 0.1)',
   },
   matchItemText: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontSize: 15,
     flex: 1,
   },
   matchItemTextMatched: {
-    color: uiColors.text.secondary,
+    // color set dynamically
   },
   feedback: {
     padding: 20,
@@ -382,7 +388,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   feedbackText: {
-    color: uiColors.text.primary,
+    // color from Text component
     lineHeight: 22,
   },
 });

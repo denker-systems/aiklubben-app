@@ -5,6 +5,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Play, Clock, Zap, X, Target } from 'lucide-react-native';
 import { Text, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import * as Haptics from 'expo-haptics';
 
 // Screen dimensions available if needed
@@ -30,6 +33,10 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
   onStart,
   lesson,
 }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t, ti } = useLanguage();
+
   // useCallback for performance (Rule 10)
   const handleStart = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -51,17 +58,17 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
           transition={SPRING_CONFIGS.bouncy}
           style={styles.dialogContainer}
         >
-          <Pressable style={styles.dialog} onPress={(e) => e.stopPropagation()}>
+          <Pressable style={[styles.dialog, { backgroundColor: isDark ? '#1A1625' : '#FFFFFF', borderColor: isDark ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.15)' }]} onPress={(e) => e.stopPropagation()}>
             {/* Close Button - Apple HIG: min 44x44 touch target */}
             <Pressable
-              style={styles.closeButton}
+              style={[styles.closeButton, { backgroundColor: colors.glass.light }]}
               onPress={handleClose}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel="Stäng dialog"
-              accessibilityHint="Stänger lektionsförhandsgranskningen"
+              accessibilityLabel={t.lessons.closeDialog}
+              accessibilityHint={t.lessons.closeDialogHint}
             >
-              <X size={20} color="#9CA3AF" />
+              <X size={20} color={colors.text.secondary} />
             </Pressable>
 
             {/* Lesson Icon */}
@@ -82,7 +89,7 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
               style={styles.lessonBadge}
             >
               <Text style={styles.lessonBadgeText}>
-                Lektion {lesson.lessonNumber} av {lesson.totalLessons}
+                {ti(t.lessons.lessonOf, { current: lesson.lessonNumber, total: lesson.totalLessons })}
               </Text>
             </MotiView>
 
@@ -92,7 +99,7 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ ...SPRING_CONFIGS.smooth, delay: 200 }}
             >
-              <Text variant="h2" style={styles.title}>
+              <Text variant="h2" style={[styles.title, { color: colors.text.primary }]}>
                 {lesson.title}
               </Text>
             </MotiView>
@@ -104,7 +111,7 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
                 animate={{ opacity: 1 }}
                 transition={{ ...SPRING_CONFIGS.smooth, delay: 250 }}
               >
-                <Text variant="body" style={styles.description}>
+                <Text variant="body" style={[styles.description, { color: colors.text.secondary }]}>
                   {lesson.description}
                 </Text>
               </MotiView>
@@ -118,18 +125,18 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
               style={styles.statsRow}
             >
               <View style={styles.statItem}>
-                <Clock size={18} color="#9CA3AF" />
-                <Text style={styles.statText}>{lesson.duration || 5} min</Text>
+                <Clock size={18} color={colors.text.secondary} />
+                <Text style={[styles.statText, { color: colors.text.muted }]}>{lesson.duration || 5} min</Text>
               </View>
-              <View style={styles.statDivider} />
+              <View style={[styles.statDivider, { backgroundColor: colors.border.default }]} />
               <View style={styles.statItem}>
                 <Zap size={18} color="#FCD34D" />
-                <Text style={styles.statText}>+{lesson.xpReward || 10} XP</Text>
+                <Text style={[styles.statText, { color: colors.text.muted }]}>+{lesson.xpReward || 10} XP</Text>
               </View>
-              <View style={styles.statDivider} />
+              <View style={[styles.statDivider, { backgroundColor: colors.border.default }]} />
               <View style={styles.statItem}>
                 <Target size={18} color="#8B5CF6" />
-                <Text style={styles.statText}>5 steg</Text>
+                <Text style={[styles.statText, { color: colors.text.muted }]}>{ti(t.lessons.stepsCount, { count: 5 })}</Text>
               </View>
             </MotiView>
 
@@ -146,8 +153,8 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
                 style={styles.startButtonPressable}
                 accessible={true}
                 accessibilityRole="button"
-                accessibilityLabel={lesson.isCompleted ? 'Öva igen' : 'Starta lektion'}
-                accessibilityHint={`Startar ${lesson.title}`}
+                accessibilityLabel={lesson.isCompleted ? t.lessons.practiceAgain : t.lessons.startLesson}
+                accessibilityHint={ti(t.lessons.startsLesson, { title: lesson.title })}
               >
                 <LinearGradient
                   colors={['#10B981', '#059669']}
@@ -157,7 +164,7 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
                 >
                   <Play size={24} color="#FFFFFF" fill="#FFFFFF" />
                   <Text style={styles.startButtonText}>
-                    {lesson.isCompleted ? 'Öva igen' : 'Starta lektion'}
+                    {lesson.isCompleted ? t.lessons.practiceAgain : t.lessons.startLesson}
                   </Text>
                 </LinearGradient>
               </Pressable>
@@ -190,12 +197,10 @@ const styles = StyleSheet.create({
     maxWidth: 360,
   },
   dialog: {
-    backgroundColor: '#1A1625',
     borderRadius: 28,
     padding: 28,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
     shadowColor: '#8B5CF6',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
@@ -209,7 +214,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -241,14 +246,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   title: {
-    color: '#F9FAFB',
+    // color set dynamically
     textAlign: 'center',
     marginBottom: 8,
     fontSize: 22,
     fontWeight: '700',
   },
   description: {
-    color: '#9CA3AF',
+    // color set dynamically
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 22,
@@ -266,14 +271,14 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   statText: {
-    color: '#D1D5DB',
+    // color set dynamically
     fontSize: 14,
     fontWeight: '500',
   },
   statDivider: {
     width: 1,
     height: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    // backgroundColor set dynamically
   },
   buttonContainer: {
     width: '100%',

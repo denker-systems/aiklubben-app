@@ -5,7 +5,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Text } from './Text';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { TreasureReward } from '@/types/gamification';
 
 interface TreasureChestModalProps {
@@ -16,6 +18,9 @@ interface TreasureChestModalProps {
 
 export const TreasureChestModal: React.FC<TreasureChestModalProps> = memo(
   ({ visible, reward, onClose }) => {
+    const { isDark, colors } = useTheme();
+    const ui = getUiColors(isDark);
+    const { t } = useLanguage();
     const [isOpened, setIsOpened] = useState(false);
 
     useEffect(() => {
@@ -38,7 +43,7 @@ export const TreasureChestModal: React.FC<TreasureChestModalProps> = memo(
             from={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={SPRING_CONFIGS.bouncy}
-            style={styles.container}
+            style={[styles.container, { backgroundColor: ui.card.background }]}
           >
             {!isOpened ? (
               // Closed chest - tap to open
@@ -56,10 +61,10 @@ export const TreasureChestModal: React.FC<TreasureChestModalProps> = memo(
                   <Text style={styles.chestIcon}>🎁</Text>
                 </MotiView>
                 <Text variant="h3" weight="bold" style={styles.title}>
-                  Bonusbelöning!
+                  {t.components.bonusReward}
                 </Text>
-                <Text variant="body" style={styles.subtitle}>
-                  Tryck för att öppna
+                <Text variant="body" style={[styles.subtitle, { color: colors.text.secondary }]}>
+                  {t.components.tapToOpen}
                 </Text>
               </Pressable>
             ) : (
@@ -87,7 +92,7 @@ export const TreasureChestModal: React.FC<TreasureChestModalProps> = memo(
                   <Text variant="h2" weight="bold" style={styles.rewardTitle}>
                     {reward.title}
                   </Text>
-                  <Text variant="body" style={styles.rewardDescription}>
+                  <Text variant="body" style={[styles.rewardDescription, { color: colors.text.secondary }]}>
                     {reward.description}
                   </Text>
                 </MotiView>
@@ -102,7 +107,7 @@ export const TreasureChestModal: React.FC<TreasureChestModalProps> = memo(
                       colors={['#8B5CF6', '#6366F1']}
                       style={styles.collectButtonGradient}
                     >
-                      <Text style={styles.collectButtonText}>Samla in</Text>
+                      <Text style={styles.collectButtonText}>{t.components.collect}</Text>
                     </LinearGradient>
                   </Pressable>
                 </MotiView>
@@ -126,7 +131,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   container: {
-    backgroundColor: uiColors.card.background,
+    // backgroundColor set dynamically
     borderRadius: 28,
     padding: 32,
     width: '100%',
@@ -151,7 +156,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subtitle: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     textAlign: 'center',
   },
   rewardContainer: {
@@ -172,12 +177,12 @@ const styles = StyleSheet.create({
     fontSize: 48,
   },
   rewardTitle: {
-    color: uiColors.text.primary,
+    // color from Text component
     marginBottom: 8,
     textAlign: 'center',
   },
   rewardDescription: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     textAlign: 'center',
     marginBottom: 24,
   },

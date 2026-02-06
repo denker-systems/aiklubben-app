@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import { Pressable, View, StyleSheet, ViewStyle } from 'react-native';
 import { useMenu } from '@/contexts/MenuContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface MenuButtonProps {
   style?: ViewStyle;
@@ -13,6 +14,7 @@ const MenuButtonComponent = memo(function MenuButton({
   size = 'medium',
   onPress,
 }: MenuButtonProps) {
+  const { isDark, colors } = useTheme();
   const menuContext = useMenu();
 
   const handlePress = useCallback(() => {
@@ -44,6 +46,7 @@ const MenuButtonComponent = memo(function MenuButton({
           height: config.button,
           borderRadius: config.button / 2,
         },
+        { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)' },
         style,
       ]}
     >
@@ -51,8 +54,8 @@ const MenuButtonComponent = memo(function MenuButton({
         onPress={handlePress}
         style={styles.menuButtonPressable}
       >
-        <View style={[styles.menuLine, { width: config.lineWidth }]} />
-        <View style={[styles.menuLine, { width: config.lineShort }]} />
+        <View style={[styles.menuLine, { width: config.lineWidth, backgroundColor: colors.text.primary }]} />
+        <View style={[styles.menuLine, { width: config.lineShort, backgroundColor: colors.text.primary }]} />
       </Pressable>
     </View>
   );
@@ -62,7 +65,7 @@ export const MenuButton = MenuButtonComponent;
 
 const styles = StyleSheet.create({
   menuButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
@@ -74,12 +77,12 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   menuButtonPressed: {
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    // backgroundColor set dynamically
     transform: [{ scale: 0.95 }],
   },
   menuLine: {
     height: 2,
-    backgroundColor: '#FFFFFF',
+    // backgroundColor set dynamically
     borderRadius: 1,
   },
 });

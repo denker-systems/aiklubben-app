@@ -5,8 +5,10 @@ import { Code2, Copy, Check } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+import { useLanguage } from '@/contexts/LanguageContext';
 import * as Haptics from 'expo-haptics';
 
 // Screen dimensions available if needed
@@ -102,6 +104,9 @@ const highlightCode = (code: string, language: string): React.ReactNode[] => {
 };
 
 const CodeSnippetStepComponent: React.FC<CodeSnippetStepProps> = ({ content, onContinue }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
   // Auto-enable continue after content is shown
@@ -177,15 +182,15 @@ const CodeSnippetStepComponent: React.FC<CodeSnippetStepProps> = ({ content, onC
             style={styles.copyButton}
             accessible={true}
             accessibilityRole="button"
-            accessibilityLabel={copied ? 'Kod kopierad' : 'Kopiera kod'}
+            accessibilityLabel={copied ? t.steps.codeCopied : t.steps.copyCode}
           >
             {copied ? (
               <Check size={18} color="#10B981" />
             ) : (
-              <Copy size={18} color={uiColors.text.muted} />
+              <Copy size={18} color={colors.text.muted} />
             )}
-            <Text style={[styles.copyText, copied && styles.copyTextSuccess]}>
-              {copied ? 'Kopierad!' : 'Kopiera'}
+            <Text style={[styles.copyText, { color: colors.text.muted }, copied && styles.copyTextSuccess]}>
+              {copied ? t.steps.copied : t.steps.copy}
             </Text>
           </Pressable>
         </View>
@@ -210,9 +215,9 @@ const CodeSnippetStepComponent: React.FC<CodeSnippetStepProps> = ({ content, onC
           transition={{ ...SPRING_CONFIGS.smooth, delay: 400 }}
         >
           <Text variant="caption" style={styles.explanationLabel}>
-            💡 Förklaring
+            {t.steps.explanation}
           </Text>
-          <Text variant="body" style={styles.explanationText}>
+          <Text variant="body" style={[styles.explanationText, { color: colors.text.secondary }]}>
             {content.explanation}
           </Text>
         </MotiView>
@@ -225,8 +230,8 @@ const CodeSnippetStepComponent: React.FC<CodeSnippetStepProps> = ({ content, onC
         animate={{ opacity: 1 }}
         transition={{ ...SPRING_CONFIGS.smooth, delay: 600 }}
       >
-        <Text variant="caption" style={styles.readText}>
-          📖 Studera koden och tryck på Fortsätt
+        <Text variant="caption" style={[styles.readText, { color: colors.text.muted }]}>
+          {t.steps.studyCodeAndContinue}
         </Text>
       </MotiView>
     </MotiView>
@@ -254,13 +259,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontSize: 20,
     fontWeight: '700',
     lineHeight: 28,
   },
   description: {
-    color: uiColors.text.secondary,
+    // color from Text component
     fontSize: 15,
     lineHeight: 22,
     marginTop: 4,
@@ -305,7 +310,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   copyText: {
-    color: uiColors.text.muted,
+    // color set dynamically
     fontSize: 13,
   },
   copyTextSuccess: {
@@ -357,7 +362,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   explanationText: {
-    color: uiColors.text.secondary,
+    // color set dynamically
     fontSize: 15,
     lineHeight: 24,
   },
@@ -366,7 +371,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   readText: {
-    color: uiColors.text.muted,
+    // color from Text component
     fontSize: 14,
   },
 });

@@ -4,6 +4,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { brandColors } from '@/config/theme';
 import { ScreenWrapper } from '@/components/layout';
 import { Text, Button, Input } from '@/components/ui';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const AuthScreen = () => {
   console.log('[AuthScreen] Rendered');
@@ -15,13 +17,15 @@ export const AuthScreen = () => {
   const [error, setError] = useState<string | null>(null);
 
   const { signIn, signUp } = useAuth();
+  const { colors } = useTheme();
+  const { t } = useLanguage();
 
   const handleAuth = async () => {
     console.log('[AuthScreen] handleAuth', { isLogin, email });
     
     if (!email || !password) {
       console.warn('[AuthScreen] Missing email or password');
-      setError('Vänligen fyll i alla fält');
+      setError(t.auth.fillAllFields);
       return;
     }
 
@@ -42,7 +46,7 @@ export const AuthScreen = () => {
       }
     } catch (err) {
       console.error('[AuthScreen] Unexpected error:', err);
-      setError('Ett oväntat fel uppstod');
+      setError(t.auth.unexpectedError);
     } finally {
       setLoading(false);
     }
@@ -61,17 +65,17 @@ export const AuthScreen = () => {
 
         <View>
           <Input
-            label="E-post"
+            label={t.auth.email}
             value={email}
             onChangeText={setEmail}
-            placeholder="din@epost.se"
+            placeholder={t.auth.emailPlaceholder}
             autoCapitalize="none"
             keyboardType="email-address"
             error={error && error.includes('e-post') ? error : undefined}
           />
 
           <Input
-            label="Lösenord"
+            label={t.auth.password}
             value={password}
             onChangeText={setPassword}
             placeholder="••••••••"
@@ -80,7 +84,7 @@ export const AuthScreen = () => {
           />
 
           {error && !error.includes('e-post') && !error.includes('lösenord') && (
-            <Text variant="body-sm" style={{ color: '#EF4444', textAlign: 'center', marginBottom: 16 }}>
+            <Text variant="body-sm" style={{ color: colors.error || '#EF4444', textAlign: 'center', marginBottom: 16 }}>
               {error}
             </Text>
           )}
@@ -92,11 +96,11 @@ export const AuthScreen = () => {
             loading={loading}
             style={{ marginTop: 24 }}
           >
-            {isLogin ? 'Logga in' : 'Skapa konto'}
+            {isLogin ? t.auth.login : t.auth.signup}
           </Button>
 
           <Button variant="ghost" onPress={() => setIsLogin(!isLogin)} style={{ marginTop: 16 }}>
-            {isLogin ? 'Har du inget konto? Registrera dig' : 'Har du redan ett konto? Logga in'}
+            {isLogin ? t.auth.noAccount : t.auth.hasAccount}
           </Button>
         </View>
       </View>

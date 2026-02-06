@@ -7,6 +7,7 @@ import { Text } from './Text';
 import { MenuButton } from './MenuButton';
 import { FloatingOrbs } from './FloatingOrbs';
 import { ParallaxLayer } from './ParallaxLayer';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ScreenHeaderProps {
   title: string;
@@ -34,6 +35,7 @@ const ScreenHeaderComponent = memo(function ScreenHeader({
   transparent = false,
 }: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
+  const { isDark, colors } = useTheme();
 
   // Keep header fully transparent
   const headerStyle = useAnimatedStyle(() => {
@@ -57,11 +59,11 @@ const ScreenHeaderComponent = memo(function ScreenHeader({
           <View style={styles.headerLeft}>
             {leftContent}
             <View>
-              <Text variant="h1" style={styles.headerTitle}>
+              <Text variant="h1" style={[styles.headerTitle, { color: colors.text.primary }]}>
                 {title}
               </Text>
               {subtitle && (
-                <Text variant="body" style={styles.headerSubtitle}>
+                <Text variant="body" style={[styles.headerSubtitle, { color: colors.text.secondary }]}>
                   {subtitle}
                 </Text>
               )}
@@ -119,17 +121,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   headerTitle: {
-    color: '#F9FAFB',
+    // color set dynamically
     marginBottom: 4,
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 12,
   },
   headerSubtitle: {
-    color: '#9CA3AF',
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
+    // color set dynamically
   },
 });
 

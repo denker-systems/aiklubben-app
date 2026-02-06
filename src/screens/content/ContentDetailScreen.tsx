@@ -17,6 +17,8 @@ import { brandColors } from '@/config/theme';
 import Markdown from 'react-native-markdown-display';
 import { Text, Badge } from '@/components/ui';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -25,6 +27,9 @@ export const ContentDetailScreen = () => {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const { id } = route.params;
+
+  const { isDark, colors } = useTheme();
+  const { t } = useLanguage();
 
   console.log('[ContentDetailScreen] Rendered', { contentId: id });
 
@@ -68,7 +73,7 @@ export const ContentDetailScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
         <View style={styles.loadingContainer}>
           <MotiView
             from={{ opacity: 0, scale: 0.8 }}
@@ -84,12 +89,12 @@ export const ContentDetailScreen = () => {
 
   if (!content) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
         <View style={styles.loadingContainer}>
-          <Text variant="h2">Innehållet kunde inte hittas.</Text>
+          <Text variant="h2">{t.contentDetail.contentNotFound}</Text>
           <Pressable onPress={handleGoBack} style={styles.backLink}>
             <Text variant="body" style={{ color: brandColors.purple }}>
-              Gå tillbaka
+              {t.newsDetail.goBack}
             </Text>
           </Pressable>
         </View>
@@ -108,7 +113,7 @@ export const ContentDetailScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Floating Header - appears on scroll */}
       <MotiView
         style={[
@@ -116,6 +121,7 @@ export const ContentDetailScreen = () => {
           {
             paddingTop: insets.top + 8,
             opacity: headerOpacity,
+            backgroundColor: isDark ? 'rgba(12, 10, 23, 0.95)' : 'rgba(255, 255, 255, 0.95)',
           },
         ]}
         animate={{ opacity: headerOpacity }}
@@ -145,7 +151,7 @@ export const ContentDetailScreen = () => {
               resizeMode="cover"
             />
           ) : (
-            <View style={styles.heroPlaceholder}>
+            <View style={[styles.heroPlaceholder, { backgroundColor: isDark ? '#1A1625' : '#F3F4F6' }]}>
               <BookOpen size={48} color={brandColors.purple} />
             </View>
           )}
@@ -159,7 +165,7 @@ export const ContentDetailScreen = () => {
             style={[styles.backButton, { top: insets.top + 16 }]}
             accessible={true}
             accessibilityRole="button"
-            accessibilityLabel="Gå tillbaka till innehåll"
+            accessibilityLabel={t.contentDetail.goBackAccessibility}
           >
             <ArrowLeft size={24} color="#FFFFFF" />
           </Pressable>
@@ -167,7 +173,7 @@ export const ContentDetailScreen = () => {
 
         {/* Content Container */}
         <MotiView
-          style={styles.contentContainer}
+          style={[styles.contentContainer, { backgroundColor: colors.background }]}
           from={{ opacity: 0, translateY: 30 }}
           animate={{ opacity: 1, translateY: 0 }}
           transition={SPRING_CONFIGS.smooth}
@@ -202,15 +208,15 @@ export const ContentDetailScreen = () => {
             {content.level && (
               <View style={styles.metaItem}>
                 <Award size={16} color={brandColors.purple} />
-                <Text variant="caption" style={styles.metaText}>
+                <Text variant="caption" style={[styles.metaText, { color: colors.text.muted }]}>
                   {content.level}
                 </Text>
               </View>
             )}
             {content.duration && (
               <View style={styles.metaItem}>
-                <Clock size={16} color="#9CA3AF" />
-                <Text variant="caption" style={styles.metaText}>
+                <Clock size={16} color={colors.text.muted} />
+                <Text variant="caption" style={[styles.metaText, { color: colors.text.muted }]}>
                   {content.duration} min
                 </Text>
               </View>
@@ -226,7 +232,7 @@ export const ContentDetailScreen = () => {
               transition={{ ...SPRING_CONFIGS.smooth, delay: STAGGER_DELAYS.normal * 3 }}
             >
               <View style={styles.excerptAccent} />
-              <Text variant="body" style={styles.excerptText}>
+              <Text variant="body" style={[styles.excerptText, { color: colors.text.secondary }]}>
                 {content.excerpt}
               </Text>
             </MotiView>
@@ -347,7 +353,6 @@ const markdownStyles = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0C0A17',
   },
   loadingContainer: {
     flex: 1,
@@ -368,7 +373,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingBottom: 12,
-    backgroundColor: 'rgba(12, 10, 23, 0.95)',
+    // backgroundColor set dynamically
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(139, 92, 246, 0.1)',
   },
@@ -382,7 +387,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    color: '#F9FAFB',
+    // color from Text component
     textAlign: 'center',
     marginHorizontal: 12,
   },
@@ -401,7 +406,7 @@ const styles = StyleSheet.create({
   heroPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#1A1625',
+    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -430,12 +435,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 24,
     marginTop: -40,
-    backgroundColor: '#0C0A17',
+    // backgroundColor set dynamically
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
   },
   title: {
-    color: '#F9FAFB',
+    // color from Text component
     marginTop: 16,
     marginBottom: 12,
     lineHeight: 36,
@@ -452,7 +457,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   metaText: {
-    color: '#9CA3AF',
+    // color set dynamically
   },
   excerptCard: {
     backgroundColor: 'rgba(139, 92, 246, 0.08)',
@@ -469,7 +474,7 @@ const styles = StyleSheet.create({
   },
   excerptText: {
     flex: 1,
-    color: '#D1D5DB',
+    // color set dynamically
     fontStyle: 'italic',
     lineHeight: 24,
   },

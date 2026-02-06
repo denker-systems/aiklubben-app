@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface GreetingResult {
   greeting: string;
@@ -9,12 +10,14 @@ interface GreetingResult {
 
 /**
  * Returns a time-aware, emotionally intelligent greeting
- * Based on Swedish time conventions
+ * Uses i18n translations for language support
  */
 export function useGreeting(userName?: string | null): GreetingResult {
+  const { t } = useLanguage();
+
   return useMemo(() => {
     const hour = new Date().getHours();
-    const name = userName || 'där';
+    const name = userName || t.common.friend;
 
     let greeting: string;
     let timeOfDay: GreetingResult['timeOfDay'];
@@ -25,36 +28,36 @@ export function useGreeting(userName?: string | null): GreetingResult {
       // Morning: 5-10
       timeOfDay = 'morning';
       emoji = '☀️';
-      greeting = `God morgon, ${name}!`;
-      motivation = 'Låt oss börja dagen starkt!';
+      greeting = `${t.greetings.morning}, ${name}!`;
+      motivation = t.greetingsExtended.morningMotivation;
     } else if (hour >= 10 && hour < 13) {
       // Late morning: 10-13
       timeOfDay = 'morning';
       emoji = '🌤️';
-      greeting = `Hej, ${name}!`;
-      motivation = 'Redo att lära dig något nytt?';
+      greeting = `${t.greetingsExtended.lateMorning}, ${name}!`;
+      motivation = t.greetingsExtended.lateMorningMotivation;
     } else if (hour >= 13 && hour < 17) {
       // Afternoon: 13-17
       timeOfDay = 'afternoon';
       emoji = '🌞';
-      greeting = `Hej, ${name}!`;
-      motivation = 'Fortsätt din AI-resa!';
+      greeting = `${t.greetings.afternoon}, ${name}!`;
+      motivation = t.greetingsExtended.afternoonMotivation;
     } else if (hour >= 17 && hour < 21) {
       // Evening: 17-21
       timeOfDay = 'evening';
       emoji = '🌅';
-      greeting = `God kväll, ${name}!`;
-      motivation = 'Perfekt tid för lite lärande!';
+      greeting = `${t.greetings.evening}, ${name}!`;
+      motivation = t.greetingsExtended.eveningMotivation;
     } else {
       // Night: 21-5
       timeOfDay = 'night';
       emoji = '🌙';
-      greeting = `Hej, ${name}!`;
-      motivation = 'Sent uppe? Lär dig något spännande!';
+      greeting = `${t.greetingsExtended.night}, ${name}!`;
+      motivation = t.greetingsExtended.nightMotivation;
     }
 
     return { greeting, timeOfDay, emoji, motivation };
-  }, [userName]);
+  }, [userName, t]);
 }
 
 /**
@@ -66,57 +69,61 @@ export function useEncouragingMessage(stats: {
   coursesCompleted?: number;
   level?: string;
 }): string {
+  const { t, ti } = useLanguage();
+
   return useMemo(() => {
     const { streak = 0, xp = 0, coursesCompleted = 0 } = stats;
 
     // Prioritize streak messages
     if (streak >= 7) {
-      return `🔥 ${streak} dagar i rad! Du är en mästare!`;
+      return ti(t.encouraging.streakMaster, { count: streak });
     }
     if (streak >= 3) {
-      return `🔥 ${streak} dagar i rad! Fortsätt så!`;
+      return ti(t.encouraging.streakGoing, { count: streak });
     }
 
     // XP milestones
     if (xp >= 1000) {
-      return `⭐ Över 1000 XP! Imponerande!`;
+      return t.encouraging.xpOver1000;
     }
     if (xp >= 500) {
-      return `⭐ Halvvägs till 1000 XP!`;
+      return t.encouraging.xpHalfway;
     }
 
     // Course completion
     if (coursesCompleted >= 5) {
-      return `📚 ${coursesCompleted} kurser avklarade!`;
+      return ti(t.encouraging.coursesMany, { count: coursesCompleted });
     }
     if (coursesCompleted >= 1) {
-      return `📚 Bra jobbat med din första kurs!`;
+      return t.encouraging.coursesFirst;
     }
 
     // Default encouraging messages
     const defaultMessages = [
-      'Låt oss lära oss något nytt idag! 🚀',
-      'Din AI-resa fortsätter! 🧠',
-      'Upptäck världen av AI! ✨',
-      'Redo för nästa steg? 💪',
+      t.encouraging.default1,
+      t.encouraging.default2,
+      t.encouraging.default3,
+      t.encouraging.default4,
     ];
 
     return defaultMessages[Math.floor(Math.random() * defaultMessages.length)];
-  }, [stats]);
+  }, [stats, t, ti]);
 }
 
 /**
  * Returns celebration messages for achievements
  */
-export function getCelebrationMessage(
+export function useCelebrationMessage(
   type: 'xp' | 'level' | 'streak' | 'course' | 'badge',
 ): string {
+  const { t } = useLanguage();
+
   const messages = {
-    xp: ['🎉 Fantastiskt! +XP!', '⭐ Poäng intjänade!', '✨ Du växer!'],
-    level: ['🎊 Grattis! Ny nivå!', '🏆 Du levlade upp!', '🚀 Nästa nivå upplåst!'],
-    streak: ['🔥 Streak fortsätter!', '💪 Du håller igång!', '⚡ Ostagbar!'],
-    course: ['📚 Kurs avklarad!', '🎓 Du klarade det!', '✅ Komplett!'],
-    badge: ['🏅 Nytt märke!', '🎖️ Achievement unlocked!', '🌟 Du förtjänade det!'],
+    xp: [t.celebration.xp1, t.celebration.xp2, t.celebration.xp3],
+    level: [t.celebration.level1, t.celebration.level2, t.celebration.level3],
+    streak: [t.celebration.streak1, t.celebration.streak2, t.celebration.streak3],
+    course: [t.celebration.course1, t.celebration.course2, t.celebration.course3],
+    badge: [t.celebration.badge1, t.celebration.badge2, t.celebration.badge3],
   };
 
   const typeMessages = messages[type];

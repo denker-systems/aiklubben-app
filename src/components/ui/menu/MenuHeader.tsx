@@ -10,11 +10,11 @@ interface MenuHeaderProps {
 }
 
 export function MenuHeader({ title, onClose }: MenuHeaderProps) {
-  const { isDark } = useTheme();
-  const textColor = isDark ? '#FAFAFA' : '#171717';
+  const { colors } = useTheme();
+  const textColor = colors.text.primary;
 
   return (
-    <View style={[styles.header, { backgroundColor: isDark ? '#0C0A17' : '#FFFFFF' }]}>
+    <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border.subtle }]}>
       <View style={styles.leftSection}>
         <View style={styles.placeholder} />
       </View>
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(42, 36, 69, 0.5)',
+    borderBottomColor: 'transparent',
   },
   leftSection: {
     width: 48,

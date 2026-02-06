@@ -6,7 +6,9 @@ import { Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { uiColors } from '@/config/design';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUiColors } from '@/config/design';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
 import * as Haptics from 'expo-haptics';
 
@@ -24,6 +26,9 @@ interface VideoStepProps {
 }
 
 const VideoStepComponent: React.FC<VideoStepProps> = ({ content, onContinue }) => {
+  const { isDark, colors } = useTheme();
+  const ui = getUiColors(isDark);
+  const { t, ti } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [hasWatched, setHasWatched] = useState(false);
@@ -132,7 +137,7 @@ const VideoStepComponent: React.FC<VideoStepProps> = ({ content, onContinue }) =
             style={styles.playButton}
             accessible={true}
             accessibilityRole="button"
-            accessibilityLabel={isPlaying ? 'Pausa video' : 'Spela video'}
+            accessibilityLabel={isPlaying ? t.steps.pauseVideo : t.steps.playVideo}
           >
             <LinearGradient
               colors={['rgba(139, 92, 246, 0.9)', 'rgba(99, 102, 241, 0.9)']}
@@ -153,7 +158,7 @@ const VideoStepComponent: React.FC<VideoStepProps> = ({ content, onContinue }) =
               style={styles.controlButton}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel="Starta om video"
+              accessibilityLabel={t.steps.restartVideo}
             >
               <RotateCcw size={20} color="#FFFFFF" />
             </Pressable>
@@ -163,7 +168,7 @@ const VideoStepComponent: React.FC<VideoStepProps> = ({ content, onContinue }) =
               style={styles.controlButton}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel={isMuted ? 'Slå på ljud' : 'Stäng av ljud'}
+              accessibilityLabel={isMuted ? t.steps.unmute : t.steps.mute}
             >
               {isMuted ? (
                 <VolumeX size={20} color="#FFFFFF" />
@@ -184,8 +189,8 @@ const VideoStepComponent: React.FC<VideoStepProps> = ({ content, onContinue }) =
       >
         <Text variant="caption" style={styles.watchText}>
           {hasWatched
-            ? '✅ Video tittat'
-            : `🎬 Titta på videon för att fortsätta (${Math.round(progress)}%)`}
+            ? t.steps.videoWatched
+            : ti(t.steps.videoWatch, { progress: Math.round(progress) })}
         </Text>
       </MotiView>
     </MotiView>
@@ -198,13 +203,13 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   title: {
-    color: uiColors.text.primary,
+    // color from Text component
     fontSize: 22,
     fontWeight: '700',
     lineHeight: 30,
   },
   description: {
-    color: uiColors.text.secondary,
+    // color from Text component
     fontSize: 16,
     lineHeight: 24,
     marginTop: 8,
@@ -276,7 +281,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   watchText: {
-    color: uiColors.text.muted,
+    // color from Text component
     fontSize: 14,
   },
 });

@@ -5,6 +5,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, BookOpen } from 'lucide-react-native';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface UnitHeaderProps {
   title: string;
@@ -23,6 +25,9 @@ const UnitHeaderComponent: React.FC<UnitHeaderProps> = ({
   gradientColors = ['#8B5CF6', '#6366F1'],
   onBack,
 }) => {
+  const { isDark, colors } = useTheme();
+  const { t } = useLanguage();
+
   return (
     <LinearGradient
       colors={gradientColors}
@@ -46,8 +51,8 @@ const UnitHeaderComponent: React.FC<UnitHeaderProps> = ({
             style={styles.backButton}
             accessible={true}
             accessibilityRole="button"
-            accessibilityLabel="Gå tillbaka"
-            accessibilityHint="Navigerar tillbaka till kurslistan"
+            accessibilityLabel={t.unitHeader.goBackAccessibility}
+            accessibilityHint={t.unitHeader.goBackHint}
           >
             <ArrowLeft size={24} color="#FFFFFF" />
           </Pressable>
@@ -81,7 +86,7 @@ const UnitHeaderComponent: React.FC<UnitHeaderProps> = ({
 
       {/* Decorative Wave */}
       <View style={styles.wave}>
-        <View style={styles.waveInner} />
+        <View style={[styles.waveInner, { backgroundColor: colors.background }]} />
       </View>
     </LinearGradient>
   );
@@ -150,7 +155,7 @@ const styles = StyleSheet.create({
     left: -20,
     right: -20,
     height: 40,
-    backgroundColor: '#0C0A17',
+    // backgroundColor set dynamically
     borderTopLeftRadius: 100,
     borderTopRightRadius: 100,
   },
