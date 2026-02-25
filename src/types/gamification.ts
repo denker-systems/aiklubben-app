@@ -209,11 +209,7 @@ export function getBadgesByCategory(category: Badge['category']): Badge[] {
 }
 
 // Daily Quest Types
-export type QuestType =
-  | 'complete_lesson'
-  | 'answer_correct'
-  | 'maintain_streak'
-  | 'perfect_lesson';
+export type QuestType = 'complete_lesson' | 'answer_correct' | 'maintain_streak' | 'perfect_lesson';
 
 export interface DailyQuest {
   id: string;
@@ -277,22 +273,28 @@ export const TREASURE_REWARDS: TreasureReward[] = [
   { type: 'xp', amount: 10, title: 'Bonus XP', description: '+10 XP', icon: '⚡' },
   { type: 'xp', amount: 25, title: 'XP-skatt', description: '+25 XP', icon: '💰' },
   { type: 'xp', amount: 50, title: 'XP-jackpot!', description: '+50 XP', icon: '🎉' },
-  { type: 'streak_freeze', amount: 1, title: 'Streak Freeze', description: '+1 Streak Freeze', icon: '🧊' },
+  {
+    type: 'streak_freeze',
+    amount: 1,
+    title: 'Streak Freeze',
+    description: '+1 Streak Freeze',
+    icon: '🧊',
+  },
 ];
 
 // Random treasure reward (20% chance)
 export function getRandomTreasure(): TreasureReward | null {
   if (Math.random() > 0.2) return null; // 80% chance of no reward
-  
+
   const weights = [50, 30, 10, 10]; // Probability weights
   const totalWeight = weights.reduce((a, b) => a + b, 0);
   let random = Math.random() * totalWeight;
-  
+
   for (let i = 0; i < TREASURE_REWARDS.length; i++) {
     random -= weights[i];
     if (random <= 0) return TREASURE_REWARDS[i];
   }
-  
+
   return TREASURE_REWARDS[0];
 }
 

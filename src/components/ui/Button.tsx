@@ -84,17 +84,7 @@ export function Button({
 
   return (
     <View style={[wrapperStyle, style as ViewStyle]}>
-      <Pressable
-        disabled={disabled || loading}
-        style={({ pressed }) => ({
-          flex: 1,
-          alignItems: 'center' as const,
-          justifyContent: 'center' as const,
-          flexDirection: 'row' as const,
-          opacity: pressed ? 0.8 : 1,
-        })}
-        {...props}
-      >
+      <Pressable disabled={disabled || loading} style={styles.pressable} {...props}>
         {loading ? (
           <ActivityIndicator color={vStyle.text} size="small" />
         ) : (
@@ -116,8 +106,8 @@ export function Button({
 }
 
 const styles = StyleSheet.create({
-  base: {
-    borderRadius: 24,
+  pressable: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TextInput as RNTextInput, StyleSheet, ViewStyle, Text } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 
-interface InputProps {
+export interface InputProps {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
@@ -10,6 +10,9 @@ interface InputProps {
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  autoFocus?: boolean;
+  onSubmitEditing?: () => void;
+  returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send';
   error?: string;
   style?: ViewStyle;
   multiline?: boolean;
@@ -24,6 +27,9 @@ export function Input({
   secureTextEntry,
   keyboardType = 'default',
   autoCapitalize = 'none',
+  autoFocus,
+  onSubmitEditing,
+  returnKeyType,
   error,
   style,
   multiline = false,
@@ -42,6 +48,9 @@ export function Input({
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
+        autoFocus={autoFocus}
+        onSubmitEditing={onSubmitEditing}
+        returnKeyType={returnKeyType}
         multiline={multiline}
         numberOfLines={numberOfLines}
         textAlignVertical={multiline ? 'top' : 'center'}

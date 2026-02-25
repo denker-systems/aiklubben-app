@@ -1,6 +1,7 @@
 # iOS UI Fundamentals - Apple Human Interface Guidelines
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Core iOS UI rules based on Apple HIG 2025-2026
 
@@ -9,6 +10,7 @@
 ## Touch Targets & Interactive Elements
 
 ### Minimum Touch Target Size
+
 ```
 REQUIRED: All interactive elements MUST have minimum touch target of 44x44 points
 ```
@@ -20,6 +22,7 @@ REQUIRED: All interactive elements MUST have minimum touch target of 44x44 point
 - **Tab bar items**: Minimum 49pt height (iOS standard)
 
 ### Touch Target Implementation in React Native
+
 ```typescript
 // CORRECT: Explicit hitSlop for small icons
 <Pressable
@@ -45,26 +48,28 @@ REQUIRED: All interactive elements MUST have minimum touch target of 44x44 point
 ## Spacing & Layout Rules
 
 ### Standard Spacing Values (Apple HIG)
+
 ```typescript
 const SPACING = {
   // Base unit: 8pt
-  xs: 4,    // Extra small - icon padding
-  sm: 8,    // Small - between related elements
-  md: 16,   // Medium - section padding
-  lg: 24,   // Large - between sections
-  xl: 32,   // Extra large - major sections
-  xxl: 48,  // Double extra large - screen margins
+  xs: 4, // Extra small - icon padding
+  sm: 8, // Small - between related elements
+  md: 16, // Medium - section padding
+  lg: 24, // Large - between sections
+  xl: 32, // Extra large - major sections
+  xxl: 48, // Double extra large - screen margins
 } as const;
 ```
 
 ### Safe Areas (CRITICAL for iOS)
+
 ```typescript
 // ALWAYS use SafeAreaView or useSafeAreaInsets
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const MyScreen = () => {
   const insets = useSafeAreaInsets();
-  
+
   return (
     <View style={{
       paddingTop: insets.top,
@@ -79,6 +84,7 @@ const MyScreen = () => {
 ```
 
 ### Element Spacing Guidelines
+
 - **Between buttons**: Minimum 12pt, recommended 16pt
 - **Between form fields**: 16pt
 - **Section margins**: 16-24pt horizontal
@@ -91,6 +97,7 @@ const MyScreen = () => {
 ## Visual Feedback Requirements
 
 ### Press States (MANDATORY)
+
 Every interactive element MUST provide visual feedback:
 
 ```typescript
@@ -124,6 +131,7 @@ const styles = StyleSheet.create({
 ```
 
 ### Haptic Feedback Requirements
+
 ```typescript
 import * as Haptics from 'expo-haptics';
 
@@ -145,11 +153,13 @@ Haptics.selectionAsync();
 ## Color & Contrast Requirements
 
 ### Minimum Contrast Ratios (WCAG AA)
+
 - **Body text**: 4.5:1 minimum contrast ratio
 - **Large text (18pt+)**: 3:1 minimum contrast ratio
 - **UI components**: 3:1 minimum contrast ratio
 
 ### Dark Mode Support (MANDATORY)
+
 ```typescript
 // ALWAYS support both light and dark modes
 const colors = {
@@ -171,6 +181,7 @@ const colors = {
 ## Response Time Requirements
 
 ### Feedback Timing (Apple HIG)
+
 - **Visual feedback**: Within 100ms of interaction
 - **Animation start**: Within 100ms
 - **Loading indicator**: Show after 300ms if operation not complete

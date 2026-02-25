@@ -1,6 +1,7 @@
 # Component Architecture Rules
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: React Native component structure and organization rules
 
@@ -9,6 +10,7 @@
 ## Component File Structure
 
 ### Standard Component Template
+
 ```typescript
 // ComponentName.tsx
 
@@ -78,7 +80,9 @@ const styles = StyleSheet.create({
 ## Component Categories
 
 ### 1. UI Components (`src/components/ui/`)
+
 Base-level, reusable UI elements:
+
 ```
 ui/
 ├── Button.tsx          # Primary button component
@@ -94,7 +98,9 @@ ui/
 ```
 
 ### 2. Layout Components (`src/components/layout/`)
+
 Screen structure and navigation:
+
 ```
 layout/
 ├── ScreenLayout.tsx    # Base screen wrapper
@@ -106,7 +112,9 @@ layout/
 ```
 
 ### 3. Feature Components (`src/screens/[feature]/components/`)
+
 Feature-specific components:
+
 ```
 screens/
 ├── courses/
@@ -121,7 +129,9 @@ screens/
 ```
 
 ### 4. Shared Components (`src/components/shared/`)
+
 Cross-feature reusable components:
+
 ```
 shared/
 ├── EmptyState.tsx      # Empty state display
@@ -135,18 +145,19 @@ shared/
 ## Component Props Interface Rules
 
 ### Required Props Pattern
+
 ```typescript
 interface ButtonProps {
   // Required props first (no ?)
   label: string;
   onPress: () => void;
-  
+
   // Optional props after (with ?)
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   loading?: boolean;
-  
+
   // Style overrides last
   style?: ViewStyle;
   textStyle?: TextStyle;
@@ -154,6 +165,7 @@ interface ButtonProps {
 ```
 
 ### Props with Defaults
+
 ```typescript
 // Define defaults as constants
 const BUTTON_DEFAULTS = {
@@ -183,6 +195,7 @@ export const Button: React.FC<ButtonProps> = ({
 ## Component Size Configurations
 
 ### Size System Pattern
+
 ```typescript
 // Define sizes as typed constant object
 const SIZES = {
@@ -211,7 +224,7 @@ type Size = keyof typeof SIZES;
 // Usage in component
 const Button: React.FC<{ size?: Size }> = ({ size = 'md' }) => {
   const dimensions = SIZES[size];
-  
+
   return (
     <Pressable style={{
       height: dimensions.height,
@@ -230,6 +243,7 @@ const Button: React.FC<{ size?: Size }> = ({ size = 'md' }) => {
 ## Component Export Rules
 
 ### Barrel Exports (index.ts)
+
 ```typescript
 // src/components/ui/index.ts
 export { Button } from './Button';
@@ -243,12 +257,13 @@ export type { TextVariant } from './Text';
 ```
 
 ### Named Exports Only
+
 ```typescript
 // CORRECT: Named export
-export const MyComponent: React.FC<Props> = () => { };
+export const MyComponent: React.FC<Props> = () => {};
 
 // WRONG: Default export
-export default function MyComponent() { }
+export default function MyComponent() {}
 ```
 
 ---
@@ -256,6 +271,7 @@ export default function MyComponent() { }
 ## Component Composition Patterns
 
 ### Compound Components
+
 ```typescript
 // Card with sub-components
 interface CardContextValue {
@@ -297,6 +313,7 @@ Card.Footer = ({ children }) => (
 ## Performance Rules
 
 ### Memoization Rules
+
 ```typescript
 // Memoize expensive components
 export const ExpensiveList = React.memo(({ items }) => {
@@ -308,7 +325,7 @@ const ParentComponent = () => {
   const handlePress = useCallback(() => {
     // Handler logic
   }, [dependencies]);
-  
+
   return <ChildComponent onPress={handlePress} />;
 };
 
@@ -317,7 +334,7 @@ const Component = ({ data }) => {
   const processedData = useMemo(() => {
     return expensiveCalculation(data);
   }, [data]);
-  
+
   return <View>{/* Use processedData */}</View>;
 };
 ```

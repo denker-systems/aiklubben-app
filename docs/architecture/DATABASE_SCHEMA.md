@@ -7,6 +7,7 @@ AI Klubben använder Supabase (PostgreSQL) som databas med Row Level Security (R
 ## Core Tables
 
 ### `profiles`
+
 Användarprofildata kopplad till Supabase Auth.
 
 ```sql
@@ -19,23 +20,23 @@ CREATE TABLE profiles (
   bio TEXT,
   phone TEXT,
   city TEXT,
-  
+
   -- Membership
   membership_type TEXT DEFAULT 'standard',
   membership_since TIMESTAMPTZ DEFAULT NOW(),
-  
+
   -- Gamification
   total_xp INTEGER DEFAULT 0,
   current_streak INTEGER DEFAULT 0,
   longest_streak INTEGER DEFAULT 0,
   lessons_completed INTEGER DEFAULT 0,
   last_activity_date TIMESTAMPTZ DEFAULT NOW(),
-  
+
   -- Preferences
   language_preference VARCHAR DEFAULT 'sv',
   interests JSONB DEFAULT '{}',
   social_links JSONB,
-  
+
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -43,6 +44,7 @@ CREATE TABLE profiles (
 ```
 
 **RLS Policies:**
+
 - Users can read their own profile
 - Users can update their own profile
 - Admins can read all profiles
@@ -50,6 +52,7 @@ CREATE TABLE profiles (
 ## Learning System
 
 ### `content`
+
 Kurser och innehåll (används som "courses").
 
 ```sql
@@ -68,6 +71,7 @@ CREATE TABLE content (
 ```
 
 ### `course_lessons`
+
 Lektioner inom en kurs.
 
 ```sql
@@ -87,6 +91,7 @@ CREATE TABLE course_lessons (
 ```
 
 ### `lesson_steps`
+
 Individuella steg inom en lektion.
 
 ```sql
@@ -111,6 +116,7 @@ CREATE TABLE lesson_steps (
 ```
 
 **Step Types:**
+
 - `content`: Text/image content
 - `multiple_choice`: Multiple choice question
 - `fill_blank`: Fill in the blank
@@ -120,6 +126,7 @@ CREATE TABLE lesson_steps (
 - `reflection`: Open-ended reflection
 
 ### `user_lesson_progress`
+
 Spårar användarens framsteg i lektioner.
 
 ```sql
@@ -139,7 +146,7 @@ CREATE TABLE user_lesson_progress (
   completed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   UNIQUE(user_id, lesson_id)
 );
 ```
@@ -147,6 +154,7 @@ CREATE TABLE user_lesson_progress (
 ## Content Management
 
 ### `news`
+
 Nyhetsartiklar.
 
 ```sql
@@ -166,6 +174,7 @@ CREATE TABLE news (
 ```
 
 ### `news_categories`
+
 Kategorier för nyheter.
 
 ```sql
@@ -180,6 +189,7 @@ CREATE TABLE news_categories (
 ## User Engagement
 
 ### `saved_content`
+
 Sparat innehåll per användare.
 
 ```sql
@@ -188,12 +198,13 @@ CREATE TABLE saved_content (
   user_id UUID REFERENCES auth.users(id),
   content_id UUID REFERENCES content(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   UNIQUE(user_id, content_id)
 );
 ```
 
 ### `user_activities`
+
 Aktivitetslogg för användare.
 
 ```sql
@@ -209,6 +220,7 @@ CREATE TABLE user_activities (
 ## Settings & Configuration
 
 ### `settings`
+
 Applikationsinställningar.
 
 ```sql
@@ -222,6 +234,7 @@ CREATE TABLE settings (
 ```
 
 ### `notification_settings`
+
 Notifikationsinställningar per användare.
 
 ```sql

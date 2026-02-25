@@ -26,3 +26,5 @@ export { DailyQuestsCard } from './DailyQuestsCard';
 export { TreasureChestModal } from './TreasureChestModal';
 export { StyledPressable } from './StyledPressable';
 export { AppIcon, registerIcon } from './AppIcon';
+export { StepIndicator } from './StepIndicator';
+export { AnimatedPage } from './AnimatedPage';

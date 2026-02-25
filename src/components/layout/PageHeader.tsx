@@ -39,7 +39,12 @@ export function PageHeader({
   };
 
   return (
-    <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border.subtle }]}>
+    <View
+      style={[
+        styles.header,
+        { backgroundColor: colors.background, borderBottomColor: colors.border.subtle },
+      ]}
+    >
       <View style={styles.leftSection}>
         {showBack && (
           <Pressable style={styles.iconButton} onPress={handleBack}>

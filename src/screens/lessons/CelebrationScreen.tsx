@@ -72,14 +72,14 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
   const ui = getUiColors(isDark);
   const { t, ti } = useLanguage();
 
-  console.log('[CelebrationScreen] Rendered', { 
-    xpEarned, 
-    bonusXP, 
-    score, 
-    totalSteps, 
-    streak, 
+  console.log('[CelebrationScreen] Rendered', {
+    xpEarned,
+    bonusXP,
+    score,
+    totalSteps,
+    streak,
     leveledUp,
-    newLevel: newLevel?.name 
+    newLevel: newLevel?.name,
   });
 
   const percentage = Math.round((score / totalSteps) * 100);
@@ -164,13 +164,18 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
                 : t.lessons.wellDone}
           </Text>
           <Text variant="body" style={styles.subtitle}>
-            {leveledUp ? ti(t.lessons.youAreNow, { level: newLevel?.name || '' }) : t.lessons.lessonComplete}
+            {leveledUp
+              ? ti(t.lessons.youAreNow, { level: newLevel?.name || '' })
+              : t.lessons.lessonComplete}
           </Text>
         </MotiView>
 
         <View style={styles.stats}>
           <MotiView
-            style={[styles.statCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
+            style={[
+              styles.statCard,
+              { backgroundColor: ui.card.background, borderColor: ui.card.border },
+            ]}
             from={{ opacity: 0, translateX: -20 }}
             animate={{ opacity: 1, translateX: 0 }}
             transition={{ ...SPRING_CONFIGS.smooth, delay: 600 }}
@@ -194,7 +199,10 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
           </MotiView>
 
           <MotiView
-            style={[styles.statCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
+            style={[
+              styles.statCard,
+              { backgroundColor: ui.card.background, borderColor: ui.card.border },
+            ]}
             from={{ opacity: 0, translateX: 20 }}
             animate={{ opacity: 1, translateX: 0 }}
             transition={{ ...SPRING_CONFIGS.smooth, delay: 700 }}
@@ -234,7 +242,9 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
             >
               <Text style={styles.streakEmoji}>🔥</Text>
               <View style={styles.streakContent}>
-                <Text style={styles.streakValue}>{ti(t.lessons.streakDays, { count: streak })}</Text>
+                <Text style={styles.streakValue}>
+                  {ti(t.lessons.streakDays, { count: streak })}
+                </Text>
                 <Text style={styles.streakLabel}>{t.lessons.streakKeep}</Text>
               </View>
             </LinearGradient>
@@ -247,10 +257,13 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
           transition={{ ...SPRING_CONFIGS.smooth, delay: 800 }}
           style={styles.buttonContainer}
         >
-          <Pressable onPress={() => {
-            console.log('[CelebrationScreen] Continue button pressed');
-            onContinue();
-          }} style={styles.button}>
+          <Pressable
+            onPress={() => {
+              console.log('[CelebrationScreen] Continue button pressed');
+              onContinue();
+            }}
+            style={styles.button}
+          >
             <LinearGradient
               colors={[brandColors.purple, '#a855f7']}
               style={styles.buttonGradient}

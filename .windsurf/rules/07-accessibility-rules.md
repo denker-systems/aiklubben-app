@@ -1,6 +1,7 @@
 # Accessibility Rules - iOS VoiceOver & WCAG 2.1
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Accessibility requirements for iOS apps per Apple guidelines
 
@@ -9,6 +10,7 @@
 ## Core Accessibility Properties
 
 ### Required Properties for Interactive Elements
+
 ```typescript
 // EVERY interactive element MUST have accessibility properties
 <Pressable
@@ -27,33 +29,34 @@
 ```
 
 ### Accessibility Roles (iOS Standard)
+
 ```typescript
 type AccessibilityRole =
-  | 'none'           // No role
-  | 'button'         // Tappable elements
-  | 'link'           // Navigation links
-  | 'search'         // Search fields
-  | 'image'          // Images
-  | 'imagebutton'    // Tappable images
-  | 'text'           // Static text
-  | 'header'         // Section headers
-  | 'adjustable'     // Sliders, steppers
-  | 'alert'          // Alert dialogs
-  | 'checkbox'       // Checkboxes
-  | 'combobox'       // Dropdown selects
-  | 'menu'           // Menu containers
-  | 'menubar'        // Menu bars
-  | 'menuitem'       // Menu items
-  | 'progressbar'    // Progress indicators
-  | 'radio'          // Radio buttons
-  | 'radiogroup'     // Radio button groups
-  | 'scrollbar'      // Scroll indicators
-  | 'spinbutton'     // Numeric steppers
-  | 'switch'         // Toggle switches
-  | 'tab'            // Tab buttons
-  | 'tablist'        // Tab containers
-  | 'timer'          // Countdown timers
-  | 'toolbar';       // Toolbars
+  | 'none' // No role
+  | 'button' // Tappable elements
+  | 'link' // Navigation links
+  | 'search' // Search fields
+  | 'image' // Images
+  | 'imagebutton' // Tappable images
+  | 'text' // Static text
+  | 'header' // Section headers
+  | 'adjustable' // Sliders, steppers
+  | 'alert' // Alert dialogs
+  | 'checkbox' // Checkboxes
+  | 'combobox' // Dropdown selects
+  | 'menu' // Menu containers
+  | 'menubar' // Menu bars
+  | 'menuitem' // Menu items
+  | 'progressbar' // Progress indicators
+  | 'radio' // Radio buttons
+  | 'radiogroup' // Radio button groups
+  | 'scrollbar' // Scroll indicators
+  | 'spinbutton' // Numeric steppers
+  | 'switch' // Toggle switches
+  | 'tab' // Tab buttons
+  | 'tablist' // Tab containers
+  | 'timer' // Countdown timers
+  | 'toolbar'; // Toolbars
 ```
 
 ---
@@ -61,6 +64,7 @@ type AccessibilityRole =
 ## Accessibility Labels
 
 ### Label Writing Rules
+
 ```typescript
 // GOOD: Descriptive, action-oriented
 accessibilityLabel="Play audio"
@@ -80,6 +84,7 @@ accessibilityLabel="Button: Submit button" // Don't repeat "button"
 ```
 
 ### Label Patterns by Element Type
+
 ```typescript
 // Buttons
 accessibilityLabel="Submit form"
@@ -110,19 +115,21 @@ accessibilityValue={{
 ## Accessibility Hints
 
 ### Hint Guidelines
+
 ```typescript
 // Hints describe the RESULT of the action
 // GOOD: Describes outcome
-accessibilityHint="Opens your profile settings"
-accessibilityHint="Removes this item from your cart"
-accessibilityHint="Navigates to the previous screen"
+accessibilityHint = 'Opens your profile settings';
+accessibilityHint = 'Removes this item from your cart';
+accessibilityHint = 'Navigates to the previous screen';
 
 // BAD: Describes how to interact
-accessibilityHint="Tap to open" // VoiceOver already says this
-accessibilityHint="Double tap to activate" // Redundant
+accessibilityHint = 'Tap to open'; // VoiceOver already says this
+accessibilityHint = 'Double tap to activate'; // Redundant
 ```
 
 ### When to Use Hints
+
 ```typescript
 // USE hints for:
 // - Non-obvious actions
@@ -140,6 +147,7 @@ accessibilityHint="Double tap to activate" // Redundant
 ## Accessibility State
 
 ### State Properties
+
 ```typescript
 <Pressable
   accessibilityState={{
@@ -153,6 +161,7 @@ accessibilityHint="Double tap to activate" // Redundant
 ```
 
 ### Dynamic State Updates
+
 ```typescript
 // Update state for live feedback
 const [isLoading, setIsLoading] = useState(false);
@@ -173,6 +182,7 @@ const [isLoading, setIsLoading] = useState(false);
 ## Accessibility Value
 
 ### For Adjustable Elements
+
 ```typescript
 // Sliders, steppers, progress bars
 <View
@@ -205,12 +215,13 @@ const [isLoading, setIsLoading] = useState(false);
 ## Color & Contrast
 
 ### Minimum Contrast Requirements (WCAG 2.1 AA)
+
 ```typescript
 // Text contrast ratios
 const CONTRAST_RATIOS = {
-  normalText: 4.5,    // Text < 18pt
-  largeText: 3.0,     // Text >= 18pt or bold >= 14pt
-  uiComponents: 3.0,  // Icons, borders, controls
+  normalText: 4.5, // Text < 18pt
+  largeText: 3.0, // Text >= 18pt or bold >= 14pt
+  uiComponents: 3.0, // Icons, borders, controls
   graphicalObjects: 3.0, // Charts, diagrams
 };
 
@@ -218,16 +229,17 @@ const CONTRAST_RATIOS = {
 const accessibleColors = {
   // Dark background
   darkBg: '#0C0A17',
-  textOnDark: '#F9FAFB',     // Contrast: 15.8:1 ✓
+  textOnDark: '#F9FAFB', // Contrast: 15.8:1 ✓
   secondaryOnDark: '#9CA3AF', // Contrast: 5.4:1 ✓
-  
+
   // Light background
   lightBg: '#FFFFFF',
-  textOnLight: '#1F2937',    // Contrast: 14.7:1 ✓
+  textOnLight: '#1F2937', // Contrast: 14.7:1 ✓
 };
 ```
 
 ### Never Use Color Alone
+
 ```typescript
 // WRONG: Color only indicates status
 <View style={{ backgroundColor: isError ? 'red' : 'green' }} />
@@ -244,6 +256,7 @@ const accessibleColors = {
 ## Focus Management
 
 ### Accessibility Focus
+
 ```typescript
 import { AccessibilityInfo, findNodeHandle } from 'react-native';
 
@@ -266,6 +279,7 @@ useEffect(() => {
 ```
 
 ### Focus Order
+
 ```typescript
 // Use accessibilityElementsHidden to exclude decorative elements
 <View>
@@ -289,6 +303,7 @@ useEffect(() => {
 ## Live Regions
 
 ### Announce Dynamic Content
+
 ```typescript
 import { AccessibilityInfo } from 'react-native';
 
@@ -312,6 +327,7 @@ const handleSubmit = () => {
 ```
 
 ### Live Region Properties
+
 ```typescript
 // For elements that update dynamically
 <Text
@@ -327,6 +343,7 @@ const handleSubmit = () => {
 ## Reduced Motion
 
 ### Respect User Preferences
+
 ```typescript
 import { useReducedMotion } from 'moti';
 // OR
@@ -335,11 +352,11 @@ import { AccessibilityInfo } from 'react-native';
 // Using Moti hook
 const Component = () => {
   const reducedMotion = useReducedMotion();
-  
+
   return (
     <MotiView
       animate={{ opacity: 1 }}
-      transition={reducedMotion 
+      transition={reducedMotion
         ? { type: 'timing', duration: 0 }
         : { type: 'spring' }
       }
@@ -352,12 +369,12 @@ const [reduceMotion, setReduceMotion] = useState(false);
 
 useEffect(() => {
   AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
-  
+
   const subscription = AccessibilityInfo.addEventListener(
     'reduceMotionChanged',
     setReduceMotion
   );
-  
+
   return () => subscription.remove();
 }, []);
 ```
@@ -367,6 +384,7 @@ useEffect(() => {
 ## Testing Accessibility
 
 ### Manual Testing Checklist
+
 ```
 □ VoiceOver: Enable and navigate entire app
 □ Dynamic Type: Test with largest text size
@@ -377,13 +395,14 @@ useEffect(() => {
 ```
 
 ### Automated Testing
+
 ```typescript
 // Use react-native-testing-library
 import { render, screen } from '@testing-library/react-native';
 
 test('button has accessibility label', () => {
   render(<MyButton label="Submit" />);
-  
+
   expect(screen.getByRole('button', { name: 'Submit' })).toBeTruthy();
 });
 ```

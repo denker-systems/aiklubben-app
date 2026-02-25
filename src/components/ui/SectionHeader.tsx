@@ -62,7 +62,13 @@ const SectionHeaderComponent = memo(function SectionHeader({
       </View>
 
       {action && onActionPress && (
-        <Pressable onPress={onActionPress} style={[styles.actionButton, { backgroundColor: ui.glass.strong, borderColor: ui.glass.stroke }]}>
+        <Pressable
+          onPress={onActionPress}
+          style={[
+            styles.actionButton,
+            { backgroundColor: ui.glass.strong, borderColor: ui.glass.stroke },
+          ]}
+        >
           <Text style={styles.actionText}>{action}</Text>
         </Pressable>
       )}

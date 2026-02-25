@@ -182,7 +182,10 @@ export const MatchPairsStep: React.FC<MatchPairsStepProps> = ({
                 >
                   <Text
                     variant="body"
-                    style={[styles.matchItemText, isMatched && [styles.matchItemTextMatched, { color: colors.text.secondary }]]}
+                    style={[
+                      styles.matchItemText,
+                      isMatched && [styles.matchItemTextMatched, { color: colors.text.secondary }],
+                    ]}
                   >
                     {pair.left}
                   </Text>
@@ -238,7 +241,10 @@ export const MatchPairsStep: React.FC<MatchPairsStepProps> = ({
                   {isMatched && <Check size={18} color="#10B981" strokeWidth={3} />}
                   <Text
                     variant="body"
-                    style={[styles.matchItemText, isMatched && [styles.matchItemTextMatched, { color: colors.text.secondary }]]}
+                    style={[
+                      styles.matchItemText,
+                      isMatched && [styles.matchItemTextMatched, { color: colors.text.secondary }],
+                    ]}
                   >
                     {pair.right}
                   </Text>

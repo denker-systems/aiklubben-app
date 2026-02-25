@@ -2,7 +2,7 @@
   "expo": {
     "name": "AI Klubben",
     "slug": "aiklubben-app",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "nu.aiklubben.app",
-      "buildNumber": "3",
+      "buildNumber": "6",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -34,6 +34,12 @@
         "projectId": "c44a138e-9537-4cd3-897b-5dd3c2fe4bf4"
       }
     },
-    "owner": "denkersystems"
+    "owner": "denkersystems",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/c44a138e-9537-4cd3-897b-5dd3c2fe4bf4"
+    }
   }
 }

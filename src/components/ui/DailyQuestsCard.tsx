@@ -16,8 +16,7 @@ interface DailyQuestsCardProps {
 }
 
 const QuestItem: React.FC<{ quest: DailyQuest; index: number }> = memo(({ quest, index }) => {
-  const { isDark, colors } = useTheme();
-  const ui = getUiColors(isDark);
+  const { colors } = useTheme();
   const progress = Math.min(quest.progress / quest.target, 1);
 
   return (
@@ -88,7 +87,10 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = memo(({ quests })
       from={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={SPRING_CONFIGS.bouncy}
-      style={[styles.container, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
+      style={[
+        styles.container,
+        { backgroundColor: ui.card.background, borderColor: ui.card.border },
+      ]}
     >
       {/* Header */}
       <View style={styles.header}>
@@ -99,10 +101,18 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = memo(({ quests })
           </Text>
         </View>
         <View
-          style={[styles.completionBadge, { backgroundColor: colors.glass.light }, allCompleted && styles.completionBadgeComplete]}
+          style={[
+            styles.completionBadge,
+            { backgroundColor: colors.glass.light },
+            allCompleted && styles.completionBadgeComplete,
+          ]}
         >
           <Text
-            style={[styles.completionText, { color: colors.text.secondary }, allCompleted && styles.completionTextComplete]}
+            style={[
+              styles.completionText,
+              { color: colors.text.secondary },
+              allCompleted && styles.completionTextComplete,
+            ]}
           >
             {completedCount}/{quests.length}
           </Text>

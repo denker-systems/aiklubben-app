@@ -1,6 +1,7 @@
 # Navigation Rules - React Navigation for iOS
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Navigation patterns and structure for React Native iOS apps
 
@@ -9,6 +10,7 @@
 ## Navigation Structure
 
 ### Navigator Hierarchy
+
 ```typescript
 // App.tsx - Root navigation structure
 <NavigationContainer>
@@ -23,6 +25,7 @@
 ```
 
 ### Tab Navigator Setup
+
 ```typescript
 // MainNavigator.tsx
 const Tab = createBottomTabNavigator();
@@ -58,6 +61,7 @@ const Tab = createBottomTabNavigator();
 ## Screen Types
 
 ### Root Screens (Tab Bar Visible)
+
 ```typescript
 // Screens accessible from bottom tab bar
 type RootScreens = {
@@ -74,6 +78,7 @@ type RootScreens = {
 ```
 
 ### Sub Screens (Back Button)
+
 ```typescript
 // Screens navigated to FROM root screens
 type SubScreens = {
@@ -93,6 +98,7 @@ type SubScreens = {
 ## Navigation Patterns
 
 ### Type-Safe Navigation
+
 ```typescript
 // types/navigation.ts
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -103,10 +109,10 @@ export type RootStackParamList = {
   // Auth Stack
   Login: undefined;
   Register: undefined;
-  
+
   // Main Stack
   Main: undefined;
-  
+
   // Course Stack
   Courses: undefined;
   CourseDetail: { courseId: string };
@@ -114,15 +120,17 @@ export type RootStackParamList = {
 };
 
 // Navigation prop type
-export type NavigationProp<T extends keyof RootStackParamList> = 
-  NativeStackNavigationProp<RootStackParamList, T>;
+export type NavigationProp<T extends keyof RootStackParamList> = NativeStackNavigationProp<
+  RootStackParamList,
+  T
+>;
 
 // Route prop type
-export type RouteProps<T extends keyof RootStackParamList> = 
-  RouteProp<RootStackParamList, T>;
+export type RouteProps<T extends keyof RootStackParamList> = RouteProp<RootStackParamList, T>;
 ```
 
 ### Using Navigation Hook
+
 ```typescript
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NavigationProp, RouteProps } from '@/types/navigation';
@@ -130,17 +138,17 @@ import type { NavigationProp, RouteProps } from '@/types/navigation';
 const CourseDetailScreen = () => {
   const navigation = useNavigation<NavigationProp<'CourseDetail'>>();
   const route = useRoute<RouteProps<'CourseDetail'>>();
-  
+
   const { courseId } = route.params;
-  
+
   const handleLessonPress = (lessonId: string) => {
     navigation.navigate('Lesson', { lessonId, courseId });
   };
-  
+
   const handleBack = () => {
     navigation.goBack();
   };
-  
+
   return (/* Screen content */);
 };
 ```
@@ -150,6 +158,7 @@ const CourseDetailScreen = () => {
 ## Header Configuration
 
 ### Custom Header Component
+
 ```typescript
 // components/layout/Header.tsx
 interface HeaderProps {
@@ -167,13 +176,13 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  
+
   return (
     <View style={[styles.header, { paddingTop: insets.top }]}>
       {/* Left: Back or placeholder */}
       <View style={styles.headerLeft}>
         {showBack && (
-          <Pressable 
+          <Pressable
             onPress={() => navigation.goBack()}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             style={styles.backButton}
@@ -182,7 +191,7 @@ export const Header: React.FC<HeaderProps> = ({
           </Pressable>
         )}
       </View>
-      
+
       {/* Center: Title */}
       <View style={styles.headerCenter}>
         {title && (
@@ -191,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
           </Text>
         )}
       </View>
-      
+
       {/* Right: Menu or custom */}
       <View style={styles.headerRight}>
         {showMenu && (
@@ -250,6 +259,7 @@ const styles = StyleSheet.create({
 ## Screen Transitions
 
 ### iOS Standard Transitions
+
 ```typescript
 // Stack Navigator with iOS transitions
 <Stack.Navigator
@@ -264,6 +274,7 @@ const styles = StyleSheet.create({
 ```
 
 ### Modal Presentations
+
 ```typescript
 // Present screen as modal
 <Stack.Screen
@@ -291,6 +302,7 @@ const styles = StyleSheet.create({
 ## Deep Linking
 
 ### Configure Deep Links
+
 ```typescript
 // App.tsx
 const linking = {
@@ -319,6 +331,7 @@ const linking = {
 ## Navigation State Persistence
 
 ### Persist Navigation State
+
 ```typescript
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -363,15 +376,16 @@ const App = () => {
 ## Navigation Guards
 
 ### Auth Guard Pattern
+
 ```typescript
 // Use in navigation container
 const Navigation = () => {
   const { isAuthenticated, isLoading } = useAuth();
-  
+
   if (isLoading) {
     return <SplashScreen />;
   }
-  
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {isAuthenticated ? (

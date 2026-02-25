@@ -1,6 +1,7 @@
 # Styling System Rules
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Consistent styling patterns for React Native iOS apps
 
@@ -9,6 +10,7 @@
 ## StyleSheet Rules
 
 ### Always Use StyleSheet.create
+
 ```typescript
 // CORRECT: StyleSheet.create for optimization
 const styles = StyleSheet.create({
@@ -30,6 +32,7 @@ const wrongStyles = {
 ```
 
 ### Style Composition
+
 ```typescript
 // CORRECT: Array syntax for style composition
 <View style={[styles.base, styles.variant, customStyle]} />
@@ -54,17 +57,18 @@ const getDynamicStyles = (color: string) => StyleSheet.create({
 ## Color System
 
 ### Brand Colors (Defined in theme.ts)
+
 ```typescript
 export const brandColors = {
   // Primary
   purple: '#8B5CF6',
   purpleDark: '#7C3AED',
   purpleLight: '#A78BFA',
-  
+
   // Secondary
   pink: '#EC4899',
   teal: '#14B8A6',
-  
+
   // Status
   success: '#10B981',
   successDark: '#059669',
@@ -76,6 +80,7 @@ export const brandColors = {
 ```
 
 ### UI Colors (Semantic)
+
 ```typescript
 export const uiColors = {
   // Backgrounds
@@ -85,7 +90,7 @@ export const uiColors = {
     tertiary: '#252136',
     elevated: '#2D2640',
   },
-  
+
   // Text
   text: {
     primary: '#F9FAFB',
@@ -93,14 +98,14 @@ export const uiColors = {
     tertiary: '#6B7280',
     inverse: '#0C0A17',
   },
-  
+
   // Borders
   border: {
     default: '#374151',
     subtle: '#1F2937',
     strong: '#4B5563',
   },
-  
+
   // Cards
   card: {
     background: '#1A1625',
@@ -110,6 +115,7 @@ export const uiColors = {
 ```
 
 ### Color Usage Rules
+
 ```typescript
 // CORRECT: Use semantic color tokens
 backgroundColor: uiColors.background.primary
@@ -127,14 +133,15 @@ backgroundColor: '#8B5CF608', // 8% opacity purple for subtle bg
 ## Typography System
 
 ### Font Sizes (iOS Standard)
+
 ```typescript
 export const fontSize = {
-  xs: 11,    // Caption, footnote
-  sm: 13,    // Secondary text
-  base: 15,  // Body text (iOS default)
-  md: 17,    // Body text (iOS System)
-  lg: 20,    // Subheadline
-  xl: 22,    // Title 3
+  xs: 11, // Caption, footnote
+  sm: 13, // Secondary text
+  base: 15, // Body text (iOS default)
+  md: 17, // Body text (iOS System)
+  lg: 20, // Subheadline
+  xl: 22, // Title 3
   '2xl': 28, // Title 2
   '3xl': 34, // Title 1, Large Title
   '4xl': 40, // Display
@@ -142,6 +149,7 @@ export const fontSize = {
 ```
 
 ### Font Weights
+
 ```typescript
 export const fontWeight = {
   normal: '400' as const,
@@ -153,17 +161,18 @@ export const fontWeight = {
 ```
 
 ### Text Component Variants
+
 ```typescript
 // Define text variants in Text component
-export type TextVariant = 
-  | 'h1'      // 34pt Bold
-  | 'h2'      // 28pt Bold
-  | 'h3'      // 22pt Semibold
-  | 'h4'      // 20pt Semibold
-  | 'body'    // 17pt Normal
-  | 'bodyBold'// 17pt Bold
+export type TextVariant =
+  | 'h1' // 34pt Bold
+  | 'h2' // 28pt Bold
+  | 'h3' // 22pt Semibold
+  | 'h4' // 20pt Semibold
+  | 'body' // 17pt Normal
+  | 'bodyBold' // 17pt Bold
   | 'caption' // 13pt Normal
-  | 'small';  // 11pt Normal
+  | 'small'; // 11pt Normal
 
 const variantStyles: Record<TextVariant, TextStyle> = {
   h1: { fontSize: 34, fontWeight: '700', lineHeight: 41 },
@@ -182,6 +191,7 @@ const variantStyles: Record<TextVariant, TextStyle> = {
 ## Spacing System
 
 ### Spacing Scale
+
 ```typescript
 export const spacing = {
   0: 0,
@@ -200,6 +210,7 @@ export const spacing = {
 ```
 
 ### Spacing Usage
+
 ```typescript
 // CORRECT: Use spacing constants
 padding: spacing[4], // 16
@@ -216,6 +227,7 @@ padding: spacing[4] + 2, // 18 - accounts for border
 ## Border Radius System
 
 ### Border Radius Scale
+
 ```typescript
 export const borderRadius = {
   none: 0,
@@ -230,17 +242,18 @@ export const borderRadius = {
 ```
 
 ### Button/Card Radius Standards
+
 ```typescript
 // Buttons
 const buttonRadius = {
-  sm: borderRadius.md,   // 8
-  md: borderRadius.lg,   // 12
-  lg: borderRadius.xl,   // 16
+  sm: borderRadius.md, // 8
+  md: borderRadius.lg, // 12
+  lg: borderRadius.xl, // 16
 };
 
 // Cards
 const cardRadius = {
-  default: borderRadius.xl,  // 16
+  default: borderRadius.xl, // 16
   large: borderRadius['2xl'], // 20
 };
 
@@ -253,6 +266,7 @@ const circularRadius = borderRadius.full; // 9999
 ## Shadow System
 
 ### iOS Shadows
+
 ```typescript
 export const shadows = {
   sm: {
@@ -309,6 +323,7 @@ export const coloredShadows = {
 ## Opacity System
 
 ### Standard Opacities
+
 ```typescript
 export const opacity = {
   disabled: 0.5,
@@ -324,6 +339,7 @@ export const opacity = {
 ## Animation Timing
 
 ### Duration Constants
+
 ```typescript
 export const duration = {
   instant: 100,

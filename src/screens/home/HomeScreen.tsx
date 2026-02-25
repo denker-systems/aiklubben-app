@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { View, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
@@ -10,30 +10,36 @@ import { Text, FloatingOrbs, ContentCard, TiltCard, AppIcon } from '@/components
 import { useMenu } from '@/contexts/MenuContext';
 import { useAuth } from '@/hooks/useAuth';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
-import { getLevelForXP } from '@/types/gamification';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getUiColors } from '@/config/design';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useUserStats } from '@/hooks/useUserStats';
+import { useTabNavigation } from '@/contexts/TabNavigationContext';
 
 export const HomeScreen = () => {
   console.log('[HomeScreen] Rendered');
-  
+
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const menuContext = useMenu();
   const { isDark, colors } = useTheme();
   const ui = getUiColors(isDark);
-  const { t } = useLanguage();
+  const { t, locale, l } = useLanguage();
   const { user } = useAuth();
+  const { stats, level } = useUserStats();
+  const { navigateToTab } = useTabNavigation();
   const [profile, setProfile] = useState<any>(null);
-  const [stats] = useState({ totalXP: 150, currentStreak: 3 });
   const [recentNews, setRecentNews] = useState<any[]>([]);
-
-  const level = getLevelForXP(stats.totalXP);
+  const [courseProgress, setCourseProgress] = useState<{
+    courseId: string;
+    courseName: string;
+    courseNameEn: string | null;
+    progress: number;
+  } | null>(null);
 
   useEffect(() => {
     console.log('[HomeScreen] useEffect triggered', { hasUser: !!user });
-    
+
     const fetchData = async () => {
       try {
         // Fetch profile
@@ -44,7 +50,7 @@ export const HomeScreen = () => {
             .select('name')
             .eq('id', user.id)
             .single();
-          
+
           if (profileError) {
             console.error('[HomeScreen] Error fetching profile:', profileError);
           } else {
@@ -53,21 +59,104 @@ export const HomeScreen = () => {
           setProfile(profileData);
         }
 
-        // Fetch recent news
+        // Fetch recent news (select * for i18n _en columns)
         console.log('[HomeScreen] Fetching recent news');
         const { data: newsData, error: newsError } = await supabase
           .from('news')
-          .select('id, title, summary, image_url')
+          .select('*')
           .eq('is_published', true)
           .order('published_at', { ascending: false })
           .limit(3);
-        
+
         if (newsError) {
           console.error('[HomeScreen] Error fetching news:', newsError);
         } else {
           console.log('[HomeScreen] News fetched:', { count: newsData?.length });
         }
         setRecentNews(newsData || []);
+
+        // Fetch course progress for "Continue learning"
+        if (user) {
+          // Step 1: Get all course lessons
+          const { data: allCourseLessons } = await supabase
+            .from('course_lessons')
+            .select('id, course_id');
+
+          if (allCourseLessons && allCourseLessons.length > 0) {
+            const totalMap: Record<string, number> = {};
+            const lessonToCourse: Record<string, string> = {};
+            allCourseLessons.forEach((l: any) => {
+              totalMap[l.course_id] = (totalMap[l.course_id] || 0) + 1;
+              lessonToCourse[l.id] = l.course_id;
+            });
+
+            // Step 2: Get completed lessons for this user
+            const lessonIds = allCourseLessons.map((l: any) => l.id);
+            const { data: completed } = await supabase
+              .from('user_lesson_progress')
+              .select('lesson_id')
+              .eq('user_id', user.id)
+              .eq('status', 'completed')
+              .in('lesson_id', lessonIds);
+
+            if (completed && completed.length > 0) {
+              const completedPerCourse: Record<string, number> = {};
+              completed.forEach((c: any) => {
+                const cId = lessonToCourse[c.lesson_id];
+                if (cId) completedPerCourse[cId] = (completedPerCourse[cId] || 0) + 1;
+              });
+
+              // Step 3: Get course titles
+              const courseIds = Object.keys(completedPerCourse);
+              const { data: courseData } = await supabase
+                .from('content')
+                .select('id, title, title_en')
+                .in('id', courseIds);
+
+              const titleMap: Record<string, { title: string; titleEn: string | null }> = {};
+              courseData?.forEach((c: any) => {
+                titleMap[c.id] = { title: c.title, titleEn: c.title_en };
+              });
+
+              // Find best in-progress course
+              let bestCourse: {
+                id: string;
+                progress: number;
+                title: string;
+                titleEn: string | null;
+              } | null = null;
+              for (const cId of courseIds) {
+                const total = totalMap[cId] || 1;
+                const pct = Math.round((completedPerCourse[cId] / total) * 100);
+                if (pct < 100 && (!bestCourse || pct > bestCourse.progress)) {
+                  bestCourse = {
+                    id: cId,
+                    progress: pct,
+                    title: titleMap[cId]?.title || '',
+                    titleEn: titleMap[cId]?.titleEn || null,
+                  };
+                }
+              }
+              if (!bestCourse && courseIds.length > 0) {
+                const cId = courseIds[0];
+                bestCourse = {
+                  id: cId,
+                  progress: 100,
+                  title: titleMap[cId]?.title || '',
+                  titleEn: titleMap[cId]?.titleEn || null,
+                };
+              }
+              if (bestCourse) {
+                setCourseProgress({
+                  courseId: bestCourse.id,
+                  courseName: bestCourse.title,
+                  courseNameEn: bestCourse.titleEn,
+                  progress: bestCourse.progress,
+                });
+              }
+            }
+          }
+        }
       } catch (err) {
         console.error('[HomeScreen] Error fetching home data:', err);
       }
@@ -83,6 +172,30 @@ export const HomeScreen = () => {
     return t.greetings.evening;
   };
 
+  // Daily goal: target 50 XP per day, calculate from lessons completed today
+  const DAILY_XP_GOAL = 50;
+  const [dailyXP, setDailyXP] = useState(0);
+
+  useEffect(() => {
+    const fetchDailyXP = async () => {
+      if (!user) return;
+      const today = new Date().toISOString().split('T')[0];
+      const { data } = await supabase
+        .from('user_lesson_progress')
+        .select('xp_earned')
+        .eq('user_id', user.id)
+        .gte('completed_at', today + 'T00:00:00.000Z');
+      const total = data?.reduce((sum: number, r: any) => sum + (r.xp_earned || 0), 0) || 0;
+      setDailyXP(total);
+    };
+    fetchDailyXP();
+  }, [user]);
+
+  const dailyGoalPercent = useMemo(
+    () => Math.min(100, Math.round((dailyXP / DAILY_XP_GOAL) * 100)),
+    [dailyXP],
+  );
+
   const quickActions = [
     {
       id: 'courses',
@@ -91,7 +204,7 @@ export const HomeScreen = () => {
       emoji: '📚',
       iconName: 'courses',
       gradient: ['#6366f1', '#8b5cf6'] as const,
-      screen: 'Courses',
+      tab: 'Courses' as const,
     },
     {
       id: 'news',
@@ -100,7 +213,7 @@ export const HomeScreen = () => {
       emoji: '📰',
       iconName: 'news',
       gradient: ['#ff3366', '#f43f5e'] as const,
-      screen: 'News',
+      tab: 'News' as const,
     },
     {
       id: 'resources',
@@ -108,7 +221,7 @@ export const HomeScreen = () => {
       subtitle: t.home.resourcesSubtitle,
       emoji: '📂',
       gradient: ['#00d8a2', '#0ea5e9'] as const,
-      screen: 'Content',
+      tab: 'Content' as const,
     },
   ];
 
@@ -138,9 +251,18 @@ export const HomeScreen = () => {
                 {profile?.name?.split(' ')[0] || t.common.friend}
               </Text>
             </View>
-            <Pressable onPress={() => menuContext?.openMenu()} style={[styles.menuButton, { backgroundColor: colors.glass.light }]}>
+            <Pressable
+              onPress={() => menuContext?.openMenu()}
+              style={[styles.menuButton, { backgroundColor: colors.glass.light }]}
+            >
               <View style={[styles.menuLine, { backgroundColor: colors.text.secondary }]} />
-              <View style={[styles.menuLine, styles.menuLineShort, { backgroundColor: colors.text.secondary }]} />
+              <View
+                style={[
+                  styles.menuLine,
+                  styles.menuLineShort,
+                  { backgroundColor: colors.text.secondary },
+                ]}
+              />
             </Pressable>
           </View>
 
@@ -161,7 +283,9 @@ export const HomeScreen = () => {
                 <AppIcon name="xp" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={[styles.statValue, { color: colors.text.primary }]}>{stats.totalXP}</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                  {stats.totalXP}
+                </Text>
                 <Text style={[styles.statLabel, { color: colors.text.secondary }]}>XP</Text>
               </View>
             </MotiView>
@@ -181,8 +305,12 @@ export const HomeScreen = () => {
                 <AppIcon name="streak" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={[styles.statValue, { color: colors.text.primary }]}>{stats.currentStreak}</Text>
-                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>dagar</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                  {stats.currentStreak}
+                </Text>
+                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+                  {t.common.days}
+                </Text>
               </View>
             </MotiView>
 
@@ -201,42 +329,49 @@ export const HomeScreen = () => {
                 <Text style={styles.statEmoji}>🎯</Text>
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={[styles.statValue, { color: colors.text.primary }]}>Lvl {level.level}</Text>
-                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>{level.name.split(' ')[0]}</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                  Lvl {level.level}
+                </Text>
+                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+                  {(t.levels as any)[level.level] || level.name}
+                </Text>
               </View>
             </MotiView>
           </View>
         </MotiView>
 
         {/* Daily Progress Card */}
-        <Pressable onPress={() => navigation.navigate('Courses')}>
+        <Pressable onPress={() => navigateToTab('Courses')}>
           <MotiView
-            style={[styles.dailyCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
+            style={[
+              styles.dailyCard,
+              { backgroundColor: ui.card.background, borderColor: ui.card.border },
+            ]}
             from={{ opacity: 0, translateX: -30 }}
             animate={{ opacity: 1, translateX: 0 }}
             transition={{ ...SPRING_CONFIGS.smooth, delay: 100 }}
           >
             <View style={styles.dailyCardHeader}>
-            <View style={styles.dailyCardIconContainer}>
-              <AppIcon name="goal" size={120} />
+              <View style={styles.dailyCardIconContainer}>
+                <AppIcon name="goal" size={120} />
+              </View>
+              <View style={styles.dailyCardContent}>
+                <Text variant="body" style={styles.dailyCardTitle}>
+                  {t.home.dailyGoal}
+                </Text>
+                <Text variant="caption" style={styles.dailyCardSubtitle}>
+                  {t.home.keepLearning}
+                </Text>
+              </View>
+              <View style={styles.dailyCardProgress}>
+                <Text style={styles.dailyCardPercent}>{dailyGoalPercent}%</Text>
+              </View>
             </View>
-            <View style={styles.dailyCardContent}>
-              <Text variant="body" style={styles.dailyCardTitle}>
-                {t.home.dailyGoal}
-              </Text>
-              <Text variant="caption" style={styles.dailyCardSubtitle}>
-                {t.home.keepLearning}
-              </Text>
-            </View>
-            <View style={styles.dailyCardProgress}>
-              <Text style={styles.dailyCardPercent}>40%</Text>
-            </View>
-          </View>
             <View style={[styles.dailyProgressTrack, { backgroundColor: colors.glass.medium }]}>
               <MotiView
                 style={styles.dailyProgressFill}
                 from={{ width: '0%' }}
-                animate={{ width: '40%' }}
+                animate={{ width: `${dailyGoalPercent}%` as any }}
                 transition={{ ...SPRING_CONFIGS.smooth, delay: 500 }}
               />
             </View>
@@ -266,10 +401,13 @@ export const HomeScreen = () => {
                 style={styles.quickActionWrapper}
               >
                 <TiltCard
-                  onPress={() => navigation.navigate(action.screen)}
+                  onPress={() => navigateToTab(action.tab)}
                   tiltAmount={3}
                   scaleAmount={0.97}
-                  style={[styles.quickActionCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
+                  style={[
+                    styles.quickActionCard,
+                    { backgroundColor: ui.card.background, borderColor: ui.card.border },
+                  ]}
                 >
                   <View style={styles.quickActionIconContainer}>
                     {action.iconName ? (
@@ -288,44 +426,61 @@ export const HomeScreen = () => {
         </MotiView>
 
         {/* Continue Learning */}
-        <MotiView
-          style={styles.section}
-          from={{ opacity: 0, translateY: 20 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ ...SPRING_CONFIGS.smooth, delay: 400 }}
-        >
-          <View style={styles.sectionHeader}>
-            <Text variant="h3" style={styles.sectionTitle}>
-              {t.home.continueLearning}
-            </Text>
-          </View>
-
-          <TiltCard
-            onPress={() => navigation.navigate('Courses')}
-            tiltAmount={2}
-            scaleAmount={0.98}
-            style={[styles.continueCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
+        {courseProgress && (
+          <MotiView
+            style={styles.section}
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ ...SPRING_CONFIGS.smooth, delay: 400 }}
           >
-            <View style={styles.continueCardContent}>
-              <View style={styles.continueIconContainer}>
-                <AppIcon name="courses-example" size={96} />
-              </View>
-              <View style={styles.continueInfo}>
-                <Text variant="body" style={styles.continueTitle}>
-                  {t.home.basicCourse}
-                </Text>
-                <View style={styles.continueProgress}>
-                  <View style={[styles.continueProgressTrack, { backgroundColor: colors.glass.medium }]}>
-                    <View style={[styles.continueProgressFill, { width: '35%' }]} />
-                  </View>
-                  <Text variant="caption" style={styles.continuePercent}>
-                    35%
+            <View style={styles.sectionHeader}>
+              <Text variant="h3" style={styles.sectionTitle}>
+                {t.home.continueLearning}
+              </Text>
+            </View>
+
+            <TiltCard
+              onPress={() => navigation.navigate('CourseDetail', { id: courseProgress.courseId })}
+              tiltAmount={2}
+              scaleAmount={0.98}
+              style={[
+                styles.continueCard,
+                { backgroundColor: ui.card.background, borderColor: ui.card.border },
+              ]}
+            >
+              <View style={styles.continueCardContent}>
+                <View style={styles.continueIconContainer}>
+                  <AppIcon name="courses-example" size={96} />
+                </View>
+                <View style={styles.continueInfo}>
+                  <Text variant="body" style={styles.continueTitle}>
+                    {locale === 'en' && courseProgress.courseNameEn
+                      ? courseProgress.courseNameEn
+                      : courseProgress.courseName}
                   </Text>
+                  <View style={styles.continueProgress}>
+                    <View
+                      style={[
+                        styles.continueProgressTrack,
+                        { backgroundColor: colors.glass.medium },
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.continueProgressFill,
+                          { width: `${courseProgress.progress}%` },
+                        ]}
+                      />
+                    </View>
+                    <Text variant="caption" style={styles.continuePercent}>
+                      {courseProgress.progress}%
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          </TiltCard>
-        </MotiView>
+            </TiltCard>
+          </MotiView>
+        )}
 
         {/* Recent News */}
         {recentNews.length > 0 && (
@@ -339,7 +494,7 @@ export const HomeScreen = () => {
               <Text variant="h3" style={styles.sectionTitle}>
                 {t.home.latestNews}
               </Text>
-              <Pressable onPress={() => navigation.navigate('News')} style={styles.seeAllButton}>
+              <Pressable onPress={() => navigateToTab('News')} style={styles.seeAllButton}>
                 <Text style={styles.seeAllText}>{t.common.seeAll}</Text>
               </Pressable>
             </View>
@@ -356,8 +511,8 @@ export const HomeScreen = () => {
                   }}
                 >
                   <ContentCard
-                    title={news.title}
-                    subtitle={news.summary}
+                    title={l(news, 'title')}
+                    subtitle={l(news, 'summary')}
                     image={news.image_url}
                     onPress={() => navigation.navigate('NewsDetail', { id: news.id })}
                     showArrow

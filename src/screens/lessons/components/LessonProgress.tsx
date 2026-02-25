@@ -4,7 +4,6 @@ import { MotiView } from 'moti';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
-import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -23,8 +22,7 @@ export const LessonProgress: React.FC<LessonProgressProps> = ({
   lives,
   streak,
 }) => {
-  const { isDark, colors } = useTheme();
-  const ui = getUiColors(isDark);
+  const { colors } = useTheme();
   const { t, ti } = useLanguage();
   const progress = ((currentStep + 1) / totalSteps) * 100;
   const maxLives = 3;

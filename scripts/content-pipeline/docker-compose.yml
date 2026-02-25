@@ -1,0 +1,5 @@
+services:
+  content-pipeline:
+    build: .
+    env_file:
+      - .env

@@ -53,7 +53,7 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
   // Handle both text formats
   let textBefore = '';
   let textAfter = '';
-  
+
   if (content?.text) {
     // Format 1: "text with ___ blank"
     const parts = content.text.split('___');
@@ -91,7 +91,11 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
             <TextInput
               style={[
                 styles.input,
-                { backgroundColor: ui.card.background, borderColor: ui.card.border, color: colors.text.primary },
+                {
+                  backgroundColor: ui.card.background,
+                  borderColor: ui.card.border,
+                  color: colors.text.primary,
+                },
                 showFeedback && (isCorrect ? styles.inputCorrect : styles.inputIncorrect),
               ]}
               value={userAnswer}
@@ -156,7 +160,10 @@ export const FillBlankStep: React.FC<FillBlankStepProps> = ({
           animate={{ opacity: 1, translateY: 0 }}
           transition={{ ...SPRING_CONFIGS.smooth, delay: 200 }}
         >
-          <Text variant="body" style={[styles.correctAnswerLabel, { color: colors.text.secondary }]}>
+          <Text
+            variant="body"
+            style={[styles.correctAnswerLabel, { color: colors.text.secondary }]}
+          >
             {t.steps.correctAnswer}
           </Text>
           <Text variant="body" style={styles.correctAnswerText}>

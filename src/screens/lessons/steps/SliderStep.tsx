@@ -164,10 +164,20 @@ export const SliderStep: React.FC<SliderStepProps> = ({
                 disabled={showFeedback}
                 style={[styles.labelItem, { left: `${labelPercentage}%` }]}
               >
-                <View style={[styles.labelDot, { backgroundColor: colors.text.muted }, value === label.value && styles.labelDotActive]} />
+                <View
+                  style={[
+                    styles.labelDot,
+                    { backgroundColor: colors.text.muted },
+                    value === label.value && styles.labelDotActive,
+                  ]}
+                />
                 <Text
                   variant="caption"
-                  style={[styles.labelText, { color: colors.text.muted }, value === label.value && styles.labelTextActive]}
+                  style={[
+                    styles.labelText,
+                    { color: colors.text.muted },
+                    value === label.value && styles.labelTextActive,
+                  ]}
                 >
                   {label.label}
                 </Text>

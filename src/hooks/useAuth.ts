@@ -9,12 +9,12 @@ export const useAuth = () => {
 
   useEffect(() => {
     console.log('[useAuth] Initializing auth listener');
-    
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('[useAuth] Auth state changed', { event, userId: session?.user?.id });
-      
+
       if (event === 'TOKEN_REFRESHED') {
         console.log('[useAuth] Token refreshed, skipping state update');
         return;
@@ -26,9 +26,9 @@ export const useAuth = () => {
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('[useAuth] Initial session fetched', { 
-        hasSession: !!session, 
-        userId: session?.user?.id 
+      console.log('[useAuth] Initial session fetched', {
+        hasSession: !!session,
+        userId: session?.user?.id,
       });
       setSession(session);
       setUser(session?.user ?? null);
@@ -93,6 +93,24 @@ export const useAuth = () => {
     }
   };
 
+  const deleteAccount = async () => {
+    console.log('[useAuth] deleteAccount attempt');
+    try {
+      const { error: rpcError } = await supabase.rpc('delete_user_account');
+      if (rpcError) {
+        console.error('[useAuth] deleteAccount rpc error:', rpcError);
+        return { error: rpcError };
+      }
+      // Clear local session after account deletion
+      await supabase.auth.signOut();
+      console.log('[useAuth] deleteAccount successful');
+      return { error: null };
+    } catch (err) {
+      console.error('[useAuth] deleteAccount exception:', err);
+      return { error: err as Error };
+    }
+  };
+
   return {
     user,
     session,
@@ -100,5 +118,6 @@ export const useAuth = () => {
     signIn,
     signOut,
     signUp,
+    deleteAccount,
   };
 };

@@ -36,11 +36,21 @@ export const QuestionHeader: React.FC<QuestionHeaderProps> = ({
           <Icon size={28} color={iconColor} />
         </View>
       )}
-      <Text variant="h3" style={[styles.title, { color: colors.text.primary }, centered && styles.textCentered]}>
+      <Text
+        variant="h3"
+        style={[styles.title, { color: colors.text.primary }, centered && styles.textCentered]}
+      >
         {title}
       </Text>
       {subtitle && (
-        <Text variant="body" style={[styles.subtitle, { color: colors.text.secondary }, centered && styles.textCentered]}>
+        <Text
+          variant="body"
+          style={[
+            styles.subtitle,
+            { color: colors.text.secondary },
+            centered && styles.textCentered,
+          ]}
+        >
           {subtitle}
         </Text>
       )}

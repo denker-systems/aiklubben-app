@@ -1,6 +1,7 @@
 # Error Handling Rules - React Native
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Error handling patterns for robust React Native apps
 
@@ -9,6 +10,7 @@
 ## Error Boundary
 
 ### Global Error Boundary
+
 ```typescript
 // components/ErrorBoundary.tsx
 import React, { Component, ErrorInfo, ReactNode } from 'react';
@@ -39,10 +41,10 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log to error reporting service
     console.error('ErrorBoundary caught:', error, errorInfo);
-    
+
     // Call optional error handler
     this.props.onError?.(error, errorInfo);
-    
+
     // Report to analytics (Sentry, etc.)
     // errorReporting.captureException(error, { extra: errorInfo });
   }
@@ -95,6 +97,7 @@ const styles = StyleSheet.create({
 ```
 
 ### Using Error Boundaries
+
 ```typescript
 // Wrap screens or feature sections
 const App = () => (
@@ -123,6 +126,7 @@ const CourseScreen = () => (
 ## Async Error Handling
 
 ### API Error Handling Pattern
+
 ```typescript
 // types/errors.ts
 export class ApiError extends Error {
@@ -130,7 +134,7 @@ export class ApiError extends Error {
     message: string,
     public statusCode: number,
     public code?: string,
-    public details?: unknown
+    public details?: unknown,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -165,7 +169,7 @@ export class NetworkError extends Error {
 export class ValidationError extends Error {
   constructor(
     message: string,
-    public fields: Record<string, string[]>
+    public fields: Record<string, string[]>,
   ) {
     super(message);
     this.name = 'ValidationError';
@@ -174,12 +178,10 @@ export class ValidationError extends Error {
 ```
 
 ### API Client with Error Handling
+
 ```typescript
 // lib/api.ts
-const apiClient = async <T>(
-  endpoint: string,
-  options?: RequestInit
-): Promise<T> => {
+const apiClient = async <T>(endpoint: string, options?: RequestInit): Promise<T> => {
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
@@ -200,11 +202,11 @@ const apiClient = async <T>(
     if (error instanceof ApiError) {
       throw error;
     }
-    
+
     if (error instanceof TypeError && error.message.includes('Network')) {
       throw new NetworkError('Unable to connect to server');
     }
-    
+
     throw new ApiError('An unexpected error occurred', 500);
   }
 };
@@ -215,6 +217,7 @@ const apiClient = async <T>(
 ## React Query Error Handling
 
 ### Query Error Handling
+
 ```typescript
 // hooks/useCourse.ts
 import { useQuery } from '@tanstack/react-query';
@@ -248,7 +251,7 @@ const CourseScreen = ({ courseId }: Props) => {
     if (error instanceof ApiError && error.isNotFound) {
       return <NotFoundState message="Kursen hittades inte" />;
     }
-    
+
     return (
       <ErrorState
         message="Kunde inte ladda kursen"
@@ -262,11 +265,12 @@ const CourseScreen = ({ courseId }: Props) => {
 ```
 
 ### Mutation Error Handling
+
 ```typescript
 // hooks/useUpdateProfile.ts
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: api.updateProfile,
     onError: (error) => {
@@ -274,12 +278,12 @@ export const useUpdateProfile = () => {
         // Handle validation errors (show in form)
         return;
       }
-      
+
       if (error instanceof ApiError && error.isUnauthorized) {
         // Handle auth error (logout, redirect)
         return;
       }
-      
+
       // Show generic error toast
       showToast({ type: 'error', message: 'Något gick fel' });
     },
@@ -296,6 +300,7 @@ export const useUpdateProfile = () => {
 ## Form Validation Errors
 
 ### Validation Error Display
+
 ```typescript
 // components/FormField.tsx
 interface FormFieldProps {
@@ -314,7 +319,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   touched,
 }) => {
   const showError = touched && error;
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
@@ -339,37 +344,32 @@ export const FormField: React.FC<FormFieldProps> = ({
 ```
 
 ### Validation Schema
+
 ```typescript
 // lib/validation.ts
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'E-post krävs')
-    .email('Ogiltig e-postadress'),
-  password: z
-    .string()
-    .min(1, 'Lösenord krävs')
-    .min(8, 'Lösenordet måste vara minst 8 tecken'),
+  email: z.string().min(1, 'E-post krävs').email('Ogiltig e-postadress'),
+  password: z.string().min(1, 'Lösenord krävs').min(8, 'Lösenordet måste vara minst 8 tecken'),
 });
 
 export const validateForm = <T extends z.ZodSchema>(
   schema: T,
-  data: unknown
+  data: unknown,
 ): { success: true; data: z.infer<T> } | { success: false; errors: Record<string, string> } => {
   const result = schema.safeParse(data);
-  
+
   if (result.success) {
     return { success: true, data: result.data };
   }
-  
+
   const errors: Record<string, string> = {};
   result.error.errors.forEach((err) => {
     const path = err.path.join('.');
     errors[path] = err.message;
   });
-  
+
   return { success: false, errors };
 };
 ```
@@ -379,6 +379,7 @@ export const validateForm = <T extends z.ZodSchema>(
 ## Toast/Snackbar Notifications
 
 ### Toast System
+
 ```typescript
 // contexts/ToastContext.tsx
 interface Toast {
@@ -400,9 +401,9 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const showToast = useCallback((toast: Omit<Toast, 'id'>) => {
     const id = Date.now().toString();
     const duration = toast.duration ?? 3000;
-    
+
     setToasts(prev => [...prev, { ...toast, id }]);
-    
+
     if (duration > 0) {
       setTimeout(() => {
         hideToast(id);
@@ -428,28 +429,29 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 ## Offline Error Handling
 
 ### Network State Hook
+
 ```typescript
 // hooks/useNetworkState.ts
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 
 export const useNetworkState = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  
+
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
       setIsConnected(state.isConnected);
     });
-    
+
     return () => unsubscribe();
   }, []);
-  
+
   return { isConnected, isOffline: isConnected === false };
 };
 
 // Usage
 const DataScreen = () => {
   const { isOffline } = useNetworkState();
-  
+
   if (isOffline) {
     return (
       <OfflineState
@@ -458,7 +460,7 @@ const DataScreen = () => {
       />
     );
   }
-  
+
   return <DataContent />;
 };
 ```
@@ -468,6 +470,7 @@ const DataScreen = () => {
 ## Error Logging
 
 ### Error Reporting Setup
+
 ```typescript
 // lib/errorReporting.ts
 interface ErrorReport {
@@ -482,7 +485,7 @@ export const reportError = ({ error, context, user }: ErrorReport) => {
     console.error('Error Report:', error, context);
     return;
   }
-  
+
   // Send to error reporting service (Sentry, etc.)
   // Sentry.captureException(error, {
   //   extra: context,

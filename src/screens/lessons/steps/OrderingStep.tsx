@@ -1,10 +1,8 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { View, Pressable, StyleSheet, PanResponder, Animated, ScrollView } from 'react-native';
-import { MotiView } from 'moti';
 import { GripVertical, ArrowUp, ArrowDown } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { Text } from '@/components/ui';
-import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getUiColors } from '@/config/design';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -47,6 +45,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const dragY = useRef(new Animated.Value(0)).current;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const itemPositions = useRef<number[]>([]);
 
   const moveItem = useCallback(
@@ -66,6 +65,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
     [items, showFeedback],
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleItemPress = useCallback(
     (index: number) => {
       if (showFeedback) return;
@@ -137,11 +137,7 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
 
   return (
     <StepContainer>
-      <QuestionHeader
-        icon={ListOrdered}
-        title={content.instruction}
-        subtitle={t.steps.useArrows}
-      />
+      <QuestionHeader icon={ListOrdered} title={content.instruction} subtitle={t.steps.useArrows} />
 
       <View style={styles.itemsContainer}>
         {items.map((item, index) => {
@@ -178,7 +174,10 @@ export const OrderingStep: React.FC<OrderingStepProps> = ({
               </View>
 
               <View style={styles.itemContent}>
-                <GripVertical size={20} color={isDragging ? brandColors.purple : colors.text.muted} />
+                <GripVertical
+                  size={20}
+                  color={isDragging ? brandColors.purple : colors.text.muted}
+                />
                 <Text variant="body" style={styles.itemText}>
                   {item.item}
                 </Text>

@@ -50,12 +50,19 @@ const MenuButtonComponent = memo(function MenuButton({
         style,
       ]}
     >
-      <Pressable
-        onPress={handlePress}
-        style={styles.menuButtonPressable}
-      >
-        <View style={[styles.menuLine, { width: config.lineWidth, backgroundColor: colors.text.primary }]} />
-        <View style={[styles.menuLine, { width: config.lineShort, backgroundColor: colors.text.primary }]} />
+      <Pressable onPress={handlePress} style={styles.menuButtonPressable}>
+        <View
+          style={[
+            styles.menuLine,
+            { width: config.lineWidth, backgroundColor: colors.text.primary },
+          ]}
+        />
+        <View
+          style={[
+            styles.menuLine,
+            { width: config.lineShort, backgroundColor: colors.text.primary },
+          ]}
+        />
       </Pressable>
     </View>
   );

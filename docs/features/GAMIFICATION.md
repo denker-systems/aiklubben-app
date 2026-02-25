@@ -9,6 +9,7 @@ AI Klubben använder gamification för att öka engagement och motivation. Syste
 ### 1. Experience Points (XP)
 
 **Earning XP:**
+
 - Complete lesson: 10-50 XP (baserat på svårighetsgrad)
 - Perfect score bonus: +20 XP
 - Daily streak bonus: +5 XP per dag
@@ -16,6 +17,7 @@ AI Klubben använder gamification för att öka engagement och motivation. Syste
 - Complete quiz: +25 XP
 
 **XP Storage:**
+
 ```typescript
 profiles.total_xp: INTEGER
 ```
@@ -33,27 +35,28 @@ export const LEVELS = [
   { level: 5, name: 'Expert', minXP: 1000, icon: '⭐' },
   { level: 6, name: 'Mästare', minXP: 1500, icon: '🎓' },
   { level: 7, name: 'Guru', minXP: 2500, icon: '🧙' },
-  { level: 8, name: 'AI Guru', minXP: 5000, icon: '🚀' }
+  { level: 8, name: 'AI Guru', minXP: 5000, icon: '🚀' },
 ];
 ```
 
 **Level Calculation:**
+
 ```typescript
 export function getLevelForXP(xp: number): Level {
-  return LEVELS.reduce((prev, curr) => 
-    xp >= curr.minXP ? curr : prev
-  );
+  return LEVELS.reduce((prev, curr) => (xp >= curr.minXP ? curr : prev));
 }
 ```
 
 ### 3. Streaks
 
 **Daily Streak:**
+
 - Complete any lesson = streak +1
 - Miss a day = streak reset to 1
 - Tracked via `last_activity_date`
 
 **Streak Logic:**
+
 ```typescript
 const today = new Date().toISOString().split('T')[0];
 const lastActive = profile.last_activity_date?.split('T')[0];
@@ -74,6 +77,7 @@ if (lastActive !== today) {
 ```
 
 **Storage:**
+
 ```typescript
 profiles.current_streak: INTEGER
 profiles.longest_streak: INTEGER
@@ -83,6 +87,7 @@ profiles.last_activity_date: TIMESTAMPTZ
 ### 4. Badges (Planned)
 
 **Badge Categories:**
+
 - **Learning:** Complete X lessons
 - **Streak:** Maintain X day streak
 - **Explorer:** Try all lesson types
@@ -90,6 +95,7 @@ profiles.last_activity_date: TIMESTAMPTZ
 - **Special:** Holiday/event badges
 
 **Badge Structure:**
+
 ```typescript
 interface Badge {
   id: string;
@@ -109,17 +115,20 @@ interface Badge {
 ### Progress Indicators
 
 **XP Progress Bar:**
+
 ```typescript
 const progress = getXPProgress(currentXP);
 // Returns: { current, required, percentage }
 ```
 
 **Level Badge:**
+
 - Circular badge med level icon
 - Animerad när level up
 - Visar current level name
 
 **Streak Counter:**
+
 - Flame emoji 🔥
 - Dagens streak-nummer
 - Pulserar vid ny streak
@@ -127,17 +136,20 @@ const progress = getXPProgress(currentXP);
 ### Celebration Animations
 
 **Level Up:**
+
 - Fullscreen confetti
 - Level badge scale animation
 - Haptic feedback (success)
 - Sound effect (optional)
 
 **Perfect Score:**
+
 - Golden stars
 - Bonus XP animation
 - Haptic feedback (heavy)
 
 **Streak Milestone:**
+
 - Fire animation
 - Streak badge bounce
 - Haptic feedback (medium)
@@ -178,29 +190,22 @@ export const SPRING_CONFIGS = {
 import * as Haptics from 'expo-haptics';
 
 // Correct answer
-Haptics.notificationAsync(
-  Haptics.NotificationFeedbackType.Success
-);
+Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
 // Incorrect answer
-Haptics.notificationAsync(
-  Haptics.NotificationFeedbackType.Error
-);
+Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
 // Button press
-Haptics.impactAsync(
-  Haptics.ImpactFeedbackStyle.Light
-);
+Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
 // Level up
-Haptics.notificationAsync(
-  Haptics.NotificationFeedbackType.Success
-);
+Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 ```
 
 ## Data Tracking
 
 ### Profile Updates
+
 ```typescript
 await supabase
   .from('profiles')
@@ -209,41 +214,44 @@ await supabase
     current_streak: newStreak,
     longest_streak: Math.max(longestStreak, newStreak),
     last_activity_date: new Date().toISOString(),
-    lessons_completed: lessonsCompleted + 1
+    lessons_completed: lessonsCompleted + 1,
   })
   .eq('id', userId);
 ```
 
 ### Activity Log
+
 ```typescript
-await supabase
-  .from('user_activities')
-  .insert({
-    user_id: userId,
-    type: 'lesson_completed',
-    title: lessonTitle,
-    created_at: new Date().toISOString()
-  });
+await supabase.from('user_activities').insert({
+  user_id: userId,
+  type: 'lesson_completed',
+  title: lessonTitle,
+  created_at: new Date().toISOString(),
+});
 ```
 
 ## Best Practices
 
 ### Loss Aversion
+
 - Visa streak-varning innan midnatt
 - "Don't break your X day streak!"
 - Push notification reminder
 
 ### Immediate Feedback
+
 - Instant XP animation
 - Haptic feedback på alla actions
 - Visual confirmation (checkmarks, colors)
 
 ### Progress Visibility
+
 - XP bar alltid synlig
 - Level badge i header
 - Streak counter prominent
 
 ### Micro-celebrations
+
 - Små animationer för varje rätt svar
 - Större för milestones
 - Confetti för level up

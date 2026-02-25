@@ -25,7 +25,7 @@ const UnitHeaderComponent: React.FC<UnitHeaderProps> = ({
   gradientColors = ['#8B5CF6', '#6366F1'],
   onBack,
 }) => {
-  const { isDark, colors } = useTheme();
+  const { colors } = useTheme();
   const { t } = useLanguage();
 
   return (

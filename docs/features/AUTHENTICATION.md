@@ -25,9 +25,11 @@ App Re-renders
 ## Components
 
 ### AuthScreen
+
 Login/signup screen.
 
 **Features:**
+
 - Toggle mellan login/signup
 - Email + password fields
 - Input validation
@@ -35,6 +37,7 @@ Login/signup screen.
 - Loading states
 
 **Flow:**
+
 ```typescript
 1. User enters email/password
 2. Validates input (not empty)
@@ -45,9 +48,11 @@ Login/signup screen.
 ```
 
 ### useAuth Hook
+
 Custom hook för auth operations.
 
 **Methods:**
+
 ```typescript
 interface AuthContextType {
   user: User | null;
@@ -59,6 +64,7 @@ interface AuthContextType {
 ```
 
 **Implementation:**
+
 ```typescript
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -72,6 +78,7 @@ export const useAuth = () => {
 ## Authentication Flow
 
 ### Sign Up
+
 ```
 1. User enters email/password
    ↓
@@ -91,6 +98,7 @@ export const useAuth = () => {
 ```
 
 ### Sign In
+
 ```
 1. User enters email/password
    ↓
@@ -108,6 +116,7 @@ export const useAuth = () => {
 ```
 
 ### Sign Out
+
 ```
 1. User clicks logout
    ↓
@@ -125,42 +134,48 @@ export const useAuth = () => {
 ## Session Management
 
 ### Token Storage
+
 Supabase hanterar token storage automatiskt:
+
 - Access token (JWT)
 - Refresh token
 - Stored in secure storage
 
 ### Session Refresh
+
 ```typescript
 useEffect(() => {
   // Listen for auth state changes
-  const { data: { subscription } } = supabase.auth.onAuthStateChange(
-    (event, session) => {
-      console.log('[useAuth] Auth state changed', { event });
-      
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        setUser(session?.user ?? null);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-      }
-      
-      setLoading(false);
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, session) => {
+    console.log('[useAuth] Auth state changed', { event });
+
+    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+      setUser(session?.user ?? null);
+    } else if (event === 'SIGNED_OUT') {
+      setUser(null);
     }
-  );
+
+    setLoading(false);
+  });
 
   return () => subscription.unsubscribe();
 }, []);
 ```
 
 ### Initial Session
+
 ```typescript
 useEffect(() => {
   const getSession = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     setUser(session?.user ?? null);
     setLoading(false);
   };
-  
+
   getSession();
 }, []);
 ```
@@ -168,6 +183,7 @@ useEffect(() => {
 ## Protected Routes
 
 ### AppNavigator Logic
+
 ```typescript
 {!user ? (
   <Stack.Screen name="Auth" component={AuthScreen} />
@@ -180,6 +196,7 @@ useEffect(() => {
 ```
 
 ### Loading State
+
 ```typescript
 if (loading) {
   return (
@@ -193,6 +210,7 @@ if (loading) {
 ## User Profile
 
 ### Profile Creation
+
 Automatisk via database trigger:
 
 ```sql
@@ -218,6 +236,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 ### Profile Data
+
 ```typescript
 interface Profile {
   id: string;
@@ -234,21 +253,31 @@ interface Profile {
 ## Error Handling
 
 ### Common Errors
+
 ```typescript
 // Invalid credentials
-{ message: "Invalid login credentials" }
+{
+  message: 'Invalid login credentials';
+}
 
 // Email already exists
-{ message: "User already registered" }
+{
+  message: 'User already registered';
+}
 
 // Weak password
-{ message: "Password should be at least 6 characters" }
+{
+  message: 'Password should be at least 6 characters';
+}
 
 // Network error
-{ message: "Network request failed" }
+{
+  message: 'Network request failed';
+}
 ```
 
 ### Error Display
+
 ```typescript
 const [error, setError] = useState<string | null>(null);
 
@@ -268,16 +297,20 @@ if (authError) {
 ## Security
 
 ### Password Requirements
+
 - Minimum 6 characters (Supabase default)
 - Can be customized in Supabase dashboard
 
 ### JWT Token
+
 - Expires after 1 hour (default)
 - Auto-refreshed by Supabase client
 - Stored securely
 
 ### Row Level Security
+
 All database queries use JWT:
+
 ```sql
 CREATE POLICY "Users can view own profile"
   ON profiles FOR SELECT
@@ -298,11 +331,13 @@ console.log('[useAuth] signIn successful');
 ## Best Practices
 
 ### 1. Always Handle Loading
+
 ```typescript
 if (loading) return <LoadingScreen />;
 ```
 
 ### 2. Clear Errors on Input Change
+
 ```typescript
 const handleEmailChange = (text: string) => {
   setEmail(text);
@@ -311,6 +346,7 @@ const handleEmailChange = (text: string) => {
 ```
 
 ### 3. Validate Input
+
 ```typescript
 if (!email || !password) {
   setError('Vänligen fyll i alla fält');
@@ -319,6 +355,7 @@ if (!email || !password) {
 ```
 
 ### 4. Use Secure Storage
+
 ```typescript
 import * as SecureStore from 'expo-secure-store';
 

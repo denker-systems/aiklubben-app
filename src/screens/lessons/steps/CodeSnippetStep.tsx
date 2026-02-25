@@ -6,7 +6,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
-import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import * as Haptics from 'expo-haptics';
@@ -104,8 +103,7 @@ const highlightCode = (code: string, language: string): React.ReactNode[] => {
 };
 
 const CodeSnippetStepComponent: React.FC<CodeSnippetStepProps> = ({ content, onContinue }) => {
-  const { isDark, colors } = useTheme();
-  const ui = getUiColors(isDark);
+  const { colors } = useTheme();
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
@@ -189,7 +187,13 @@ const CodeSnippetStepComponent: React.FC<CodeSnippetStepProps> = ({ content, onC
             ) : (
               <Copy size={18} color={colors.text.muted} />
             )}
-            <Text style={[styles.copyText, { color: colors.text.muted }, copied && styles.copyTextSuccess]}>
+            <Text
+              style={[
+                styles.copyText,
+                { color: colors.text.muted },
+                copied && styles.copyTextSuccess,
+              ]}
+            >
               {copied ? t.steps.copied : t.steps.copy}
             </Text>
           </Pressable>

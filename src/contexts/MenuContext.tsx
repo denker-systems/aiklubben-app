@@ -15,7 +15,7 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
     console.log('[MenuContext] Opening menu');
     setMenuVisible(true);
   }, []);
-  
+
   const closeMenu = useCallback(() => {
     console.log('[MenuContext] Closing menu');
     setMenuVisible(false);

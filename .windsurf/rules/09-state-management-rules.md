@@ -1,6 +1,7 @@
 # State Management Rules - React Context & Hooks
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: State management patterns for React Native apps
 
@@ -9,6 +10,7 @@
 ## State Management Hierarchy
 
 ### Choose the Right Level
+
 ```
 1. Local State (useState)
    - UI state: open/closed, selected, hover
@@ -39,6 +41,7 @@
 ## useState Patterns
 
 ### Basic useState
+
 ```typescript
 // Simple state
 const [count, setCount] = useState(0);
@@ -54,11 +57,12 @@ const [data, setData] = useState(() => computeExpensiveInitialValue());
 ```
 
 ### State Update Patterns
+
 ```typescript
 // CORRECT: Functional updates for state that depends on previous value
-setCount(prev => prev + 1);
-setItems(prev => [...prev, newItem]);
-setUser(prev => prev ? { ...prev, name: newName } : null);
+setCount((prev) => prev + 1);
+setItems((prev) => [...prev, newItem]);
+setUser((prev) => (prev ? { ...prev, name: newName } : null));
 
 // WRONG: Direct reference (may cause stale state)
 setCount(count + 1);
@@ -66,6 +70,7 @@ setItems([...items, newItem]);
 ```
 
 ### Complex State with useReducer
+
 ```typescript
 // Use useReducer for complex state logic
 interface FormState {
@@ -117,6 +122,7 @@ dispatch({ type: 'SET_FIELD', field: 'email', value: 'test@example.com' });
 ## Context Pattern
 
 ### Context Structure
+
 ```typescript
 // contexts/AuthContext.tsx
 
@@ -194,6 +200,7 @@ export const useAuth = (): AuthContextValue => {
 ```
 
 ### Context Performance Optimization
+
 ```typescript
 // Split context to avoid unnecessary re-renders
 // Separate state from actions
@@ -203,7 +210,7 @@ const AuthActionsContext = createContext<AuthActions | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<AuthState>(initialState);
-  
+
   // Actions are stable references
   const actions = useMemo(() => ({
     login: async (credentials: Credentials) => { /* ... */ },
@@ -238,6 +245,7 @@ export const useAuthActions = () => {
 ## Server State with React Query
 
 ### Query Setup
+
 ```typescript
 // lib/queryClient.ts
 import { QueryClient } from '@tanstack/react-query';
@@ -246,7 +254,7 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000,   // 10 minutes (formerly cacheTime)
+      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
       retry: 2,
       refetchOnWindowFocus: false,
     },
@@ -255,6 +263,7 @@ export const queryClient = new QueryClient({
 ```
 
 ### Query Patterns
+
 ```typescript
 // hooks/useCourses.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -289,15 +298,12 @@ export const useCourse = (id: string) => {
 // Mutation hook
 export const useUpdateCourse = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (data: UpdateCourseData) => api.updateCourse(data),
     onSuccess: (data, variables) => {
       // Update cache
-      queryClient.setQueryData(
-        courseKeys.detail(variables.id),
-        data
-      );
+      queryClient.setQueryData(courseKeys.detail(variables.id), data);
       // Invalidate list
       queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
     },
@@ -310,6 +316,7 @@ export const useUpdateCourse = () => {
 ## Custom Hooks
 
 ### Hook Structure
+
 ```typescript
 // hooks/useForm.ts
 interface UseFormOptions<T> {
@@ -328,8 +335,8 @@ export const useForm = <T extends Record<string, unknown>>({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const setValue = useCallback(<K extends keyof T>(field: K, value: T[K]) => {
-    setValues(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: undefined }));
+    setValues((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -340,7 +347,7 @@ export const useForm = <T extends Record<string, unknown>>({
         return;
       }
     }
-    
+
     setIsSubmitting(true);
     try {
       await onSubmit(values);
@@ -370,13 +377,14 @@ export const useForm = <T extends Record<string, unknown>>({
 ## State Persistence
 
 ### AsyncStorage Pattern
+
 ```typescript
 // hooks/usePersistedState.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const usePersistedState = <T>(
   key: string,
-  initialValue: T
+  initialValue: T,
 ): [T, (value: T) => void, boolean] => {
   const [value, setValue] = useState<T>(initialValue);
   const [isLoading, setIsLoading] = useState(true);
@@ -391,10 +399,13 @@ export const usePersistedState = <T>(
       .finally(() => setIsLoading(false));
   }, [key]);
 
-  const setPersistedValue = useCallback((newValue: T) => {
-    setValue(newValue);
-    AsyncStorage.setItem(key, JSON.stringify(newValue));
-  }, [key]);
+  const setPersistedValue = useCallback(
+    (newValue: T) => {
+      setValue(newValue);
+      AsyncStorage.setItem(key, JSON.stringify(newValue));
+    },
+    [key],
+  );
 
   return [value, setPersistedValue, isLoading];
 };

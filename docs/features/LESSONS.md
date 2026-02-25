@@ -25,6 +25,7 @@ Course (content table)
 ## Step Types
 
 ### 1. Content Step
+
 Visar text och bilder.
 
 ```typescript
@@ -42,6 +43,7 @@ Visar text och bilder.
 **Component:** `ContentStep.tsx`
 
 ### 2. Multiple Choice
+
 Flervalsfråga med alternativ.
 
 ```typescript
@@ -59,6 +61,7 @@ Flervalsfråga med alternativ.
 **Component:** `MultipleChoiceStep.tsx`
 
 ### 3. True/False
+
 Sant eller falskt-fråga.
 
 ```typescript
@@ -75,6 +78,7 @@ Sant eller falskt-fråga.
 **Component:** `TrueFalseStep.tsx`
 
 ### 4. Fill in the Blank
+
 Fyll i det saknade ordet.
 
 ```typescript
@@ -95,6 +99,7 @@ Fyll i det saknade ordet.
 **Component:** `FillBlankStep.tsx`
 
 ### 5. Match Pairs
+
 Matcha par av items.
 
 ```typescript
@@ -114,6 +119,7 @@ Matcha par av items.
 **Component:** `MatchPairsStep.tsx`
 
 ### 6. Ordering
+
 Ordna items i rätt ordning.
 
 ```typescript
@@ -133,16 +139,19 @@ Ordna items i rätt ordning.
 ## Lesson Progression
 
 ### Lives System
+
 - Användare börjar med **3 liv**
 - Fel svar = -1 liv
 - 0 liv = Game Over screen
 
 ### Scoring
+
 - Rätt svar = +1 poäng
 - Fel svar = 0 poäng
 - Slutpoäng = antal rätta svar
 
 ### XP Rewards
+
 - Base XP per lektion: 10-50 XP
 - Perfect score bonus: +20 XP
 - Streak bonus: Varierar
@@ -150,15 +159,18 @@ Ordna items i rätt ordning.
 ## Components
 
 ### LessonScreen
+
 Huvudkomponent för lektioner.
 
 **Ansvar:**
+
 - Hämta lesson data från Supabase
 - Hantera step progression
 - Spåra score och lives
 - Spara progress till databas
 
 **Key Methods:**
+
 ```typescript
 handleAnswer(answer: any, isCorrect: boolean)
 handleNext()
@@ -166,9 +178,11 @@ completeLesson()
 ```
 
 ### Step Components
+
 Varje step type har sin egen komponent.
 
 **Props Interface:**
+
 ```typescript
 interface StepProps {
   content: any; // Step-specific
@@ -179,9 +193,11 @@ interface StepProps {
 ```
 
 ### CelebrationScreen
+
 Visas när lektion är slutförd.
 
 **Props:**
+
 ```typescript
 interface CelebrationScreenProps {
   xpEarned: number;
@@ -226,6 +242,7 @@ interface CelebrationScreenProps {
 ## Database Integration
 
 ### Fetching Lesson
+
 ```typescript
 const { data: lesson } = await supabase
   .from('course_lessons')
@@ -241,21 +258,21 @@ const { data: steps } = await supabase
 ```
 
 ### Saving Progress
+
 ```typescript
-await supabase
-  .from('user_lesson_progress')
-  .upsert({
-    user_id: userId,
-    lesson_id: lessonId,
-    status: 'completed',
-    score: score,
-    total_steps: totalSteps,
-    xp_earned: xpEarned,
-    completed_at: new Date().toISOString()
-  });
+await supabase.from('user_lesson_progress').upsert({
+  user_id: userId,
+  lesson_id: lessonId,
+  status: 'completed',
+  score: score,
+  total_steps: totalSteps,
+  xp_earned: xpEarned,
+  completed_at: new Date().toISOString(),
+});
 ```
 
 ### Updating Profile
+
 ```typescript
 await supabase
   .from('profiles')
@@ -264,7 +281,7 @@ await supabase
     current_streak: newStreak,
     longest_streak: longestStreak,
     last_activity_date: new Date().toISOString(),
-    lessons_completed: lessonsCompleted + 1
+    lessons_completed: lessonsCompleted + 1,
   })
   .eq('id', userId);
 ```

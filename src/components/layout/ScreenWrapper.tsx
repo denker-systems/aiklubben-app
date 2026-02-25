@@ -39,10 +39,7 @@ export function ScreenWrapper({
 
   const containerStyle = [styles.container, { backgroundColor, paddingTop: insets.top }, style];
 
-  const innerStyle = [
-    !noPadding && styles.padding,
-    { paddingBottom: insets.bottom + 100 },
-  ];
+  const innerStyle = [!noPadding && styles.padding, { paddingBottom: insets.bottom + 100 }];
 
   const content = (
     <MotiView

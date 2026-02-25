@@ -25,7 +25,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode; defaultTheme?: ThemeType }> = ({
   children,
-  defaultTheme = 'dark', // Default to dark for AI Klubben
+  defaultTheme = 'light', // Default to light, user can choose in Start screen
 }) => {
   const systemColorScheme = useColorScheme();
   const [theme, setThemeState] = useState<ThemeType>(defaultTheme);
@@ -87,7 +87,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode; defaultTheme?:
         if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
           setThemeState(savedTheme as ThemeType);
         }
-        
+
         // Load notifications
         const savedNotifications = await AsyncStorage.getItem(NOTIFICATIONS_STORAGE_KEY);
         if (savedNotifications !== null) {

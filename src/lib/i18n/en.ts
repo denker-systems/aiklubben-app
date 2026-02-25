@@ -48,6 +48,29 @@ export const en: Translations = {
     fillAllFields: 'Please fill in all fields',
     unexpectedError: 'An unexpected error occurred',
     welcome: 'Welcome to AI Klubben',
+    // Signup flow
+    signupTitle: 'Create your account',
+    whatsYourName: "What's your name?",
+    namePlaceholder: 'Your name',
+    whatsYourEmail: "What's your email?",
+    choosePassword: 'Choose a password',
+    passwordHint: 'At least 6 characters',
+    privacyTitle: 'Privacy & Terms',
+    privacyIntro: 'Before creating your account, please review how we handle your data.',
+    privacyAgree: 'I have read and agree to the terms',
+    privacyReadMore: 'Read the full agreement',
+    createAccount: 'Create account',
+    back: 'Back',
+    nameRequired: 'Please enter your name',
+    emailRequired: 'Please enter your email',
+    passwordTooShort: 'Password must be at least 6 characters',
+    mustAgreePrivacy: 'You must agree to the terms',
+    continueAsGuest: 'Explore without account',
+    guestLoginPromptTitle: 'Sign in to continue',
+    guestLoginPromptBody:
+      'This feature requires an account. Sign in or create a free account to continue.',
+    guestLoginButton: 'Sign in',
+    guestSignupButton: 'Create account',
   },
 
   // Navigation / Tab names
@@ -143,13 +166,20 @@ export const en: Translations = {
     aboutSection: 'ABOUT THE APP',
     logoutConfirmTitle: 'Log out',
     logoutConfirmMessage: 'Are you sure you want to log out?',
-    changePasswordMessage:
-      'We will send a link to your email to reset your password.',
+    changePasswordMessage: 'We will send a link to your email to reset your password.',
     changePasswordSendLink: 'Send link',
     changePasswordSent: 'Sent!',
     changePasswordSentMessage: 'Check your email to reset your password.',
     swedish: 'Svenska',
     english: 'English',
+    dangerZone: 'DANGER ZONE',
+    deleteAccount: 'Delete my account',
+    deleteAccountTitle: 'Delete account',
+    deleteAccountMessage:
+      'Are you absolutely sure? All your data — profile, progress, scores and saved resources — will be permanently deleted. This cannot be undone.',
+    deleteAccountConfirm: 'Yes, delete my account',
+    deleteAccountSuccess: 'Your account has been deleted.',
+    deleteAccountError: 'Could not delete the account. Try again or contact support.',
   },
 
   // About Screen
@@ -233,15 +263,13 @@ export const en: Translations = {
 
     // Game Over
     outOfLives: 'Out of lives!',
-    gameOverMessage:
-      "Don't worry, you can try again or come back later.",
+    gameOverMessage: "Don't worry, you can try again or come back later.",
     retryButton: 'Try again',
     exitButton: 'Exit',
 
     // Exit Modal
     exitTitle: 'Exit the lesson?',
-    exitMessage:
-      'Your progress will not be saved if you exit now.',
+    exitMessage: 'Your progress will not be saved if you exit now.',
     exitContinue: 'Continue',
     exitConfirm: 'Exit',
 
@@ -256,7 +284,7 @@ export const en: Translations = {
 
   // Greetings (extended for useGreeting hook)
   greetingsExtended: {
-    morningMotivation: 'Let\'s start the day strong!',
+    morningMotivation: "Let's start the day strong!",
     lateMorningMotivation: 'Perfect time for learning!',
     afternoonMotivation: 'A little break with AI?',
     eveningMotivation: 'Perfect time for some learning!',
@@ -270,12 +298,20 @@ export const en: Translations = {
     articleNotFound: 'Article not found.',
     goBack: 'Go back',
     goBackAccessibility: 'Go back to news',
+    sources: 'Sources',
+    aiAnalysis: 'AI Analysis',
+    formatNews: 'News',
+    formatExplainer: 'Explainer',
+    formatAnalysis: 'Analysis',
+    formatColumn: 'Column',
+    formatReview: 'Review',
   },
 
   // Content Detail
   contentDetail: {
     contentNotFound: 'Content not found.',
     goBackAccessibility: 'Go back to content',
+    sources: 'Sources',
   },
 
   // Unit Header
@@ -328,7 +364,8 @@ export const en: Translations = {
     falseLabel: 'FALSE',
     allCorrect: 'All correct!',
     notQuite: 'Not quite',
-    reflectionInfo: '💡 There is no right or wrong answer. Take your time to reflect on the question.',
+    reflectionInfo:
+      '💡 There is no right or wrong answer. Take your time to reflect on the question.',
   },
 
   // Feedback
@@ -351,6 +388,18 @@ export const en: Translations = {
     collect: 'Collect',
     newBadge: '🎉 New Badge!',
     awesome: 'Awesome!',
+  },
+
+  // Levels
+  levels: {
+    1: 'Beginner',
+    2: 'Explorer',
+    3: 'Apprentice',
+    4: 'Practitioner',
+    5: 'Specialist',
+    6: 'Expert',
+    7: 'Master',
+    8: 'AI Guru',
   },
 
   // Badges
@@ -430,5 +479,49 @@ export const en: Translations = {
     privacySubtitle: 'How we handle your data',
     aboutSubtitle: 'Get to know us better',
     logoutSubtitle: 'End your session',
+    guestSignIn: 'Sign in',
+    guestSignInSubtitle: 'Sign in to access all features',
+    guestCreateAccount: 'Create account',
+    guestCreateAccountSubtitle: 'Become a member and unlock all content',
+    guestSection: 'My account',
+  },
+
+  // Start screen (before auth)
+  start: {
+    iAmFrom: "I'm from...",
+    iSpeak: 'I speak...',
+    regionNorthAmerica: 'North America',
+    regionSouthAmerica: 'South America',
+    regionEurope: 'Europe',
+    regionAfrica: 'Africa',
+    regionAsia: 'Asia',
+    langSwedish: 'Svenska',
+    langEnglish: 'English',
+    chooseTheme: 'Choose appearance',
+    themeDark: 'Dark mode',
+    themeLight: 'Light mode',
+    welcome: 'Welcome to the AI Club!',
+    welcomeSubtitle: 'Your journey into the world of AI starts here',
+    getStarted: 'Get Started',
+    next: 'Next',
+    skip: 'Skip',
+  },
+
+  // Onboarding (after first login)
+  onboarding: {
+    step1Title: 'News',
+    step1Subtitle: 'Stay up to date with the latest AI news, curated for you every day.',
+    step2Title: 'Courses',
+    step2Subtitle:
+      'Interactive lessons with quizzes, XP points and badges. Learn at your own pace.',
+    step3Title: 'Resources',
+    step3Subtitle: 'Tools, platforms and events — everything you need in one place.',
+    step4Title: 'Your Profile',
+    step4Subtitle: 'Track your progress, streaks and levels. See how far you have come!',
+    step5Title: 'Ready to go!',
+    step5Subtitle: "You're part of the club now. Explore, learn and have fun!",
+    letsGo: "Let's go!",
+    next: 'Next',
+    skip: 'Skip',
   },
 };

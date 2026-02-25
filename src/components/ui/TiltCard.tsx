@@ -66,7 +66,14 @@ const TiltCardComponent = memo(function TiltCard({
   const shadowStyle = getShadowStyle(elevation);
 
   return (
-    <Animated.View style={[styles.container, { backgroundColor: ui.card.background }, shadowStyle, animatedStyle]}>
+    <Animated.View
+      style={[
+        styles.container,
+        { backgroundColor: ui.card.background },
+        shadowStyle,
+        animatedStyle,
+      ]}
+    >
       <Pressable
         onPress={onPress}
         onPressIn={handlePressIn}

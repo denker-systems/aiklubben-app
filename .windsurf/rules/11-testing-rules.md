@@ -1,6 +1,7 @@
 # Testing Rules - React Native Testing
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Testing standards for React Native applications
 
@@ -9,6 +10,7 @@
 ## Testing Stack
 
 ### Required Testing Libraries
+
 ```json
 // package.json devDependencies
 {
@@ -23,6 +25,7 @@
 ```
 
 ### Jest Configuration
+
 ```javascript
 // jest.config.js
 module.exports = {
@@ -44,6 +47,7 @@ module.exports = {
 ```
 
 ### Jest Setup
+
 ```typescript
 // jest.setup.ts
 import '@testing-library/jest-native/extend-expect';
@@ -92,6 +96,7 @@ global.console = {
 ## Component Testing
 
 ### Test File Structure
+
 ```typescript
 // ComponentName.test.tsx
 import React from 'react';
@@ -121,9 +126,9 @@ describe('ComponentName', () => {
     it('calls onPress when pressed', () => {
       const onPress = jest.fn();
       render(<ComponentName title="Test" onPress={onPress} />);
-      
+
       fireEvent.press(screen.getByRole('button'));
-      
+
       expect(onPress).toHaveBeenCalledTimes(1);
     });
   });
@@ -131,6 +136,7 @@ describe('ComponentName', () => {
 ```
 
 ### Querying Elements
+
 ```typescript
 // PREFERRED: Use accessible queries
 // 1. getByRole - most accessible
@@ -151,12 +157,13 @@ screen.getByTestId('custom-component');
 // find* - async, waits for element
 
 // Examples
-const button = screen.getByRole('button');          // Throws if not found
-const maybeButton = screen.queryByRole('button');   // Returns null if not found
+const button = screen.getByRole('button'); // Throws if not found
+const maybeButton = screen.queryByRole('button'); // Returns null if not found
 const asyncButton = await screen.findByRole('button'); // Waits up to 1000ms
 ```
 
 ### Testing User Interactions
+
 ```typescript
 import { fireEvent, waitFor } from '@testing-library/react-native';
 
@@ -189,6 +196,7 @@ await waitFor(() => {
 ## Hook Testing
 
 ### Testing Custom Hooks
+
 ```typescript
 import { renderHook, act } from '@testing-library/react-native';
 import { useCounter } from './useCounter';
@@ -206,27 +214,28 @@ describe('useCounter', () => {
 
   it('increments count', () => {
     const { result } = renderHook(() => useCounter());
-    
+
     act(() => {
       result.current.increment();
     });
-    
+
     expect(result.current.count).toBe(1);
   });
 
   it('decrements count', () => {
     const { result } = renderHook(() => useCounter(5));
-    
+
     act(() => {
       result.current.decrement();
     });
-    
+
     expect(result.current.count).toBe(4);
   });
 });
 ```
 
 ### Testing Hooks with Context
+
 ```typescript
 import { renderHook } from '@testing-library/react-native';
 import { useAuth } from './useAuth';
@@ -239,7 +248,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 describe('useAuth', () => {
   it('provides auth context', () => {
     const { result } = renderHook(() => useAuth(), { wrapper });
-    
+
     expect(result.current.isAuthenticated).toBe(false);
     expect(result.current.user).toBeNull();
   });
@@ -251,6 +260,7 @@ describe('useAuth', () => {
 ## Testing with Providers
 
 ### Test Utilities
+
 ```typescript
 // test-utils.tsx
 import React from 'react';
@@ -274,7 +284,7 @@ interface AllProvidersProps {
 
 const AllProviders = ({ children }: AllProvidersProps) => {
   const queryClient = createTestQueryClient();
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
@@ -302,6 +312,7 @@ export { customRender as render };
 ## Mocking
 
 ### Mocking Modules
+
 ```typescript
 // Mock at top of file
 jest.mock('@/services/api', () => ({
@@ -327,7 +338,7 @@ describe('UserProfile', () => {
 
   it('displays user data', async () => {
     render(<UserProfile userId="1" />);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Test User')).toBeTruthy();
     });
@@ -336,6 +347,7 @@ describe('UserProfile', () => {
 ```
 
 ### Mocking Navigation
+
 ```typescript
 const mockNavigate = jest.fn();
 const mockGoBack = jest.fn();
@@ -357,6 +369,7 @@ jest.mock('@react-navigation/native', () => ({
 ## Snapshot Testing
 
 ### When to Use Snapshots
+
 ```typescript
 // USE snapshots for:
 // - Static UI components
@@ -386,6 +399,7 @@ describe('Button', () => {
 ## Test Coverage Requirements
 
 ### Minimum Coverage Thresholds
+
 ```javascript
 // jest.config.js
 module.exports = {
@@ -401,6 +415,7 @@ module.exports = {
 ```
 
 ### What to Test
+
 ```
 Priority 1 (Required):
 - Custom hooks

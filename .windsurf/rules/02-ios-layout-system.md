@@ -1,6 +1,7 @@
 # iOS Layout System - React Native Flexbox & Positioning
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Layout rules for iOS compatibility in React Native
 
@@ -9,6 +10,7 @@
 ## Flexbox Layout System
 
 ### Core Flexbox Rules for iOS
+
 ```typescript
 // React Native uses Flexbox with flexDirection: 'column' as DEFAULT
 // This is OPPOSITE of web CSS (row is default on web)
@@ -27,6 +29,7 @@ const styles = StyleSheet.create({
 ```
 
 ### Flex Property Rules
+
 ```typescript
 // flex: 1 means "take remaining space"
 // ALWAYS use flex: 1 on scrollable content containers
@@ -51,12 +54,14 @@ const styles = StyleSheet.create({
 ## Position Absolute Rules (CRITICAL)
 
 ### The Golden Rule of Position Absolute
+
 ```
-CRITICAL: Elements with position: 'absolute' do NOT contribute to parent's 
+CRITICAL: Elements with position: 'absolute' do NOT contribute to parent's
 layout dimensions. Parent container MUST have explicit width/height.
 ```
 
 ### Correct Absolute Positioning
+
 ```typescript
 // CORRECT: Parent has explicit dimensions
 const styles = StyleSheet.create({
@@ -89,6 +94,7 @@ const wrongStyles = StyleSheet.create({
 ```
 
 ### When to Use Absolute Positioning
+
 1. **Overlays and modals** - positioned over content
 2. **Floating action buttons** - pinned to corners
 3. **Progress indicators** - overlaid on content
@@ -96,6 +102,7 @@ const wrongStyles = StyleSheet.create({
 5. **Background decorations** - behind main content
 
 ### When NOT to Use Absolute Positioning
+
 1. **Regular layout flows** - use Flexbox instead
 2. **List items** - use FlatList with proper item heights
 3. **Stacked content** - use flexDirection: 'column'
@@ -106,6 +113,7 @@ const wrongStyles = StyleSheet.create({
 ## Explicit Dimensions (iOS Requirement)
 
 ### Always Specify Dimensions for Complex Layouts
+
 ```typescript
 // CORRECT: Explicit dimensions for 3D button effect
 const BUTTON_SIZE = 72;
@@ -125,12 +133,13 @@ const BUTTON_DEPTH = 8;
 ```
 
 ### Component Height Calculation
+
 ```typescript
 // Always calculate total height for components with depth/shadows
 const calculateTotalHeight = (
   baseHeight: number,
   depth: number,
-  shadowOffset: number = 0
+  shadowOffset: number = 0,
 ): number => {
   return baseHeight + depth + shadowOffset;
 };
@@ -144,6 +153,7 @@ const TOTAL_HEIGHT = calculateTotalHeight(72, 8, 4); // 84
 ## Safe Area Implementation
 
 ### SafeAreaView Usage
+
 ```typescript
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -159,9 +169,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Screen = () => {
   const insets = useSafeAreaInsets();
-  
+
   return (
-    <View style={{ 
+    <View style={{
       flex: 1,
       paddingTop: insets.top,
       paddingBottom: insets.bottom,
@@ -173,6 +183,7 @@ const Screen = () => {
 ```
 
 ### Safe Area Edge Cases
+
 ```typescript
 // Modal with bottom sheet - only bottom safe area
 <SafeAreaView edges={['bottom']}>
@@ -193,6 +204,7 @@ const Screen = () => {
 ## ScrollView Layout Rules
 
 ### ScrollView Container Requirements
+
 ```typescript
 // CORRECT: ScrollView inside flex: 1 container
 <View style={{ flex: 1 }}>
@@ -217,6 +229,7 @@ const Screen = () => {
 ```
 
 ### FlatList Performance Rules
+
 ```typescript
 // CORRECT: Optimized FlatList
 <FlatList
@@ -240,6 +253,7 @@ const Screen = () => {
 ## Dimension Constants
 
 ### Screen Dimensions
+
 ```typescript
 import { Dimensions, Platform, StatusBar } from 'react-native';
 

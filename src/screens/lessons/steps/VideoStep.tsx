@@ -6,8 +6,6 @@ import { Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { useTheme } from '@/contexts/ThemeContext';
-import { getUiColors } from '@/config/design';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
 import * as Haptics from 'expo-haptics';
@@ -26,8 +24,6 @@ interface VideoStepProps {
 }
 
 const VideoStepComponent: React.FC<VideoStepProps> = ({ content, onContinue }) => {
-  const { isDark, colors } = useTheme();
-  const ui = getUiColors(isDark);
   const { t, ti } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);

@@ -32,12 +32,12 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
   const ui = getUiColors(isDark);
   const { t } = useLanguage();
 
-  console.log('[MultipleChoiceStep] Rendered', { 
-    question: content.question, 
-    optionsCount: content.options.length, 
-    correctIndex 
+  console.log('[MultipleChoiceStep] Rendered', {
+    question: content.question,
+    optionsCount: content.options.length,
+    correctIndex,
   });
-  
+
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
@@ -45,7 +45,7 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
   const handleSelect = useCallback(
     (index: number) => {
       console.log('[MultipleChoiceStep] handleSelect', { index, showFeedback });
-      
+
       if (showFeedback) {
         console.log('[MultipleChoiceStep] Already showing feedback, ignoring');
         return;
@@ -56,7 +56,11 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
       setShowFeedback(true);
       const isCorrect = index === correctIndex;
 
-      console.log('[MultipleChoiceStep] Answer checked', { selectedIndex: index, correctIndex, isCorrect });
+      console.log('[MultipleChoiceStep] Answer checked', {
+        selectedIndex: index,
+        correctIndex,
+        isCorrect,
+      });
 
       if (isCorrect) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -105,72 +109,74 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
               transition={{ ...SPRING_CONFIGS.smooth, delay: 50 + index * 60 }}
             >
               <View
-                style={[
-                  styles.option,
-                  { backgroundColor: ui.card.background, borderColor: ui.card.border },
-                  isSelected && !showFeedback && styles.optionSelected,
-                  showAsCorrect && styles.optionCorrect,
-                  showAsIncorrect && styles.optionIncorrect,
-                ] as ViewStyle[]}
+                style={
+                  [
+                    styles.option,
+                    { backgroundColor: ui.card.background, borderColor: ui.card.border },
+                    isSelected && !showFeedback && styles.optionSelected,
+                    showAsCorrect && styles.optionCorrect,
+                    showAsIncorrect && styles.optionIncorrect,
+                  ] as ViewStyle[]
+                }
               >
-              <Pressable
-                onPress={() => handleSelect(index)}
-                disabled={showFeedback}
-                style={styles.optionPressable}
-                accessible={true}
-                accessibilityRole="button"
-                accessibilityLabel={`Alternativ ${getOptionLetter(index)}: ${option}`}
-                accessibilityHint={showFeedback ? undefined : t.steps.tapToSelect}
-                accessibilityState={{
-                  selected: isSelected,
-                  disabled: showFeedback,
-                }}
-              >
-                {/* Letter Badge */}
-                <View
-                  style={[
-                    styles.letterBadge,
-                    isSelected && !showFeedback && styles.letterBadgeSelected,
-                    showAsCorrect && styles.letterBadgeCorrect,
-                    showAsIncorrect && styles.letterBadgeIncorrect,
-                  ]}
+                <Pressable
+                  onPress={() => handleSelect(index)}
+                  disabled={showFeedback}
+                  style={styles.optionPressable}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Alternativ ${getOptionLetter(index)}: ${option}`}
+                  accessibilityHint={showFeedback ? undefined : t.steps.tapToSelect}
+                  accessibilityState={{
+                    selected: isSelected,
+                    disabled: showFeedback,
+                  }}
                 >
-                  {showAsCorrect ? (
-                    <MotiView
-                      from={{ scale: 0, rotate: '-180deg' }}
-                      animate={{ scale: 1, rotate: '0deg' }}
-                      transition={SPRING_CONFIGS.bouncy}
-                    >
-                      <Check size={20} color="#FFFFFF" strokeWidth={3} />
-                    </MotiView>
-                  ) : showAsIncorrect ? (
-                    <MotiView
-                      from={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={SPRING_CONFIGS.bouncy}
-                    >
-                      <X size={20} color="#FFFFFF" strokeWidth={3} />
-                    </MotiView>
-                  ) : (
-                    <Text style={[styles.letterText, isSelected && styles.letterTextSelected]}>
-                      {getOptionLetter(index)}
-                    </Text>
-                  )}
-                </View>
+                  {/* Letter Badge */}
+                  <View
+                    style={[
+                      styles.letterBadge,
+                      isSelected && !showFeedback && styles.letterBadgeSelected,
+                      showAsCorrect && styles.letterBadgeCorrect,
+                      showAsIncorrect && styles.letterBadgeIncorrect,
+                    ]}
+                  >
+                    {showAsCorrect ? (
+                      <MotiView
+                        from={{ scale: 0, rotate: '-180deg' }}
+                        animate={{ scale: 1, rotate: '0deg' }}
+                        transition={SPRING_CONFIGS.bouncy}
+                      >
+                        <Check size={20} color="#FFFFFF" strokeWidth={3} />
+                      </MotiView>
+                    ) : showAsIncorrect ? (
+                      <MotiView
+                        from={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={SPRING_CONFIGS.bouncy}
+                      >
+                        <X size={20} color="#FFFFFF" strokeWidth={3} />
+                      </MotiView>
+                    ) : (
+                      <Text style={[styles.letterText, isSelected && styles.letterTextSelected]}>
+                        {getOptionLetter(index)}
+                      </Text>
+                    )}
+                  </View>
 
-                {/* Option Text */}
-                <Text
-                  variant="body"
-                  style={[
-                    styles.optionText,
-                    isSelected && !showFeedback && styles.optionTextSelected,
-                    showAsCorrect && styles.optionTextCorrect,
-                    showAsIncorrect && styles.optionTextIncorrect,
-                  ]}
-                >
-                  {option}
-                </Text>
-              </Pressable>
+                  {/* Option Text */}
+                  <Text
+                    variant="body"
+                    style={[
+                      styles.optionText,
+                      isSelected && !showFeedback && styles.optionTextSelected,
+                      showAsCorrect && styles.optionTextCorrect,
+                      showAsIncorrect && styles.optionTextIncorrect,
+                    ]}
+                  >
+                    {option}
+                  </Text>
+                </Pressable>
               </View>
             </MotiView>
           );

@@ -14,7 +14,12 @@ export function MenuHeader({ title, onClose }: MenuHeaderProps) {
   const textColor = colors.text.primary;
 
   return (
-    <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border.subtle }]}>
+    <View
+      style={[
+        styles.header,
+        { backgroundColor: colors.background, borderBottomColor: colors.border.subtle },
+      ]}
+    >
       <View style={styles.leftSection}>
         <View style={styles.placeholder} />
       </View>

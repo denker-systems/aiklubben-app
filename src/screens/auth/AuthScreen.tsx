@@ -1,30 +1,48 @@
-import React, { useState } from 'react';
-import { View, Image } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Image, ImageSourcePropType } from 'react-native';
 import { useAuth } from '@/hooks/useAuth';
-import { brandColors } from '@/config/theme';
 import { ScreenWrapper } from '@/components/layout';
 import { Text, Button, Input } from '@/components/ui';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '@/types/navigation';
 
-export const AuthScreen = () => {
+// Logo variants: [locale][theme]
+const LOGOS: Record<string, Record<string, ImageSourcePropType>> = {
+  sv: {
+    dark: require('../../../assets/logo.png'),
+    light: require('../../../assets/logo-light.png'),
+  },
+  en: {
+    dark: require('../../../assets/logo-eng.png'),
+    light: require('../../../assets/logo-eng-light.png'),
+  },
+};
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Auth'> & {
+  onGuestMode?: () => void;
+};
+
+export const AuthScreen: React.FC<Props> = ({ navigation, onGuestMode }) => {
   console.log('[AuthScreen] Rendered');
-  
-  const [isLogin, setIsLogin] = useState(true);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { signIn, signUp } = useAuth();
-  const { colors } = useTheme();
-  const { t } = useLanguage();
+  const { signIn } = useAuth();
+  const { isDark, colors } = useTheme();
+  const { t, locale } = useLanguage();
 
-  const handleAuth = async () => {
-    console.log('[AuthScreen] handleAuth', { isLogin, email });
-    
+  const logoSource = useMemo(
+    () => LOGOS[locale]?.[isDark ? 'dark' : 'light'] ?? LOGOS.sv.dark,
+    [locale, isDark],
+  );
+
+  const handleLogin = async () => {
     if (!email || !password) {
-      console.warn('[AuthScreen] Missing email or password');
       setError(t.auth.fillAllFields);
       return;
     }
@@ -33,19 +51,11 @@ export const AuthScreen = () => {
     setError(null);
 
     try {
-      console.log('[AuthScreen] Attempting', isLogin ? 'sign in' : 'sign up');
-      const { error: authError } = isLogin
-        ? await signIn(email, password)
-        : await signUp(email, password, { name: email.split('@')[0] });
-
+      const { error: authError } = await signIn(email, password);
       if (authError) {
-        console.error('[AuthScreen] Auth error:', authError.message);
         setError(authError.message);
-      } else {
-        console.log('[AuthScreen] Auth successful');
       }
-    } catch (err) {
-      console.error('[AuthScreen] Unexpected error:', err);
+    } catch {
       setError(t.auth.unexpectedError);
     } finally {
       setLoading(false);
@@ -53,14 +63,14 @@ export const AuthScreen = () => {
   };
 
   return (
-    <ScreenWrapper noPadding scrollable={false} contentStyle={{ justifyContent: 'center', flex: 1 }}>
+    <ScreenWrapper
+      noPadding
+      scrollable={false}
+      contentStyle={{ justifyContent: 'center', flex: 1 }}
+    >
       <View style={{ paddingHorizontal: 32 }}>
         <View style={{ alignItems: 'center', marginBottom: 48 }}>
-          <Image
-            source={require('../../../assets/logo.png')}
-            style={{ width: 200, height: 200 }}
-            resizeMode="contain"
-          />
+          <Image source={logoSource} style={{ width: 200, height: 200 }} resizeMode="contain" />
         </View>
 
         <View>
@@ -71,7 +81,6 @@ export const AuthScreen = () => {
             placeholder={t.auth.emailPlaceholder}
             autoCapitalize="none"
             keyboardType="email-address"
-            error={error && error.includes('e-post') ? error : undefined}
           />
 
           <Input
@@ -80,11 +89,13 @@ export const AuthScreen = () => {
             onChangeText={setPassword}
             placeholder="••••••••"
             secureTextEntry
-            error={error && error.includes('lösenord') ? error : undefined}
           />
 
-          {error && !error.includes('e-post') && !error.includes('lösenord') && (
-            <Text variant="body-sm" style={{ color: colors.error || '#EF4444', textAlign: 'center', marginBottom: 16 }}>
+          {error && (
+            <Text
+              variant="body-sm"
+              style={{ color: colors.error || '#EF4444', textAlign: 'center', marginBottom: 16 }}
+            >
               {error}
             </Text>
           )}
@@ -92,16 +103,26 @@ export const AuthScreen = () => {
           <Button
             variant="primary"
             size="lg"
-            onPress={handleAuth}
+            onPress={handleLogin}
             loading={loading}
             style={{ marginTop: 24 }}
           >
-            {isLogin ? t.auth.login : t.auth.signup}
+            {t.auth.login}
           </Button>
 
-          <Button variant="ghost" onPress={() => setIsLogin(!isLogin)} style={{ marginTop: 16 }}>
-            {isLogin ? t.auth.noAccount : t.auth.hasAccount}
+          <Button
+            variant="ghost"
+            onPress={() => navigation.navigate('Signup')}
+            style={{ marginTop: 16 }}
+          >
+            {t.auth.noAccount}
           </Button>
+
+          {onGuestMode && (
+            <Button variant="ghost" onPress={onGuestMode} style={{ marginTop: 8 }}>
+              {t.auth.continueAsGuest}
+            </Button>
+          )}
         </View>
       </View>
     </ScreenWrapper>

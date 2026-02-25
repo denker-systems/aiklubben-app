@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Image, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ChevronRight } from 'lucide-react-native';
 import { Text } from './Text';
 import { TiltCard } from './TiltCard';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -31,7 +32,7 @@ export function ContentCard({
   showOptions = false,
   variant = 'compact',
 }: ContentCardProps) {
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
   const ui = getUiColors(isDark);
   const isCompact = variant === 'compact';
 
@@ -40,7 +41,11 @@ export function ContentCard({
       onPress={onPress}
       tiltAmount={2}
       scaleAmount={0.98}
-      style={[styles.card, { backgroundColor: ui.card.background, borderColor: ui.card.border }, isCompact ? styles.cardCompact : styles.cardSpacious]}
+      style={[
+        styles.card,
+        { backgroundColor: ui.card.background, borderColor: ui.card.border },
+        isCompact ? styles.cardCompact : styles.cardSpacious,
+      ]}
     >
       {emoji && (
         <LinearGradient
@@ -58,17 +63,23 @@ export function ContentCard({
       <View style={styles.content}>
         <Text
           variant="body"
+          weight="semibold"
           style={[styles.title, isCompact ? styles.titleCompact : styles.titleSpacious]}
+          numberOfLines={2}
         >
           {title}
         </Text>
         {subtitle && (
-          <Text variant="caption" style={styles.subtitle} numberOfLines={1}>
+          <Text
+            variant="caption"
+            style={[styles.subtitle, { color: colors.text.muted }]}
+            numberOfLines={1}
+          >
             {subtitle}
           </Text>
         )}
         {date && (
-          <Text variant="caption" style={styles.date}>
+          <Text variant="caption" style={[styles.date, { color: colors.text.muted }]}>
             {date}
           </Text>
         )}
@@ -82,7 +93,7 @@ export function ContentCard({
         />
       )}
 
-      {showArrow && <Text style={styles.arrow}>›</Text>}
+      {showArrow && <ChevronRight size={20} color={colors.text.muted} style={styles.arrow} />}
 
       {showOptions && (
         <Pressable style={styles.optionsButton}>
@@ -97,94 +108,79 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    // backgroundColor and borderColor set dynamically
     borderRadius: 20,
     borderWidth: 1,
-    position: 'relative',
     overflow: 'hidden',
   },
   cardCompact: {
-    padding: 16,
-    gap: 14,
+    padding: 14,
+    gap: 12,
   },
   cardSpacious: {
-    padding: 24,
-    gap: 18,
+    padding: 16,
+    gap: 14,
   },
   iconGradient: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconCompact: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+  },
+  iconSpacious: {
     width: 52,
     height: 52,
     borderRadius: 14,
-  },
-  iconSpacious: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
   },
   emoji: {
     textAlign: 'center',
   },
   emojiCompact: {
-    fontSize: 24,
+    fontSize: 22,
   },
   emojiSpacious: {
-    fontSize: 32,
+    fontSize: 26,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
-    paddingRight: 120,
   },
   title: {
-    // color from Text component
     fontWeight: '600',
   },
   titleCompact: {
     fontSize: 15,
     lineHeight: 20,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   titleSpacious: {
-    fontSize: 16,
-    lineHeight: 22,
-    marginBottom: 6,
+    fontSize: 15,
+    lineHeight: 21,
+    marginBottom: 4,
   },
   subtitle: {
-    // color from Text component
     fontSize: 13,
+    lineHeight: 18,
   },
   date: {
-    // color set dynamically
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
     marginTop: 4,
   },
   image: {
-    position: 'absolute',
+    borderRadius: 12,
   },
   imageCompact: {
-    right: -10,
-    bottom: -10,
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 56,
+    height: 56,
   },
   imageSpacious: {
-    right: 8,
-    top: '50%',
-    marginTop: -50,
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 64,
+    height: 64,
   },
   arrow: {
-    fontSize: 28,
-    // color set dynamically
-    fontWeight: '300',
+    marginLeft: 4,
   },
   optionsButton: {
     position: 'absolute',
@@ -193,7 +189,6 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   optionsText: {
-    // color set dynamically
     fontSize: 16,
     fontWeight: '600',
   },

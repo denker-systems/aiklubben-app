@@ -8,6 +8,12 @@ export interface UserProfile {
   created_at: string;
 }
 
+export interface NewsSource {
+  name: string;
+  url: string;
+  title?: string;
+}
+
 export interface NewsArticle {
   id: string;
   title: string;
@@ -16,6 +22,7 @@ export interface NewsArticle {
   image_url: string | null;
   published_at: string | null;
   slug: string;
+  sources?: NewsSource[] | null;
 }
 
 export interface ContentItem {

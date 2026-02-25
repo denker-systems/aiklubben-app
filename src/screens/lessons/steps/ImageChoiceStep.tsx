@@ -90,61 +90,61 @@ export const ImageChoiceStep: React.FC<ImageChoiceStepProps> = ({
                   showAsIncorrect && styles.optionIncorrect,
                 ]}
               >
-              <Pressable
-                onPress={() => handleSelect(option.id)}
-                disabled={showFeedback}
-                style={styles.optionPressable}
-              >
-                <View style={[styles.imageContainer, { backgroundColor: colors.glass.light }]}>
-                  {option.image_url ? (
-                    <Image
-                      source={{ uri: option.image_url }}
-                      style={styles.image}
-                      resizeMode="cover"
-                    />
-                  ) : option.emoji ? (
-                    <Text style={styles.emoji}>{option.emoji}</Text>
-                  ) : (
-                    <View style={styles.placeholder}>
-                      <ImageIcon size={32} color={colors.text.muted} />
-                    </View>
-                  )}
-
-                  {showAsCorrect && (
-                    <MotiView
-                      style={styles.badge}
-                      from={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={SPRING_CONFIGS.bouncy}
-                    >
-                      <Check size={16} color="#FFFFFF" strokeWidth={3} />
-                    </MotiView>
-                  )}
-
-                  {showAsIncorrect && (
-                    <MotiView
-                      style={[styles.badge, styles.badgeIncorrect]}
-                      from={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={SPRING_CONFIGS.bouncy}
-                    >
-                      <X size={16} color="#FFFFFF" strokeWidth={3} />
-                    </MotiView>
-                  )}
-                </View>
-
-                <Text
-                  variant="body"
-                  style={[
-                    styles.label,
-                    showAsCorrect && styles.labelCorrect,
-                    showAsIncorrect && styles.labelIncorrect,
-                  ]}
-                  numberOfLines={2}
+                <Pressable
+                  onPress={() => handleSelect(option.id)}
+                  disabled={showFeedback}
+                  style={styles.optionPressable}
                 >
-                  {option.label}
-                </Text>
-              </Pressable>
+                  <View style={[styles.imageContainer, { backgroundColor: colors.glass.light }]}>
+                    {option.image_url ? (
+                      <Image
+                        source={{ uri: option.image_url }}
+                        style={styles.image}
+                        resizeMode="cover"
+                      />
+                    ) : option.emoji ? (
+                      <Text style={styles.emoji}>{option.emoji}</Text>
+                    ) : (
+                      <View style={styles.placeholder}>
+                        <ImageIcon size={32} color={colors.text.muted} />
+                      </View>
+                    )}
+
+                    {showAsCorrect && (
+                      <MotiView
+                        style={styles.badge}
+                        from={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={SPRING_CONFIGS.bouncy}
+                      >
+                        <Check size={16} color="#FFFFFF" strokeWidth={3} />
+                      </MotiView>
+                    )}
+
+                    {showAsIncorrect && (
+                      <MotiView
+                        style={[styles.badge, styles.badgeIncorrect]}
+                        from={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={SPRING_CONFIGS.bouncy}
+                      >
+                        <X size={16} color="#FFFFFF" strokeWidth={3} />
+                      </MotiView>
+                    )}
+                  </View>
+
+                  <Text
+                    variant="body"
+                    style={[
+                      styles.label,
+                      showAsCorrect && styles.labelCorrect,
+                      showAsIncorrect && styles.labelIncorrect,
+                    ]}
+                    numberOfLines={2}
+                  >
+                    {option.label}
+                  </Text>
+                </Pressable>
               </View>
             </MotiView>
           );

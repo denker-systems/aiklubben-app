@@ -31,7 +31,7 @@ export const OptionChip: React.FC<OptionChipProps> = ({
   index = 0,
   style,
 }) => {
-  const { isDark, colors } = useTheme();
+  const { isDark } = useTheme();
   const ui = getUiColors(isDark);
   const isDisabled = disabled || state === 'disabled' || state === 'used';
 
@@ -72,12 +72,16 @@ export const OptionChip: React.FC<OptionChipProps> = ({
       }}
       transition={{ ...SPRING_CONFIGS.snappy, delay: index * 30 }}
     >
-      <View style={[styles.chip, { backgroundColor: ui.card.background, borderColor: ui.card.border }, getSizeStyles(), getStateStyles(), style]}>
-        <Pressable
-          onPress={onPress}
-          disabled={isDisabled}
-          style={styles.chipPressable}
-        >
+      <View
+        style={[
+          styles.chip,
+          { backgroundColor: ui.card.background, borderColor: ui.card.border },
+          getSizeStyles(),
+          getStateStyles(),
+          style,
+        ]}
+      >
+        <Pressable onPress={onPress} disabled={isDisabled} style={styles.chipPressable}>
           <Text
             variant="body"
             style={[

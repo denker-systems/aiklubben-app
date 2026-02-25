@@ -3,9 +3,11 @@
 ## Metro Bundler Issues
 
 ### Cache Problems
+
 **Symptom:** App not updating with code changes
 
 **Solution:**
+
 ```bash
 # Clear Metro cache
 npx expo start -c
@@ -17,9 +19,11 @@ npx expo start -c
 ```
 
 ### Port Already in Use
+
 **Symptom:** "Port 8081 already in use"
 
 **Solution:**
+
 ```bash
 # Kill process on port
 lsof -ti:8081 | xargs kill -9
@@ -31,25 +35,23 @@ npx expo start --port 8082
 ## Navigation Issues
 
 ### Tab Bar Not Hiding
+
 **Symptom:** Tab bar visible on detail screens
 
 **Solution:**
 Check `hideOnScreens` array in AppNavigator:
+
 ```typescript
-const hideOnScreens = [
-  'Lesson',
-  'CourseDetail',
-  'NewsDetail',
-  'ContentDetail',
-  'Auth'
-];
+const hideOnScreens = ['Lesson', 'CourseDetail', 'NewsDetail', 'ContentDetail', 'Auth'];
 ```
 
 ### Stack Not Resetting
+
 **Symptom:** Detail screen persists when switching tabs
 
 **Solution:**
 Ensure navigation reset logic runs:
+
 ```typescript
 if (currentRoute && !tabScreens.includes(currentRoute)) {
   navigationRef.navigate(key as any);
@@ -57,10 +59,12 @@ if (currentRoute && !tabScreens.includes(currentRoute)) {
 ```
 
 ### Back Button Not Working
+
 **Symptom:** Back button doesn't navigate
 
 **Solution:**
 Use `navigation.goBack()` instead of `navigateToTab()`:
+
 ```typescript
 const handleGoBack = () => {
   navigation.goBack();
@@ -70,9 +74,11 @@ const handleGoBack = () => {
 ## Database Issues
 
 ### Column Does Not Exist
+
 **Symptom:** `column does not exist` error
 
 **Solution:**
+
 1. Check database schema
 2. Run migrations
 3. Update query to match actual columns
@@ -86,9 +92,11 @@ const handleGoBack = () => {
 ```
 
 ### RLS Policy Blocking Query
+
 **Symptom:** No data returned despite existing records
 
 **Solution:**
+
 1. Check RLS policies in Supabase dashboard
 2. Verify user is authenticated
 3. Ensure policy allows operation
@@ -99,9 +107,11 @@ SELECT * FROM pg_policies WHERE tablename = 'your_table';
 ```
 
 ### Query Timeout
+
 **Symptom:** Query takes too long
 
 **Solution:**
+
 1. Add indexes
 2. Limit results
 3. Optimize query
@@ -118,48 +128,54 @@ SELECT * FROM pg_policies WHERE tablename = 'your_table';
 ## Authentication Issues
 
 ### Session Not Persisting
+
 **Symptom:** User logged out on app restart
 
 **Solution:**
 Ensure Supabase client is configured correctly:
+
 ```typescript
 import { createClient } from '@supabase/supabase-js';
 
-export const supabase = createClient(
-  supabaseUrl,
-  supabaseAnonKey,
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true
-    }
-  }
-);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+});
 ```
 
 ### Invalid Credentials
+
 **Symptom:** "Invalid login credentials" error
 
 **Solution:**
+
 1. Verify email/password are correct
 2. Check if user exists in auth.users
 3. Ensure password meets requirements (min 6 chars)
 
 ### Token Expired
+
 **Symptom:** Queries fail with auth error
 
 **Solution:**
 Token should auto-refresh. If not:
+
 ```typescript
-const { data: { session } } = await supabase.auth.refreshSession();
+const {
+  data: { session },
+} = await supabase.auth.refreshSession();
 ```
 
 ## Build Issues
 
 ### iOS Build Fails
+
 **Symptom:** Build fails with CocoaPods error
 
 **Solution:**
+
 ```bash
 cd ios
 pod deintegrate
@@ -168,9 +184,11 @@ cd ..
 ```
 
 ### Android Build Fails
+
 **Symptom:** Gradle build error
 
 **Solution:**
+
 ```bash
 cd android
 ./gradlew clean
@@ -178,9 +196,11 @@ cd ..
 ```
 
 ### TypeScript Errors
+
 **Symptom:** Type errors in build
 
 **Solution:**
+
 ```bash
 # Check errors
 npx tsc --noEmit
@@ -192,9 +212,11 @@ npx tsc --noEmit
 ## Performance Issues
 
 ### Slow Animations
+
 **Symptom:** Animations lag or stutter
 
 **Solution:**
+
 1. Use native driver
 2. Reduce animation complexity
 3. Memoize components
@@ -211,19 +233,19 @@ export default React.memo(Component);
 ```
 
 ### Memory Leaks
+
 **Symptom:** App becomes slow over time
 
 **Solution:**
+
 1. Cleanup subscriptions
 2. Clear timers
 3. Remove event listeners
 
 ```typescript
 useEffect(() => {
-  const subscription = supabase
-    .channel('changes')
-    .subscribe();
-  
+  const subscription = supabase.channel('changes').subscribe();
+
   return () => {
     subscription.unsubscribe();
   };
@@ -231,9 +253,11 @@ useEffect(() => {
 ```
 
 ### Large Bundle Size
+
 **Symptom:** App takes long to load
 
 **Solution:**
+
 1. Lazy load screens
 2. Optimize images
 3. Remove unused dependencies
@@ -241,9 +265,11 @@ useEffect(() => {
 ## UI Issues
 
 ### Keyboard Covering Input
+
 **Symptom:** Keyboard hides text input
 
 **Solution:**
+
 ```typescript
 import { KeyboardAvoidingView, Platform } from 'react-native';
 
@@ -255,9 +281,11 @@ import { KeyboardAvoidingView, Platform } from 'react-native';
 ```
 
 ### SafeArea Not Working
+
 **Symptom:** Content under status bar/notch
 
 **Solution:**
+
 ```typescript
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -267,9 +295,11 @@ const insets = useSafeAreaInsets();
 ```
 
 ### Images Not Loading
+
 **Symptom:** Images show broken icon
 
 **Solution:**
+
 1. Check image URL
 2. Verify network permissions
 3. Use expo-image
@@ -287,17 +317,21 @@ import { Image } from 'expo-image';
 ## Development Issues
 
 ### Hot Reload Not Working
+
 **Symptom:** Changes don't reflect in app
 
 **Solution:**
+
 1. Restart Metro bundler
 2. Clear cache
 3. Reload app manually (shake device)
 
 ### Environment Variables Not Loading
+
 **Symptom:** `undefined` for env vars
 
 **Solution:**
+
 1. Ensure `.env` file exists
 2. Restart Metro bundler
 3. Use `EXPO_PUBLIC_` prefix
@@ -311,9 +345,11 @@ EXPO_PUBLIC_SUPABASE_URL=...
 ```
 
 ### Module Not Found
+
 **Symptom:** "Module not found" error
 
 **Solution:**
+
 ```bash
 # Reinstall dependencies
 rm -rf node_modules
@@ -326,6 +362,7 @@ npx expo start -c
 ## Getting More Help
 
 If issue persists:
+
 1. Check [FAQ](./FAQ.md)
 2. Review [Debug Guide](./DEBUG_GUIDE.md)
 3. Contact development team

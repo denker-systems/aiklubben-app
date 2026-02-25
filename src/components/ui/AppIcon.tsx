@@ -77,13 +77,7 @@ const AppIconComponent = memo(function AppIcon({ name, size = 24 }: AppIconProps
   const source = iconAssets[name];
 
   if (source) {
-    return (
-      <Image
-        source={source}
-        style={{ width: size, height: size }}
-        resizeMode="contain"
-      />
-    );
+    return <Image source={source} style={{ width: size, height: size }} resizeMode="contain" />;
   }
 
   // Placeholder: colored circle

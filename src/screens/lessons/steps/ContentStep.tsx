@@ -4,8 +4,6 @@ import { MotiView } from 'moti';
 import { Text, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS, STAGGER_DELAYS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
-import { getUiColors } from '@/config/design';
-import { brandColors } from '@/config/theme';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Simple markdown renderer for bold (**text**) support
@@ -38,23 +36,18 @@ interface ContentStepProps {
 }
 
 const ContentStepComponent: React.FC<ContentStepProps> = ({ content, onContinue }) => {
-  const { isDark, colors } = useTheme();
-  const ui = getUiColors(isDark);
+  const { colors } = useTheme();
   const { t } = useLanguage();
   console.log('[ContentStep] Rendered', { title: content.title });
-
-  const handleContinue = () => {
-    console.log('[ContentStep] handleContinue - user clicked continue');
-    onContinue();
-  };
 
   // Auto-enable continue after content is shown
   useEffect(() => {
     const timer = setTimeout(() => {
-      handleContinue();
+      onContinue();
     }, 500);
     return () => clearTimeout(timer);
-  }, [handleContinue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <MotiView
@@ -105,7 +98,11 @@ const ContentStepComponent: React.FC<ContentStepProps> = ({ content, onContinue 
           animate={{ opacity: 1, translateY: 0 }}
           transition={{ ...SPRING_CONFIGS.smooth, delay: STAGGER_DELAYS.normal * 2 }}
         >
-          {renderMarkdown(content.body, [styles.body, { color: colors.text.secondary }], colors.text.primary)}
+          {renderMarkdown(
+            content.body,
+            [styles.body, { color: colors.text.secondary }],
+            colors.text.primary,
+          )}
         </MotiView>
       </View>
 

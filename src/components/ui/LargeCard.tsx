@@ -44,34 +44,68 @@ const LargeCardComponent = memo(function LargeCard({
   const ui = getUiColors(isDark);
 
   const cardContent = (
-    <View style={[styles.card, { height, backgroundColor: ui.card.background, borderColor: ui.card.border }, style]}>
-    <Pressable
-      style={styles.cardPressable}
-      onPress={onPress}
-      disabled={!onPress}
+    <View
+      style={[
+        styles.card,
+        { height, backgroundColor: ui.card.background, borderColor: ui.card.border },
+        style,
+      ]}
     >
-      {imageUrl ? (
-        <ImageBackground
-          source={{ uri: imageUrl }}
-          style={styles.imageBg}
-          imageStyle={styles.imageStyle}
-          resizeMode="cover"
-        >
+      <Pressable style={styles.cardPressable} onPress={onPress} disabled={!onPress}>
+        {imageUrl ? (
+          <ImageBackground
+            source={{ uri: imageUrl }}
+            style={styles.imageBg}
+            imageStyle={styles.imageStyle}
+            resizeMode="cover"
+          >
+            <LinearGradient
+              colors={['transparent', 'rgba(12, 10, 23, 0.7)', 'rgba(12, 10, 23, 0.95)']}
+              style={styles.gradientOverlay}
+              locations={[0, 0.5, 1]}
+            >
+              <View style={styles.cardContent}>
+                <View style={styles.badgeRow}>
+                  {badge && (
+                    <View style={[styles.badge, { backgroundColor: badgeColor }]}>
+                      <Text style={styles.badgeText}>{badge}</Text>
+                    </View>
+                  )}
+                  {featured && (
+                    <View style={styles.featuredBadge}>
+                      <Text style={styles.featuredBadgeText}>⭐ Utvald</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={styles.title} numberOfLines={2}>
+                  {title}
+                </Text>
+                {subtitle && (
+                  <Text style={styles.subtitle} numberOfLines={2}>
+                    {subtitle}
+                  </Text>
+                )}
+                {children}
+                {onPress && (
+                  <View style={styles.footer}>
+                    <Text style={styles.readMore}>Läs mer →</Text>
+                  </View>
+                )}
+              </View>
+            </LinearGradient>
+          </ImageBackground>
+        ) : (
           <LinearGradient
-            colors={['transparent', 'rgba(12, 10, 23, 0.7)', 'rgba(12, 10, 23, 0.95)']}
-            style={styles.gradientOverlay}
-            locations={[0, 0.5, 1]}
+            colors={gradient}
+            style={styles.noImageGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
           >
             <View style={styles.cardContent}>
               <View style={styles.badgeRow}>
                 {badge && (
-                  <View style={[styles.badge, { backgroundColor: badgeColor }]}>
-                    <Text style={styles.badgeText}>{badge}</Text>
-                  </View>
-                )}
-                {featured && (
-                  <View style={styles.featuredBadge}>
-                    <Text style={styles.featuredBadgeText}>⭐ Utvald</Text>
+                  <View style={styles.badgeLight}>
+                    <Text style={styles.badgeTextDark}>{badge}</Text>
                   </View>
                 )}
               </View>
@@ -79,7 +113,7 @@ const LargeCardComponent = memo(function LargeCard({
                 {title}
               </Text>
               {subtitle && (
-                <Text style={styles.subtitle} numberOfLines={2}>
+                <Text style={[styles.subtitle, { opacity: 0.9 }]} numberOfLines={2}>
                   {subtitle}
                 </Text>
               )}
@@ -91,40 +125,8 @@ const LargeCardComponent = memo(function LargeCard({
               )}
             </View>
           </LinearGradient>
-        </ImageBackground>
-      ) : (
-        <LinearGradient
-          colors={gradient}
-          style={styles.noImageGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <View style={styles.cardContent}>
-            <View style={styles.badgeRow}>
-              {badge && (
-                <View style={styles.badgeLight}>
-                  <Text style={styles.badgeTextDark}>{badge}</Text>
-                </View>
-              )}
-            </View>
-            <Text style={styles.title} numberOfLines={2}>
-              {title}
-            </Text>
-            {subtitle && (
-              <Text style={[styles.subtitle, { opacity: 0.9 }]} numberOfLines={2}>
-                {subtitle}
-              </Text>
-            )}
-            {children}
-            {onPress && (
-              <View style={styles.footer}>
-                <Text style={styles.readMore}>Läs mer →</Text>
-              </View>
-            )}
-          </View>
-        </LinearGradient>
-      )}
-    </Pressable>
+        )}
+      </Pressable>
     </View>
   );
 

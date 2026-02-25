@@ -35,7 +35,7 @@ const ScreenHeaderComponent = memo(function ScreenHeader({
   transparent = false,
 }: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
-  const { isDark, colors } = useTheme();
+  const { colors } = useTheme();
 
   // Keep header fully transparent
   const headerStyle = useAnimatedStyle(() => {
@@ -63,7 +63,10 @@ const ScreenHeaderComponent = memo(function ScreenHeader({
                 {title}
               </Text>
               {subtitle && (
-                <Text variant="body" style={[styles.headerSubtitle, { color: colors.text.secondary }]}>
+                <Text
+                  variant="body"
+                  style={[styles.headerSubtitle, { color: colors.text.secondary }]}
+                >
                   {subtitle}
                 </Text>
               )}

@@ -36,8 +36,8 @@ export const ContentScreen = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const insets = useSafeAreaInsets();
-  const { isDark, colors } = useTheme();
-  const { t } = useLanguage();
+  const { colors } = useTheme();
+  const { t, l } = useLanguage();
   const initialCategory = route.params?.category || 'resurser';
 
   console.log('[ContentScreen] Rendered', { initialCategory });
@@ -75,11 +75,11 @@ export const ContentScreen = () => {
 
   useEffect(() => {
     console.log('[ContentScreen] useEffect triggered', { activeCategory });
-    
+
     const fetchContent = async () => {
       setLoading(true);
       console.log('[ContentScreen] Fetching content for category:', activeCategory);
-      
+
       try {
         const { data, error } = await supabase
           .from('content')
@@ -175,10 +175,15 @@ export const ContentScreen = () => {
                   ) : (
                     <Pressable
                       onPress={() => setActiveCategory(cat.id)}
-                      style={[styles.categoryPill, { backgroundColor: colors.glass.light, borderColor: colors.border.default }]}
+                      style={[
+                        styles.categoryPill,
+                        { backgroundColor: colors.glass.light, borderColor: colors.border.default },
+                      ]}
                     >
                       <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
-                      <Text style={[styles.categoryText, { color: colors.text.secondary }]}>{cat.name}</Text>
+                      <Text style={[styles.categoryText, { color: colors.text.secondary }]}>
+                        {cat.name}
+                      </Text>
                     </Pressable>
                   )}
                 </MotiView>
@@ -226,7 +231,7 @@ export const ContentScreen = () => {
                     transition={{ ...SPRING_CONFIGS.smooth, delay: 200 + index * 80 }}
                   >
                     <ContentCard
-                      title={item.title}
+                      title={l(item, 'title')}
                       date={formattedDate}
                       image={item.featured_image}
                       onPress={() => navigation.navigate('ContentDetail', { id: item.id })}

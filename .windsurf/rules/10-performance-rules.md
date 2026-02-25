@@ -1,6 +1,7 @@
 # Performance Rules - React Native iOS Optimization
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Performance optimization patterns for smooth 60fps iOS apps
 
@@ -9,6 +10,7 @@
 ## Rendering Performance
 
 ### Component Memoization
+
 ```typescript
 // Memoize components that receive stable props
 // CORRECT: Prevent unnecessary re-renders
@@ -35,21 +37,22 @@ export const UserCard = React.memo(
 ```
 
 ### useCallback & useMemo
+
 ```typescript
 // useCallback: Memoize functions passed to child components
 const ParentComponent = () => {
   const [count, setCount] = useState(0);
-  
+
   // CORRECT: Memoized callback
   const handlePress = useCallback(() => {
     setCount(c => c + 1);
   }, []);
-  
+
   // WRONG: New function every render
   const handlePressBad = () => {
     setCount(c => c + 1);
   };
-  
+
   return <ChildComponent onPress={handlePress} />;
 };
 
@@ -59,18 +62,19 @@ const Component = ({ items }: Props) => {
   const sortedItems = useMemo(() => {
     return [...items].sort((a, b) => a.name.localeCompare(b.name));
   }, [items]);
-  
+
   // CORRECT: Expensive filtering
   const filteredItems = useMemo(() => {
     return items.filter(item => complexFilter(item));
   }, [items]);
-  
+
   // WRONG: Don't memoize simple operations
   const itemCount = useMemo(() => items.length, [items]); // Overkill
 };
 ```
 
 ### When NOT to Memoize
+
 ```typescript
 // DON'T memoize:
 // 1. Primitive props (strings, numbers, booleans)
@@ -88,27 +92,28 @@ const doubled = useMemo(() => count * 2, [count]); // Simple math
 ## List Performance
 
 ### FlatList Optimization
+
 ```typescript
 // Optimized FlatList configuration
 <FlatList
   data={items}
   renderItem={renderItem}
   keyExtractor={item => item.id}
-  
+
   // CRITICAL: Define item layout for virtualization
   getItemLayout={(data, index) => ({
     length: ITEM_HEIGHT,
     offset: ITEM_HEIGHT * index,
     index,
   })}
-  
+
   // Performance settings
   removeClippedSubviews={true}      // Remove off-screen items
   maxToRenderPerBatch={10}          // Items per batch
   updateCellsBatchingPeriod={50}    // Batch update interval
   windowSize={5}                     // Viewport multiplier
   initialNumToRender={10}           // Initial render count
-  
+
   // Avoid inline functions
   // WRONG: Creates new function each render
   // renderItem={({ item }) => <Item item={item} />}
@@ -116,6 +121,7 @@ const doubled = useMemo(() => count * 2, [count]); // Simple math
 ```
 
 ### Optimized renderItem
+
 ```typescript
 // Extract renderItem outside component or memoize
 const renderItem = useCallback(({ item, index }: ListRenderItemInfo<Item>) => (
@@ -136,6 +142,7 @@ const ItemComponent = React.memo(({ item }: { item: Item }) => (
 ```
 
 ### Avoid Nested VirtualizedLists
+
 ```typescript
 // WRONG: Nested FlatLists cause performance issues
 <FlatList
@@ -168,6 +175,7 @@ const flattenedData = sections.flatMap(section => [
 ## Image Optimization
 
 ### Image Loading
+
 ```typescript
 // Use expo-image for better performance
 import { Image } from 'expo-image';
@@ -196,6 +204,7 @@ useEffect(() => {
 ```
 
 ### Image Dimensions
+
 ```typescript
 // ALWAYS specify image dimensions
 // CORRECT: Explicit dimensions prevent layout shift
@@ -222,6 +231,7 @@ useEffect(() => {
 ## Animation Performance
 
 ### Use Native Driver
+
 ```typescript
 // Animated API with native driver
 import { Animated } from 'react-native';
@@ -245,6 +255,7 @@ Animated.timing(fadeAnim, {
 ```
 
 ### Reanimated 2 for Complex Animations
+
 ```typescript
 // Use Reanimated for gesture-driven animations
 import Animated, {
@@ -255,11 +266,11 @@ import Animated, {
 
 const Component = () => {
   const offset = useSharedValue(0);
-  
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: offset.value }],
   }));
-  
+
   // Runs on UI thread - 60fps guaranteed
   return <Animated.View style={animatedStyle} />;
 };
@@ -270,10 +281,11 @@ const Component = () => {
 ## JavaScript Thread Optimization
 
 ### Avoid Heavy Operations on JS Thread
+
 ```typescript
 // WRONG: Heavy computation blocks JS thread
 const processLargeArray = (items: Item[]) => {
-  return items.map(item => expensiveTransform(item));
+  return items.map((item) => expensiveTransform(item));
 };
 
 // CORRECT: Use InteractionManager
@@ -282,7 +294,7 @@ import { InteractionManager } from 'react-native';
 const loadData = async () => {
   // Wait for animations to complete
   await InteractionManager.runAfterInteractions();
-  
+
   // Then do heavy work
   const result = processLargeArray(items);
   setData(result);
@@ -299,6 +311,7 @@ unstable_batchedUpdates(() => {
 ```
 
 ### Debounce & Throttle
+
 ```typescript
 // Debounce for search input
 import { useMemo } from 'react';
@@ -306,24 +319,24 @@ import debounce from 'lodash/debounce';
 
 const SearchInput = () => {
   const [query, setQuery] = useState('');
-  
+
   const debouncedSearch = useMemo(
     () => debounce((text: string) => {
       performSearch(text);
     }, 300),
     []
   );
-  
+
   const handleChange = (text: string) => {
     setQuery(text);
     debouncedSearch(text);
   };
-  
+
   // Cleanup
   useEffect(() => {
     return () => debouncedSearch.cancel();
   }, [debouncedSearch]);
-  
+
   return <TextInput value={query} onChangeText={handleChange} />;
 };
 ```
@@ -333,11 +346,12 @@ const SearchInput = () => {
 ## Memory Management
 
 ### Cleanup Effects
+
 ```typescript
 // ALWAYS cleanup subscriptions and timers
 useEffect(() => {
   const subscription = eventEmitter.addListener('event', handler);
-  
+
   return () => {
     subscription.remove(); // Cleanup
   };
@@ -347,7 +361,7 @@ useEffect(() => {
   const timer = setTimeout(() => {
     // Do something
   }, 1000);
-  
+
   return () => {
     clearTimeout(timer); // Cleanup
   };
@@ -355,10 +369,11 @@ useEffect(() => {
 ```
 
 ### Avoid Memory Leaks
+
 ```typescript
 // WRONG: Setting state after unmount
 useEffect(() => {
-  fetchData().then(data => {
+  fetchData().then((data) => {
     setData(data); // May leak if component unmounted
   });
 }, []);
@@ -366,13 +381,13 @@ useEffect(() => {
 // CORRECT: Check if mounted
 useEffect(() => {
   let isMounted = true;
-  
-  fetchData().then(data => {
+
+  fetchData().then((data) => {
     if (isMounted) {
       setData(data);
     }
   });
-  
+
   return () => {
     isMounted = false;
   };
@@ -381,16 +396,16 @@ useEffect(() => {
 // CORRECT: Use AbortController
 useEffect(() => {
   const controller = new AbortController();
-  
+
   fetch(url, { signal: controller.signal })
-    .then(res => res.json())
+    .then((res) => res.json())
     .then(setData)
-    .catch(err => {
+    .catch((err) => {
       if (err.name !== 'AbortError') {
         setError(err);
       }
     });
-  
+
   return () => controller.abort();
 }, [url]);
 ```
@@ -400,6 +415,7 @@ useEffect(() => {
 ## Bundle Size Optimization
 
 ### Tree Shaking
+
 ```typescript
 // CORRECT: Named imports for tree shaking
 import { map, filter } from 'lodash-es';
@@ -411,6 +427,7 @@ import * as dateFns from 'date-fns';
 ```
 
 ### Lazy Loading
+
 ```typescript
 // Lazy load heavy screens
 const HeavyScreen = React.lazy(() => import('./HeavyScreen'));
@@ -426,6 +443,7 @@ const HeavyScreen = React.lazy(() => import('./HeavyScreen'));
 ## Profiling Tools
 
 ### React DevTools Profiler
+
 ```typescript
 // Wrap components to profile
 import { Profiler } from 'react';

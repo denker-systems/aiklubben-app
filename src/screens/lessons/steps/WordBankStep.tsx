@@ -128,7 +128,12 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
       </Text>
 
       {/* Sentence Builder Area */}
-      <View style={[styles.sentenceContainer, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}>
+      <View
+        style={[
+          styles.sentenceContainer,
+          { backgroundColor: ui.card.background, borderColor: ui.card.border },
+        ]}
+      >
         <View style={styles.sentenceRow}>
           {selectedWords.map((word, index) => {
             const isBlank = content.sentence_template[index] === null;
@@ -217,7 +222,10 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
                   >
                     <Text
                       variant="body"
-                      style={[styles.wordChipText, isUsed && [styles.wordChipTextUsed, { color: colors.text.muted }]]}
+                      style={[
+                        styles.wordChipText,
+                        isUsed && [styles.wordChipTextUsed, { color: colors.text.muted }],
+                      ]}
                     >
                       {word}
                     </Text>
@@ -276,7 +284,10 @@ export const WordBankStep: React.FC<WordBankStepProps> = ({ content, explanation
           )}
           {!isCorrect && (
             <View style={styles.correctAnswerContainer}>
-              <Text variant="caption" style={[styles.correctAnswerLabel, { color: colors.text.muted }]}>
+              <Text
+                variant="caption"
+                style={[styles.correctAnswerLabel, { color: colors.text.muted }]}
+              >
                 {t.common.correctAnswer}
               </Text>
               <Text variant="body" style={styles.correctAnswerText}>

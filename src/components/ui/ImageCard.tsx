@@ -4,8 +4,6 @@ import { Card } from './Card';
 import { Text } from './Text';
 import { ChevronRight } from 'lucide-react-native';
 import { brandColors } from '@/config/theme';
-import { useTheme } from '@/contexts/ThemeContext';
-import { getUiColors } from '@/config/design';
 
 interface ImageCardProps {
   title: string;
@@ -32,8 +30,6 @@ export function ImageCard({
   style,
   variant = 'vertical',
 }: ImageCardProps) {
-  const { isDark, colors } = useTheme();
-  const ui = getUiColors(isDark);
   const isHorizontal = variant === 'horizontal';
 
   return (

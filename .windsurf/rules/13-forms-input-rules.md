@@ -1,6 +1,7 @@
 # Forms & Input Rules - React Native iOS
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Form handling patterns for iOS-compliant user input
 
@@ -9,13 +10,14 @@
 ## Input Component Standards
 
 ### TextInput iOS Configuration
+
 ```typescript
 // Standard TextInput with iOS optimizations
 <TextInput
   // Required props
   value={value}
   onChangeText={setValue}
-  
+
   // iOS-specific props
   clearButtonMode="while-editing"    // Show clear button
   keyboardType="default"             // Appropriate keyboard
@@ -24,12 +26,12 @@
   autoCorrect={false}                // Disable for sensitive fields
   autoComplete="email"               // iOS autofill
   textContentType="emailAddress"     // iOS password manager
-  
+
   // Accessibility
   accessible={true}
   accessibilityLabel="Email address"
   accessibilityHint="Enter your email"
-  
+
   // Styling
   style={styles.input}
   placeholderTextColor="#9CA3AF"
@@ -37,6 +39,7 @@
 ```
 
 ### Keyboard Types by Field
+
 ```typescript
 const KEYBOARD_CONFIGS = {
   email: {
@@ -80,17 +83,18 @@ const KEYBOARD_CONFIGS = {
 ## Keyboard Avoiding
 
 ### KeyboardAvoidingView Setup
+
 ```typescript
-import { 
-  KeyboardAvoidingView, 
-  Platform, 
-  ScrollView 
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const FormScreen = () => {
   const insets = useSafeAreaInsets();
-  
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -113,6 +117,7 @@ const FormScreen = () => {
 ```
 
 ### Keyboard Dismiss Patterns
+
 ```typescript
 import { Keyboard, TouchableWithoutFeedback } from 'react-native';
 
@@ -137,6 +142,7 @@ const DismissKeyboardView = ({ children }: { children: ReactNode }) => (
 ## Form State Management
 
 ### Form Hook Pattern
+
 ```typescript
 // hooks/useForm.ts
 interface FormConfig<T> {
@@ -157,27 +163,27 @@ export const useForm = <T extends Record<string, unknown>>({
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const setValue = useCallback(<K extends keyof T>(field: K, value: T[K]) => {
-    setValues(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: undefined }));
+    setValues((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
     setSubmitError(null);
   }, []);
 
   const setFieldTouched = useCallback((field: keyof T) => {
-    setTouched(prev => ({ ...prev, [field]: true }));
+    setTouched((prev) => ({ ...prev, [field]: true }));
   }, []);
 
   const validate = useCallback((): boolean => {
     if (!validationSchema) return true;
-    
+
     const result = validationSchema.safeParse(values);
-    
+
     if (result.success) {
       setErrors({});
       return true;
     }
-    
+
     const newErrors: Partial<Record<keyof T, string>> = {};
-    result.error.errors.forEach(err => {
+    result.error.errors.forEach((err) => {
       const field = err.path[0] as keyof T;
       if (!newErrors[field]) {
         newErrors[field] = err.message;
@@ -191,7 +197,7 @@ export const useForm = <T extends Record<string, unknown>>({
     // Mark all fields as touched
     const allTouched = Object.keys(initialValues).reduce(
       (acc, key) => ({ ...acc, [key]: true }),
-      {} as Record<keyof T, boolean>
+      {} as Record<keyof T, boolean>,
     );
     setTouched(allTouched);
 
@@ -203,9 +209,7 @@ export const useForm = <T extends Record<string, unknown>>({
     try {
       await onSubmit(values);
     } catch (error) {
-      setSubmitError(
-        error instanceof Error ? error.message : 'Ett fel uppstod'
-      );
+      setSubmitError(error instanceof Error ? error.message : 'Ett fel uppstod');
     } finally {
       setIsSubmitting(false);
     }
@@ -238,11 +242,12 @@ export const useForm = <T extends Record<string, unknown>>({
 ## Input Validation
 
 ### Real-time Validation
+
 ```typescript
 // Validate on blur
 const EmailInput = () => {
   const { values, errors, touched, setValue, setFieldTouched } = useForm();
-  
+
   return (
     <FormField
       label="E-post"
@@ -258,14 +263,12 @@ const EmailInput = () => {
 ```
 
 ### Validation Rules
+
 ```typescript
 // lib/validation/rules.ts
 import { z } from 'zod';
 
-export const emailRule = z
-  .string()
-  .min(1, 'E-post krävs')
-  .email('Ogiltig e-postadress');
+export const emailRule = z.string().min(1, 'E-post krävs').email('Ogiltig e-postadress');
 
 export const passwordRule = z
   .string()
@@ -274,8 +277,7 @@ export const passwordRule = z
   .regex(/[A-Z]/, 'Minst en stor bokstav')
   .regex(/[0-9]/, 'Minst en siffra');
 
-export const requiredString = (fieldName: string) =>
-  z.string().min(1, `${fieldName} krävs`);
+export const requiredString = (fieldName: string) => z.string().min(1, `${fieldName} krävs`);
 
 export const optionalString = z.string().optional();
 
@@ -285,15 +287,17 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Lösenord krävs'),
 });
 
-export const registerSchema = z.object({
-  name: requiredString('Namn'),
-  email: emailRule,
-  password: passwordRule,
-  confirmPassword: z.string(),
-}).refine(data => data.password === data.confirmPassword, {
-  message: 'Lösenorden matchar inte',
-  path: ['confirmPassword'],
-});
+export const registerSchema = z
+  .object({
+    name: requiredString('Namn'),
+    email: emailRule,
+    password: passwordRule,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Lösenorden matchar inte',
+    path: ['confirmPassword'],
+  });
 ```
 
 ---
@@ -301,6 +305,7 @@ export const registerSchema = z.object({
 ## Form Field Component
 
 ### Reusable FormField
+
 ```typescript
 // components/ui/FormField.tsx
 interface FormFieldProps {
@@ -342,7 +347,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      
+
       <View style={[
         styles.inputContainer,
         isFocused && styles.inputFocused,
@@ -367,28 +372,28 @@ export const FormField: React.FC<FormFieldProps> = ({
           numberOfLines={numberOfLines}
           maxLength={maxLength}
           editable={!disabled}
-          
+
           // Accessibility
           accessible={true}
           accessibilityLabel={label}
           accessibilityState={{ disabled }}
           accessibilityHint={error || placeholder}
         />
-        
+
         {rightElement && (
           <View style={styles.rightElement}>
             {rightElement}
           </View>
         )}
       </View>
-      
+
       {hasError && (
         <View style={styles.errorContainer}>
           <AlertCircle size={14} color="#EF4444" />
           <Text style={styles.errorText}>{error}</Text>
         </View>
       )}
-      
+
       {maxLength && (
         <Text style={styles.charCount}>
           {value.length}/{maxLength}
@@ -464,6 +469,7 @@ const styles = StyleSheet.create({
 ## Submit Button State
 
 ### Submit Button Pattern
+
 ```typescript
 // Form submit button with proper states
 interface SubmitButtonProps {

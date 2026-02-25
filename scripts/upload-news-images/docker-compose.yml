@@ -1,0 +1,5 @@
+services:
+  upload-images:
+    build: .
+    env_file:
+      - .env

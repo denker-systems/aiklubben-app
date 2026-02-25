@@ -28,7 +28,7 @@ export const HighlightStep: React.FC<HighlightStepProps> = ({
   explanation,
   onAnswer,
 }) => {
-  const { isDark, colors } = useTheme();
+  const { isDark } = useTheme();
   const ui = getUiColors(isDark);
   const { t, ti } = useLanguage();
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
@@ -95,7 +95,12 @@ export const HighlightStep: React.FC<HighlightStepProps> = ({
         subtitle={t.steps.tapToHighlight}
       />
 
-      <View style={[styles.textContainer, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}>
+      <View
+        style={[
+          styles.textContainer,
+          { backgroundColor: ui.card.background, borderColor: ui.card.border },
+        ]}
+      >
         <View style={styles.wordsContainer}>
           {content.words.map((word, index) => {
             const state = getWordState(index);

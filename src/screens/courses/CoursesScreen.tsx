@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   View,
   ScrollView,
@@ -19,10 +19,11 @@ import { brandColors } from '@/config/theme';
 import { Text, FloatingOrbs, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useMenu } from '@/contexts/MenuContext';
-import { getLevelForXP } from '@/types/gamification';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getUiColors } from '@/config/design';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useUserStats } from '@/hooks/useUserStats';
+import { useAuth } from '@/hooks/useAuth';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH * 0.75;
@@ -47,7 +48,8 @@ export const CoursesScreen = () => {
   const menuContext = useMenu();
   const { isDark, colors } = useTheme();
   const ui = getUiColors(isDark);
-  const { t } = useLanguage();
+  const { t, l } = useLanguage();
+  const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [userProgress, setUserProgress] = useState<Record<string, number>>({});
@@ -65,12 +67,48 @@ export const CoursesScreen = () => {
         if (error) throw error;
         setCourses(data || []);
 
-        // Mock progress data for now
-        const mockProgress: Record<string, number> = {};
-        (data || []).forEach((course: Course, index: number) => {
-          mockProgress[course.id] = index === 0 ? 35 : 0;
-        });
-        setUserProgress(mockProgress);
+        // Fetch real progress from user_lesson_progress
+        if (user && data && data.length > 0) {
+          const courseIds = data.map((c: Course) => c.id);
+
+          // Get all lessons for these courses
+          const { data: allLessons } = await supabase
+            .from('course_lessons')
+            .select('id, course_id')
+            .in('course_id', courseIds);
+
+          const totalMap: Record<string, number> = {};
+          const lessonToCourse: Record<string, string> = {};
+          allLessons?.forEach((l: any) => {
+            totalMap[l.course_id] = (totalMap[l.course_id] || 0) + 1;
+            lessonToCourse[l.id] = l.course_id;
+          });
+
+          // Get all completed lesson IDs for this user
+          const lessonIds = allLessons?.map((l: any) => l.id) || [];
+          if (lessonIds.length > 0) {
+            const { data: completed } = await supabase
+              .from('user_lesson_progress')
+              .select('lesson_id')
+              .eq('user_id', user.id)
+              .eq('status', 'completed')
+              .in('lesson_id', lessonIds);
+
+            const completedMap: Record<string, number> = {};
+            completed?.forEach((c: any) => {
+              const cId = lessonToCourse[c.lesson_id];
+              if (cId) completedMap[cId] = (completedMap[cId] || 0) + 1;
+            });
+
+            const progress: Record<string, number> = {};
+            courseIds.forEach((id: string) => {
+              const total = totalMap[id] || 0;
+              const done = completedMap[id] || 0;
+              progress[id] = total > 0 ? Math.round((done / total) * 100) : 0;
+            });
+            setUserProgress(progress);
+          }
+        }
       } catch (err) {
         console.error('Error fetching courses:', err);
       } finally {
@@ -79,9 +117,10 @@ export const CoursesScreen = () => {
     };
 
     fetchCourses();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
-  // useMemo for expensive computations (Rule 10)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getLevelInfo = useCallback((level: string) => {
     switch (level?.toLowerCase()) {
       case 'nybörjare':
@@ -111,8 +150,22 @@ export const CoursesScreen = () => {
     menuContext?.openMenu();
   }, [menuContext]);
 
-  const userStats = { totalXP: 150, currentStreak: 3 };
-  const level = getLevelForXP(userStats.totalXP);
+  const { stats: userStats, level } = useUserStats();
+
+  // Find the best in-progress course (highest progress but not 100%)
+  const continueCourse = useMemo(() => {
+    if (courses.length === 0) return null;
+    let best: { course: Course; progress: number } | null = null;
+    for (const course of courses) {
+      const pct = userProgress[course.id] || 0;
+      if (pct > 0 && pct < 100) {
+        if (!best || pct > best.progress) {
+          best = { course, progress: pct };
+        }
+      }
+    }
+    return best;
+  }, [courses, userProgress]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -146,7 +199,13 @@ export const CoursesScreen = () => {
               accessibilityHint={t.menu.openMenuHint}
             >
               <View style={[styles.menuLine, { backgroundColor: colors.text.secondary }]} />
-              <View style={[styles.menuLine, styles.menuLineShort, { backgroundColor: colors.text.secondary }]} />
+              <View
+                style={[
+                  styles.menuLine,
+                  styles.menuLineShort,
+                  { backgroundColor: colors.text.secondary },
+                ]}
+              />
             </Pressable>
           </View>
 
@@ -167,7 +226,9 @@ export const CoursesScreen = () => {
                 <AppIcon name="xp" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={[styles.statValue, { color: colors.text.primary }]}>{userStats.totalXP}</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                  {userStats.totalXP}
+                </Text>
                 <Text style={[styles.statLabel, { color: colors.text.secondary }]}>XP</Text>
               </View>
             </MotiView>
@@ -187,8 +248,12 @@ export const CoursesScreen = () => {
                 <AppIcon name="streak" size={52} />
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={[styles.statValue, { color: colors.text.primary }]}>{userStats.currentStreak}</Text>
-                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>dagar</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                  {userStats.currentStreak}
+                </Text>
+                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+                  {t.common.days}
+                </Text>
               </View>
             </MotiView>
 
@@ -207,15 +272,19 @@ export const CoursesScreen = () => {
                 <Text style={styles.statEmoji}>🌟</Text>
               </LinearGradient>
               <View style={styles.statInfo}>
-                <Text style={[styles.statValue, { color: colors.text.primary }]}>Lvl {level.level}</Text>
-                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>{level.name.split(' ')[0]}</Text>
+                <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                  Lvl {level.level}
+                </Text>
+                <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+                  {(t.levels as any)[level.level] || level.name}
+                </Text>
               </View>
             </MotiView>
           </View>
         </MotiView>
 
         {/* Continue Learning Section */}
-        {courses.length > 0 && userProgress[courses[0]?.id] > 0 && (
+        {continueCourse && (
           <MotiView
             style={styles.section}
             from={{ opacity: 0, translateY: 20 }}
@@ -229,11 +298,14 @@ export const CoursesScreen = () => {
             </View>
 
             <Pressable
-              style={[styles.continueCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
-              onPress={() => handleCoursePress(courses[0].id)}
+              style={[
+                styles.continueCard,
+                { backgroundColor: ui.card.background, borderColor: ui.card.border },
+              ]}
+              onPress={() => handleCoursePress(continueCourse.course.id)}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel={`${t.common.continue} ${courses[0].title}`}
+              accessibilityLabel={`${t.common.continue} ${l(continueCourse.course, 'title')}`}
               accessibilityHint=""
             >
               <View style={styles.continueContent}>
@@ -242,19 +314,24 @@ export const CoursesScreen = () => {
                 </View>
                 <View style={styles.continueTextContent}>
                   <Text variant="body" style={styles.continueTitle} numberOfLines={2}>
-                    {courses[0].title}
+                    {l(continueCourse.course, 'title')}
                   </Text>
                   <View style={styles.continueProgressRow}>
-                    <View style={[styles.continueProgressTrack, { backgroundColor: colors.glass.medium }]}>
+                    <View
+                      style={[
+                        styles.continueProgressTrack,
+                        { backgroundColor: colors.glass.medium },
+                      ]}
+                    >
                       <View
                         style={[
                           styles.continueProgressFill,
-                          { width: `${userProgress[courses[0].id]}%` },
+                          { width: `${continueCourse.progress}%` },
                         ]}
                       />
                     </View>
                     <Text variant="caption" style={styles.continueProgressText}>
-                      {userProgress[courses[0].id]}%
+                      {continueCourse.progress}%
                     </Text>
                   </View>
                 </View>
@@ -319,58 +396,79 @@ export const CoursesScreen = () => {
                     delay: 400 + index * 100,
                   }}
                 >
-                  <View style={[styles.carouselCard, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}>
-                  <Pressable
-                    onPress={() => handleCoursePress(course.id)}
-                    style={styles.carouselCardPressable}
-                    accessible={true}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${course.title}, ${course.level || t.courses.allLevels}`}
-                    accessibilityHint={t.courses.tapToOpenCourse}
+                  <View
+                    style={[
+                      styles.carouselCard,
+                      { backgroundColor: ui.card.background, borderColor: ui.card.border },
+                    ]}
                   >
-                    <View style={styles.carouselIconContainer}>
-                      <AppIcon name="courses-example" size={160} />
-                    </View>
-
-                    <Text variant="body" style={styles.carouselTitle} numberOfLines={2}>
-                      {course.title}
-                    </Text>
-
-                    <Text variant="caption" style={styles.carouselExcerpt} numberOfLines={3}>
-                      {course.excerpt}
-                    </Text>
-
-                    <View style={styles.carouselMeta}>
-                      <View style={styles.carouselMetaRow}>
-                        <Text style={styles.carouselMetaIcon}>⏱</Text>
-                        <Text variant="caption" style={[styles.carouselMetaText, { color: colors.text.secondary }]}>
-                          {course.duration || 30} min
-                        </Text>
+                    <Pressable
+                      onPress={() => handleCoursePress(course.id)}
+                      style={styles.carouselCardPressable}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${l(course, 'title')}, ${course.level || t.courses.allLevels}`}
+                      accessibilityHint={t.courses.tapToOpenCourse}
+                    >
+                      <View style={styles.carouselIconContainer}>
+                        <AppIcon name="courses-example" size={160} />
                       </View>
-                      <View style={styles.carouselMetaRow}>
-                        <Text style={styles.carouselMetaIcon}>⚡</Text>
-                        <Text variant="caption" style={[styles.carouselMetaText, { color: colors.text.secondary }]}>
-                          +50 XP
-                        </Text>
-                      </View>
-                    </View>
 
-                    {userProgress[course.id] > 0 && (
-                      <View style={[styles.carouselProgress, { borderTopColor: colors.border.default }]}>
-                        <View style={[styles.carouselProgressTrack, { backgroundColor: colors.glass.medium }]}>
+                      <Text variant="body" style={styles.carouselTitle} numberOfLines={2}>
+                        {l(course, 'title')}
+                      </Text>
+
+                      <Text variant="caption" style={styles.carouselExcerpt} numberOfLines={3}>
+                        {l(course, 'excerpt')}
+                      </Text>
+
+                      <View style={styles.carouselMeta}>
+                        <View style={styles.carouselMetaRow}>
+                          <Text style={styles.carouselMetaIcon}>⏱</Text>
+                          <Text
+                            variant="caption"
+                            style={[styles.carouselMetaText, { color: colors.text.secondary }]}
+                          >
+                            {course.duration || 30} min
+                          </Text>
+                        </View>
+                        <View style={styles.carouselMetaRow}>
+                          <Text style={styles.carouselMetaIcon}>⚡</Text>
+                          <Text
+                            variant="caption"
+                            style={[styles.carouselMetaText, { color: colors.text.secondary }]}
+                          >
+                            +50 XP
+                          </Text>
+                        </View>
+                      </View>
+
+                      {userProgress[course.id] > 0 && (
+                        <View
+                          style={[
+                            styles.carouselProgress,
+                            { borderTopColor: colors.border.default },
+                          ]}
+                        >
                           <View
                             style={[
-                              styles.carouselProgressFill,
-                              { width: `${userProgress[course.id]}%` },
+                              styles.carouselProgressTrack,
+                              { backgroundColor: colors.glass.medium },
                             ]}
-                          />
+                          >
+                            <View
+                              style={[
+                                styles.carouselProgressFill,
+                                { width: `${userProgress[course.id]}%` },
+                              ]}
+                            />
+                          </View>
+                          <Text variant="caption" style={styles.carouselProgressText}>
+                            {userProgress[course.id]}%
+                          </Text>
                         </View>
-                        <Text variant="caption" style={styles.carouselProgressText}>
-                          {userProgress[course.id]}%
-                        </Text>
-                      </View>
-                    )}
-                  </Pressable>
+                      )}
+                    </Pressable>
                   </View>
                 </MotiView>
               )}

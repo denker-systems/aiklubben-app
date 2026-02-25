@@ -1,6 +1,7 @@
 # Project Structure Rules - React Native Expo
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Directory structure and file organization standards
 
@@ -9,10 +10,11 @@
 ## Root Directory Structure
 
 ### Standard Project Layout
+
 ```
 aiklubben-app/
 ├── .expo/                    # Expo configuration (gitignored)
-├── .windsurf/               
+├── .windsurf/
 │   └── rules/               # Cascade rules
 ├── assets/                   # Static assets (images, fonts)
 │   ├── images/
@@ -38,6 +40,7 @@ aiklubben-app/
 ## Source Directory Structure
 
 ### /src Organization
+
 ```
 src/
 ├── components/               # Reusable components
@@ -110,6 +113,7 @@ src/
 ## File Naming Conventions
 
 ### Component Files
+
 ```
 PascalCase.tsx              # React components
 ├── Button.tsx
@@ -119,6 +123,7 @@ PascalCase.tsx              # React components
 ```
 
 ### Hook Files
+
 ```
 camelCase.ts                # Custom hooks (with use prefix)
 ├── useAuth.ts
@@ -128,6 +133,7 @@ camelCase.ts                # Custom hooks (with use prefix)
 ```
 
 ### Utility Files
+
 ```
 camelCase.ts                # Utilities and helpers
 ├── formatDate.ts
@@ -137,6 +143,7 @@ camelCase.ts                # Utilities and helpers
 ```
 
 ### Type Files
+
 ```
 camelCase.ts                # Type definitions
 ├── user.ts
@@ -146,6 +153,7 @@ camelCase.ts                # Type definitions
 ```
 
 ### Constant Files
+
 ```
 camelCase.ts                # Constants
 ├── colors.ts
@@ -159,6 +167,7 @@ camelCase.ts                # Constants
 ## Component Organization
 
 ### Feature-Based Structure
+
 ```
 screens/
 └── courses/
@@ -177,6 +186,7 @@ screens/
 ```
 
 ### Shared vs Feature Components
+
 ```typescript
 // SHARED: Used across multiple features
 // Location: src/components/ui/ or src/components/shared/
@@ -192,6 +202,7 @@ screens/
 ## Import Aliases
 
 ### tsconfig.json Paths
+
 ```json
 {
   "compilerOptions": {
@@ -214,6 +225,7 @@ screens/
 ```
 
 ### Import Order
+
 ```typescript
 // 1. React
 import React, { useState, useEffect } from 'react';
@@ -252,6 +264,7 @@ import { LessonNode } from './components';
 ## Barrel Exports
 
 ### Index File Pattern
+
 ```typescript
 // components/ui/index.ts
 export { Button } from './Button';
@@ -266,6 +279,7 @@ export type { TextVariant } from './Text';
 ```
 
 ### When to Use Barrel Exports
+
 ```typescript
 // USE barrel exports for:
 // - UI components (src/components/ui/index.ts)
@@ -284,6 +298,7 @@ export type { TextVariant } from './Text';
 ## Configuration Files
 
 ### Environment Variables
+
 ```bash
 # .env.example - Template for environment variables
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -292,6 +307,7 @@ EXPO_PUBLIC_API_URL=https://api.example.com
 ```
 
 ### App Configuration
+
 ```typescript
 // src/config/index.ts
 export const config = {
@@ -315,6 +331,7 @@ export const config = {
 ## Documentation Structure
 
 ### /docs Organization
+
 ```
 docs/
 ├── README.md                 # Project overview

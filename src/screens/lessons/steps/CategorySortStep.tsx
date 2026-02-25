@@ -118,7 +118,11 @@ export const CategorySortStep: React.FC<CategorySortStepProps> = ({
         icon={FolderOpen}
         iconColor="#3B82F6"
         title={content.instruction}
-        subtitle={selectedItem ? ti(t.steps.chooseCategoryFor, { item: selectedItem }) : t.steps.chooseItemFirst}
+        subtitle={
+          selectedItem
+            ? ti(t.steps.chooseCategoryFor, { item: selectedItem })
+            : t.steps.chooseItemFirst
+        }
       />
 
       {/* Unassigned Items */}
@@ -162,7 +166,10 @@ export const CategorySortStep: React.FC<CategorySortStepProps> = ({
                 disabled={showFeedback || !selectedItem}
                 style={[
                   styles.categoryCard,
-                  { backgroundColor: ui.card.background, borderColor: selectedItem ? category.color : ui.card.border },
+                  {
+                    backgroundColor: ui.card.background,
+                    borderColor: selectedItem ? category.color : ui.card.border,
+                  },
                   selectedItem && styles.categoryCardActive,
                 ]}
               >
@@ -171,14 +178,23 @@ export const CategorySortStep: React.FC<CategorySortStepProps> = ({
                   <Text variant="body" style={[styles.categoryName, { color: category.color }]}>
                     {category.name}
                   </Text>
-                  <Text variant="caption" style={[styles.categoryCount, { color: colors.text.muted, backgroundColor: colors.glass.light }]}>
+                  <Text
+                    variant="caption"
+                    style={[
+                      styles.categoryCount,
+                      { color: colors.text.muted, backgroundColor: colors.glass.light },
+                    ]}
+                  >
                     {categoryItems.length}
                   </Text>
                 </View>
 
                 <View style={styles.categoryItems}>
                   {categoryItems.length === 0 ? (
-                    <Text variant="caption" style={[styles.emptyText, { color: colors.text.muted }]}>
+                    <Text
+                      variant="caption"
+                      style={[styles.emptyText, { color: colors.text.muted }]}
+                    >
                       {selectedItem ? t.steps.tapToAdd : t.steps.empty}
                     </Text>
                   ) : (

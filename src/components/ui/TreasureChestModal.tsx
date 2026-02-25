@@ -76,10 +76,7 @@ export const TreasureChestModal: React.FC<TreasureChestModalProps> = memo(
                   transition={{ ...SPRING_CONFIGS.celebratory, delay: 100 }}
                   style={styles.rewardIconWrapper}
                 >
-                  <LinearGradient
-                    colors={['#F59E0B', '#FBBF24']}
-                    style={styles.rewardIconBg}
-                  >
+                  <LinearGradient colors={['#F59E0B', '#FBBF24']} style={styles.rewardIconBg}>
                     <Text style={styles.rewardIcon}>{reward.icon}</Text>
                   </LinearGradient>
                 </MotiView>
@@ -92,7 +89,10 @@ export const TreasureChestModal: React.FC<TreasureChestModalProps> = memo(
                   <Text variant="h2" weight="bold" style={styles.rewardTitle}>
                     {reward.title}
                   </Text>
-                  <Text variant="body" style={[styles.rewardDescription, { color: colors.text.secondary }]}>
+                  <Text
+                    variant="body"
+                    style={[styles.rewardDescription, { color: colors.text.secondary }]}
+                  >
                     {reward.description}
                   </Text>
                 </MotiView>
@@ -117,7 +117,7 @@ export const TreasureChestModal: React.FC<TreasureChestModalProps> = memo(
         </View>
       </Modal>
     );
-  }
+  },
 );
 
 TreasureChestModal.displayName = 'TreasureChestModal';

@@ -5,7 +5,6 @@ import { Check, X, Lightbulb } from 'lucide-react-native';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
-import { getUiColors } from '@/config/design';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
 
@@ -26,8 +25,7 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({
   correctAnswerLabel,
   delay = 0,
 }) => {
-  const { isDark, colors } = useTheme();
-  const ui = getUiColors(isDark);
+  const { colors } = useTheme();
   const { t } = useLanguage();
   const defaultTitle = isCorrect ? t.feedback.correct : t.feedback.incorrect;
   const color = isCorrect ? '#10B981' : '#EF4444';

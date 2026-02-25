@@ -46,6 +46,29 @@ export const sv = {
     fillAllFields: 'Vänligen fyll i alla fält',
     unexpectedError: 'Ett oväntat fel uppstod',
     welcome: 'Välkommen till AI Klubben',
+    // Signup flow
+    signupTitle: 'Skapa ditt konto',
+    whatsYourName: 'Vad heter du?',
+    namePlaceholder: 'Ditt namn',
+    whatsYourEmail: 'Vad är din e-post?',
+    choosePassword: 'Välj ett lösenord',
+    passwordHint: 'Minst 6 tecken',
+    privacyTitle: 'Integritet & villkor',
+    privacyIntro: 'Innan du skapar ditt konto, läs igenom hur vi hanterar dina uppgifter.',
+    privacyAgree: 'Jag har läst och godkänner villkoren',
+    privacyReadMore: 'Läs hela avtalet',
+    createAccount: 'Skapa konto',
+    back: 'Tillbaka',
+    nameRequired: 'Vänligen ange ditt namn',
+    emailRequired: 'Vänligen ange din e-post',
+    passwordTooShort: 'Lösenordet måste vara minst 6 tecken',
+    mustAgreePrivacy: 'Du måste godkänna villkoren',
+    continueAsGuest: 'Utforska utan konto',
+    guestLoginPromptTitle: 'Logga in för att fortsätta',
+    guestLoginPromptBody:
+      'Den här funktionen kräver ett konto. Logga in eller skapa ett gratis konto för att fortsätta.',
+    guestLoginButton: 'Logga in',
+    guestSignupButton: 'Skapa konto',
   },
 
   // Navigation / Tab names
@@ -141,14 +164,20 @@ export const sv = {
     aboutSection: 'OM APPEN',
     logoutConfirmTitle: 'Logga ut',
     logoutConfirmMessage: 'Är du säker på att du vill logga ut?',
-    changePasswordMessage:
-      'Vi skickar en länk till din e-post för att återställa ditt lösenord.',
+    changePasswordMessage: 'Vi skickar en länk till din e-post för att återställa ditt lösenord.',
     changePasswordSendLink: 'Skicka länk',
     changePasswordSent: 'Skickat!',
-    changePasswordSentMessage:
-      'Kolla din e-post för att återställa lösenordet.',
+    changePasswordSentMessage: 'Kolla din e-post för att återställa lösenordet.',
     swedish: 'Svenska',
     english: 'English',
+    dangerZone: 'FAROZON',
+    deleteAccount: 'Radera mitt konto',
+    deleteAccountTitle: 'Radera konto',
+    deleteAccountMessage:
+      'Är du helt säker? All din data — profil, framsteg, poäng och sparade resurser — raderas permanent. Detta kan inte ångras.',
+    deleteAccountConfirm: 'Ja, radera mitt konto',
+    deleteAccountSuccess: 'Ditt konto har raderats.',
+    deleteAccountError: 'Kunde inte radera kontot. Försök igen eller kontakta support.',
   },
 
   // About Screen
@@ -232,15 +261,13 @@ export const sv = {
 
     // Game Over
     outOfLives: 'Slut på liv!',
-    gameOverMessage:
-      'Oroa dig inte, du kan försöka igen eller komma tillbaka senare.',
+    gameOverMessage: 'Oroa dig inte, du kan försöka igen eller komma tillbaka senare.',
     retryButton: 'Försök igen',
     exitButton: 'Avsluta',
 
     // Exit Modal
     exitTitle: 'Avsluta lektionen?',
-    exitMessage:
-      'Din framsteg kommer inte att sparas om du avslutar nu.',
+    exitMessage: 'Din framsteg kommer inte att sparas om du avslutar nu.',
     exitContinue: 'Fortsätt',
     exitConfirm: 'Avsluta',
 
@@ -269,12 +296,20 @@ export const sv = {
     articleNotFound: 'Artikeln kunde inte hittas.',
     goBack: 'Gå tillbaka',
     goBackAccessibility: 'Gå tillbaka till nyheter',
+    sources: 'Källor',
+    aiAnalysis: 'AI-analys',
+    formatNews: 'Nyhet',
+    formatExplainer: 'Fördjupning',
+    formatAnalysis: 'Analys',
+    formatColumn: 'Krönika',
+    formatReview: 'Recension',
   },
 
   // Content Detail
   contentDetail: {
     contentNotFound: 'Innehållet kunde inte hittas.',
     goBackAccessibility: 'Gå tillbaka till innehåll',
+    sources: 'Källor',
   },
 
   // Unit Header
@@ -303,8 +338,7 @@ export const sv = {
     copied: 'Kopierad!',
     copy: 'Kopiera',
     writeMinWords: 'Skriv minst {{count}} ord',
-    checkLines:
-      'Kontrollera ({{count}} {{unit}} vald)',
+    checkLines: 'Kontrollera ({{count}} {{unit}} vald)',
     linesSingular: 'rad',
     linesPlural: 'rader',
     correctAnswerIs: 'Rätt svar: {{answer}}',
@@ -328,7 +362,8 @@ export const sv = {
     falseLabel: 'FALSKT',
     allCorrect: 'Helt rätt!',
     notQuite: 'Inte riktigt',
-    reflectionInfo: '💡 Det finns inget rätt eller fel svar. Ta dig tid att reflektera över frågan.',
+    reflectionInfo:
+      '💡 Det finns inget rätt eller fel svar. Ta dig tid att reflektera över frågan.',
   },
 
   // Feedback
@@ -351,6 +386,18 @@ export const sv = {
     collect: 'Samla in',
     newBadge: '🎉 Ny Badge!',
     awesome: 'Fantastiskt!',
+  },
+
+  // Levels
+  levels: {
+    1: 'Nybörjare',
+    2: 'Utforskare',
+    3: 'Lärling',
+    4: 'Praktikant',
+    5: 'Specialist',
+    6: 'Expert',
+    7: 'Mästare',
+    8: 'AI Guru',
   },
 
   // Badges
@@ -430,6 +477,49 @@ export const sv = {
     privacySubtitle: 'Hur vi hanterar din data',
     aboutSubtitle: 'Lär känna oss bättre',
     logoutSubtitle: 'Avsluta din session',
+    guestSignIn: 'Logga in',
+    guestSignInSubtitle: 'Logga in för att komma åt alla funktioner',
+    guestCreateAccount: 'Skapa konto',
+    guestCreateAccountSubtitle: 'Bli medlem och lås upp allt innehåll',
+    guestSection: 'Mitt konto',
+  },
+
+  // Start screen (before auth)
+  start: {
+    iAmFrom: 'Jag är från...',
+    iSpeak: 'Jag pratar...',
+    regionNorthAmerica: 'Nordamerika',
+    regionSouthAmerica: 'Sydamerika',
+    regionEurope: 'Europa',
+    regionAfrica: 'Afrika',
+    regionAsia: 'Asien',
+    langSwedish: 'Svenska',
+    langEnglish: 'English',
+    chooseTheme: 'Välj utseende',
+    themeDark: 'Mörkt läge',
+    themeLight: 'Ljust läge',
+    welcome: 'Välkommen till AI Klubben!',
+    welcomeSubtitle: 'Din resa in i AI-världen börjar här',
+    getStarted: 'Kom igång',
+    next: 'Nästa',
+    skip: 'Hoppa över',
+  },
+
+  // Onboarding (after first login)
+  onboarding: {
+    step1Title: 'Nyheter',
+    step1Subtitle: 'Håll dig uppdaterad med senaste AI-nyheterna, kurerade för dig varje dag.',
+    step2Title: 'Kurser',
+    step2Subtitle: 'Interaktiva lektioner med quiz, XP-poäng och badges. Lär dig i din egen takt.',
+    step3Title: 'Resurser',
+    step3Subtitle: 'Verktyg, plattformar och event — allt du behöver samlat på ett ställe.',
+    step4Title: 'Din Profil',
+    step4Subtitle: 'Följ dina framsteg, streaks och nivåer. Se hur långt du har kommit!',
+    step5Title: 'Redo att börja!',
+    step5Subtitle: 'Du är med i klubben nu. Utforska, lär dig och ha kul!',
+    letsGo: 'Sätt igång!',
+    next: 'Nästa',
+    skip: 'Hoppa över',
   },
 };
 

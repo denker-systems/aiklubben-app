@@ -3,7 +3,6 @@ import { View, StyleSheet } from 'react-native';
 import { MotiView } from 'moti';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
-import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
 
 interface ProgressDotsProps {
@@ -23,8 +22,7 @@ export const ProgressDots: React.FC<ProgressDotsProps> = ({
   activeColor = brandColors.purple,
   completedColor = '#10B981',
 }) => {
-  const { isDark, colors } = useTheme();
-  const ui = getUiColors(isDark);
+  const { colors } = useTheme();
 
   const getDotSize = () => {
     switch (size) {

@@ -9,7 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export const SupportScreen = () => {
   console.log('[SupportScreen] Rendered');
   const { t } = useLanguage();
-  
+
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
 

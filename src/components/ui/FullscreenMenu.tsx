@@ -29,14 +29,89 @@ interface FullscreenMenuProps {
   onClose: () => void;
   onNavigate?: (screen: string) => void;
   onLogout?: () => void;
+  isGuest?: boolean;
 }
 
-export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: FullscreenMenuProps) {
+export function FullscreenMenu({
+  visible,
+  onClose,
+  onNavigate,
+  onLogout,
+  isGuest,
+}: FullscreenMenuProps) {
   const insets = useSafeAreaInsets();
-  const { isDark, colors } = useTheme();
+  const { colors } = useTheme();
   const { t } = useLanguage();
 
-  const menuSections: MenuSectionData[] = [
+  const guestMenuSections: MenuSectionData[] = [
+    {
+      title: t.menu.mainMenu,
+      items: [
+        {
+          key: 'News',
+          emoji: '📰',
+          iconName: 'news',
+          title: t.nav.news,
+          subtitle: t.menu.newsSubtitle,
+          gradient: ['#f97316', '#ea580c'],
+        },
+        {
+          key: 'Content',
+          emoji: '📂',
+          title: t.menu.contentTitle,
+          subtitle: t.menu.contentSubtitle,
+          gradient: ['#10B981', '#059669'],
+        },
+      ],
+    },
+    {
+      title: t.menu.guestSection,
+      items: [
+        {
+          key: 'signin',
+          emoji: '🔑',
+          title: t.menu.guestSignIn,
+          subtitle: t.menu.guestSignInSubtitle,
+          gradient: ['#8B5CF6', '#a855f7'],
+        },
+        {
+          key: 'signup',
+          emoji: '✨',
+          title: t.menu.guestCreateAccount,
+          subtitle: t.menu.guestCreateAccountSubtitle,
+          gradient: ['#EC4899', '#DB2777'],
+        },
+      ],
+    },
+    {
+      title: t.menu.supportInfo,
+      items: [
+        {
+          key: 'Support',
+          emoji: '💬',
+          title: t.supportScreen.title,
+          subtitle: t.menu.supportSubtitle,
+          gradient: ['#3B82F6', '#2563EB'],
+        },
+        {
+          key: 'Privacy',
+          emoji: '🔒',
+          title: t.privacy.title,
+          subtitle: t.menu.privacySubtitle,
+          gradient: ['#14B8A6', '#0D9488'],
+        },
+        {
+          key: 'About',
+          emoji: 'ℹ️',
+          title: t.about.title,
+          subtitle: t.menu.aboutSubtitle,
+          gradient: ['#8B5CF6', '#6366f1'],
+        },
+      ],
+    },
+  ];
+
+  const userMenuSections: MenuSectionData[] = [
     {
       title: t.menu.mainMenu,
       items: [
@@ -124,6 +199,8 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
       ],
     },
   ];
+
+  const menuSections = isGuest ? guestMenuSections : userMenuSections;
   const [showContent, setShowContent] = useState(false);
 
   console.log('[FullscreenMenu] Rendered', { visible, showContent });
@@ -141,6 +218,7 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
       }, 350);
       return () => clearTimeout(timer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const handleItemPress = (key: string) => {
@@ -148,6 +226,14 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
     if (key === 'logout') {
       console.log('[FullscreenMenu] Logout pressed');
       onLogout?.();
+      onClose();
+    } else if (key === 'signin') {
+      console.log('[FullscreenMenu] Guest sign in pressed');
+      onNavigate?.('Auth');
+      onClose();
+    } else if (key === 'signup') {
+      console.log('[FullscreenMenu] Guest signup pressed');
+      onNavigate?.('Signup');
       onClose();
     } else {
       console.log('[FullscreenMenu] Navigating to:', key);
@@ -232,9 +318,11 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
                 delay: visible ? 80 + sectionIndex * STAGGER_DELAYS.normal : 0,
               }}
             >
-              {section.title && (
-                <Text style={[styles.sectionTitle, { color: colors.text.muted }]}>{section.title.toUpperCase()}</Text>
-              )}
+              {section.title ? (
+                <Text style={[styles.sectionTitle, { color: colors.text.muted }]}>
+                  {section.title.toUpperCase()}
+                </Text>
+              ) : null}
               <View style={styles.sectionItems}>
                 {section.items.map((item, itemIndex) => (
                   <MotiView
@@ -256,32 +344,39 @@ export function FullscreenMenu({ visible, onClose, onNavigate, onLogout }: Fulls
                         item.key === 'logout' && styles.logoutItem,
                       ]}
                     >
-                    <Pressable
-                      style={styles.menuItemPressable}
-                      onPress={() => handleItemPress(item.key)}
-                    >
-                      <LinearGradient
-                        colors={item.gradient || ['#6366f1', '#8b5cf6']}
-                        style={styles.menuItemIcon}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
+                      <Pressable
+                        style={styles.menuItemPressable}
+                        onPress={() => handleItemPress(item.key)}
                       >
-                        {item.iconName ? (
-                          <AppIcon name={item.iconName} size={52} />
-                        ) : (
-                          <Text style={styles.menuItemEmoji}>{item.emoji}</Text>
-                        )}
-                      </LinearGradient>
-                      <View style={styles.menuItemContent}>
-                        <Text
-                          style={[styles.menuItemTitle, item.key === 'logout' && styles.logoutText]}
+                        <LinearGradient
+                          colors={item.gradient || ['#6366f1', '#8b5cf6']}
+                          style={styles.menuItemIcon}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
                         >
-                          {item.title}
+                          {item.iconName ? (
+                            <AppIcon name={item.iconName} size={52} />
+                          ) : (
+                            <Text style={styles.menuItemEmoji}>{item.emoji}</Text>
+                          )}
+                        </LinearGradient>
+                        <View style={styles.menuItemContent}>
+                          <Text
+                            style={[
+                              styles.menuItemTitle,
+                              item.key === 'logout' && styles.logoutText,
+                            ]}
+                          >
+                            {item.title}
+                          </Text>
+                          <Text style={[styles.menuItemSubtitle, { color: colors.text.muted }]}>
+                            {item.subtitle}
+                          </Text>
+                        </View>
+                        <Text style={[styles.menuItemArrow, { color: colors.text.secondary }]}>
+                          ›
                         </Text>
-                        <Text style={[styles.menuItemSubtitle, { color: colors.text.muted }]}>{item.subtitle}</Text>
-                      </View>
-                      <Text style={[styles.menuItemArrow, { color: colors.text.secondary }]}>›</Text>
-                    </Pressable>
+                      </Pressable>
                     </View>
                   </MotiView>
                 ))}

@@ -5,6 +5,7 @@ import { Zap } from 'lucide-react-native';
 import { Text } from './Text';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { getLevelForXP, getXPProgress } from '@/types/gamification';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface XPDisplayProps {
   xp: number;
@@ -64,13 +65,14 @@ interface XPProgressBarProps {
 export function XPProgressBar({ xp, showLabels = true, height = 8 }: XPProgressBarProps) {
   const level = getLevelForXP(xp);
   const progress = getXPProgress(xp);
+  const { t } = useLanguage();
 
   return (
     <View style={styles.progressContainer}>
       {showLabels && (
         <View style={styles.progressLabels}>
           <Text variant="caption" style={styles.progressLabel}>
-            {level.icon} {level.name}
+            {level.icon} {(t.levels as any)[level.level] || level.name}
           </Text>
           <Text variant="caption" style={styles.progressLabel}>
             {progress.current} / {progress.max === Infinity ? '∞' : progress.max} XP

@@ -7,22 +7,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export const PrivacyScreen = () => {
   console.log('[PrivacyScreen] Rendered');
   const { t } = useLanguage();
-  
+
   return (
     <ScreenWrapper title={t.privacy.title} showBack>
       <View style={{ gap: 24 }}>
-        <Section title={t.privacy.privacyTitle}>
-          {t.privacy.privacyText}
-        </Section>
-        <Section title={t.privacy.dataTitle}>
-          {t.privacy.dataText}
-        </Section>
-        <Section title={t.privacy.usageTitle}>
-          {t.privacy.usageText}
-        </Section>
-        <Section title={t.privacy.rightsTitle}>
-          {t.privacy.rightsText}
-        </Section>
+        <Section title={t.privacy.privacyTitle}>{t.privacy.privacyText}</Section>
+        <Section title={t.privacy.dataTitle}>{t.privacy.dataText}</Section>
+        <Section title={t.privacy.usageTitle}>{t.privacy.usageText}</Section>
+        <Section title={t.privacy.rightsTitle}>{t.privacy.rightsText}</Section>
       </View>
     </ScreenWrapper>
   );

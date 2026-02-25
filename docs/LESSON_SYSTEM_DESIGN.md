@@ -1,6 +1,7 @@
 # Lesson System Design
 
 ## Overview
+
 Ett interaktivt lesson/step-system inspirerat av Duolingo och Brilliant för AI Klubben.
 
 ## Database Schema
@@ -8,6 +9,7 @@ Ett interaktivt lesson/step-system inspirerat av Duolingo och Brilliant för AI 
 ### Tables
 
 #### `course_lessons`
+
 ```sql
 - id (uuid, primary key)
 - course_id (uuid, foreign key → content.id)
@@ -23,6 +25,7 @@ Ett interaktivt lesson/step-system inspirerat av Duolingo och Brilliant för AI 
 ```
 
 #### `lesson_steps`
+
 ```sql
 - id (uuid, primary key)
 - lesson_id (uuid, foreign key → course_lessons.id)
@@ -35,6 +38,7 @@ Ett interaktivt lesson/step-system inspirerat av Duolingo och Brilliant för AI 
 ```
 
 #### `user_lesson_progress`
+
 ```sql
 - id (uuid, primary key)
 - user_id (uuid, foreign key → profiles.id)
@@ -52,7 +56,9 @@ Ett interaktivt lesson/step-system inspirerat av Duolingo och Brilliant för AI 
 ## Step Types
 
 ### 1. **Content Step**
+
 Visar information, förklaringar, bilder
+
 ```json
 {
   "type": "content",
@@ -64,7 +70,9 @@ Visar information, förklaringar, bilder
 ```
 
 ### 2. **Multiple Choice**
+
 Flervalsfråga
+
 ```json
 {
   "type": "multiple_choice",
@@ -81,7 +89,9 @@ Flervalsfråga
 ```
 
 ### 3. **Fill in the Blank**
+
 Fyll i luckor
+
 ```json
 {
   "type": "fill_blank",
@@ -93,7 +103,9 @@ Fyll i luckor
 ```
 
 ### 4. **True/False**
+
 Sant eller falskt
+
 ```json
 {
   "type": "true_false",
@@ -104,7 +116,9 @@ Sant eller falskt
 ```
 
 ### 5. **Reflection**
+
 Öppen reflektion (ingen rätt/fel)
+
 ```json
 {
   "type": "reflection",
@@ -115,7 +129,9 @@ Sant eller falskt
 ```
 
 ### 6. **Video**
+
 Video-innehåll med progression tracking
+
 ```json
 {
   "type": "video",
@@ -127,7 +143,9 @@ Video-innehåll med progression tracking
 ```
 
 ### 7. **Code Snippet**
+
 Kodexempel med syntax highlighting
+
 ```json
 {
   "type": "code_snippet",
@@ -140,6 +158,7 @@ Kodexempel med syntax highlighting
 ```
 
 ### 8-15. **Interaktiva Step-typer**
+
 - `word_bank` - Dra ord till rätt plats
 - `match_pairs` - Para ihop relaterade koncept
 - `slider` - Justera värde på en skala
@@ -152,12 +171,14 @@ Kodexempel med syntax highlighting
 ## User Flow
 
 ### Lesson Start
+
 1. User klickar på en lektion i CourseDetail
 2. Navigera till LessonScreen
 3. Visa lesson intro (titel, beskrivning, XP-belöning)
 4. Börja med step 1
 
 ### During Lesson
+
 1. Visa aktuell step baserat på type
 2. User interagerar (läser, svarar på fråga, etc.)
 3. Validera svar (om quiz-step)
@@ -166,6 +187,7 @@ Kodexempel med syntax highlighting
 6. Nästa step eller completion
 
 ### Lesson Completion
+
 1. Visa celebration screen
 2. Beräkna och visa XP earned
 3. Uppdatera user_lesson_progress
@@ -175,12 +197,14 @@ Kodexempel med syntax highlighting
 ## UI Components
 
 ### LessonScreen
+
 - **Header**: Progress bar, step counter (1/10)
 - **Content Area**: Dynamiskt baserat på step type
 - **Action Buttons**: "Fortsätt", "Hoppa över", "Avsluta"
 - **Exit Confirmation**: Modal om user vill avsluta mitt i
 
 ### Step Components
+
 - `ContentStep`: Text, bilder, videos
 - `MultipleChoiceStep`: Fråga + alternativ
 - `FillBlankStep`: Input field med validation
@@ -188,6 +212,7 @@ Kodexempel med syntax highlighting
 - `ReflectionStep`: Textarea för fri text
 
 ### Feedback Components
+
 - `CorrectFeedback`: Grön checkmark + förklaring
 - `IncorrectFeedback`: Röd X + rätt svar + förklaring
 - `CelebrationScreen`: Konfetti + XP earned + badges
@@ -195,18 +220,21 @@ Kodexempel med syntax highlighting
 ## Gamification
 
 ### XP System
+
 - **Base XP**: Varje lektion ger `xp_reward` XP (standard 25)
 - **Perfect Bonus**: +50% XP för 100% rätt svar
 - **Streak Bonus**: +10 XP per streak-dag (max 50 XP)
 - **Total XP**: `baseXP + perfectBonus + streakBonus`
 
 ### Streak System
+
 - Streak ökar med 1 för varje konsekutiv dag med aktivitet
 - Streak återställs till 1 om en dag missas
 - `longest_streak` sparas för achievements
 - Visuell feedback i CelebrationScreen
 
 ### Level System (8 nivåer)
+
 1. Nybörjare 🌱 (0-100 XP)
 2. Utforskare 🔍 (100-300 XP)
 3. Lärling 📚 (300-600 XP)
@@ -217,12 +245,14 @@ Kodexempel med syntax highlighting
 8. AI Guru 🚀 (8000+ XP)
 
 ### Progress Tracking
+
 - Visa % completed per course
 - Unlock system för lektioner
 - Badges för milestones
 - Level-up celebration vid nivåhöjning
 
 ### Motivation
+
 - Celebratory animations (Moti + Confetti)
 - Progress bars med visuell feedback
 - Streak-kort med 🔥 emoji
@@ -232,21 +262,23 @@ Kodexempel med syntax highlighting
 ## Technical Implementation
 
 ### Navigation
+
 ```typescript
 // CourseDetailScreen → LessonScreen
-navigation.navigate('Lesson', { 
+navigation.navigate('Lesson', {
   lessonId: lesson.id,
-  courseId: course.id 
+  courseId: course.id,
 });
 
 // LessonScreen → CourseDetailScreen (on complete)
-navigation.navigate('CourseDetail', { 
+navigation.navigate('CourseDetail', {
   id: courseId,
-  showCelebration: true 
+  showCelebration: true,
 });
 ```
 
 ### State Management
+
 ```typescript
 const [currentStepIndex, setCurrentStepIndex] = useState(0);
 const [answers, setAnswers] = useState<Record<number, any>>({});
@@ -254,6 +286,7 @@ const [score, setScore] = useState(0);
 ```
 
 ### API Calls
+
 ```typescript
 // Fetch lesson with steps
 const { data: lesson } = await supabase
@@ -263,17 +296,16 @@ const { data: lesson } = await supabase
   .single();
 
 // Save progress
-await supabase
-  .from('user_lesson_progress')
-  .upsert({
-    user_id: userId,
-    lesson_id: lessonId,
-    current_step_index: index,
-    status: 'in_progress'
-  });
+await supabase.from('user_lesson_progress').upsert({
+  user_id: userId,
+  lesson_id: lessonId,
+  current_step_index: index,
+  status: 'in_progress',
+});
 ```
 
 ## Next Steps
+
 1. Create database migrations
 2. Build LessonScreen component
 3. Implement step components

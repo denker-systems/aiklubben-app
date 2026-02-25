@@ -46,7 +46,14 @@ export const ReflectionStep: React.FC<ReflectionStepProps> = ({ content, onAnswe
 
       <View style={styles.inputContainer}>
         <TextInput
-          style={[styles.input, { backgroundColor: ui.card.background, borderColor: ui.card.border, color: colors.text.primary }]}
+          style={[
+            styles.input,
+            {
+              backgroundColor: ui.card.background,
+              borderColor: ui.card.border,
+              color: colors.text.primary,
+            },
+          ]}
           value={text}
           onChangeText={handleTextChange}
           placeholder={content.placeholder}
@@ -58,7 +65,14 @@ export const ReflectionStep: React.FC<ReflectionStepProps> = ({ content, onAnswe
         />
 
         <View style={styles.footer}>
-          <Text variant="caption" style={[styles.wordCount, { color: colors.text.muted }, isValid && styles.wordCountValid]}>
+          <Text
+            variant="caption"
+            style={[
+              styles.wordCount,
+              { color: colors.text.muted },
+              isValid && styles.wordCountValid,
+            ]}
+          >
             {wordCount} / {minWords}
           </Text>
           {!isValid && (

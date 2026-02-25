@@ -6,7 +6,6 @@ import { Check, X, ThumbsUp, ThumbsDown } from 'lucide-react-native';
 import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
-import { getUiColors } from '@/config/design';
 import { useLanguage } from '@/contexts/LanguageContext';
 import * as Haptics from 'expo-haptics';
 
@@ -27,18 +26,17 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
   explanation,
   onAnswer,
 }) => {
-  const { isDark, colors } = useTheme();
-  const ui = getUiColors(isDark);
+  const { colors } = useTheme();
   const { t } = useLanguage();
 
   console.log('[TrueFalseStep] Rendered', { statement: content.statement, correctAnswer });
-  
+
   const [selectedAnswer, setSelectedAnswer] = useState<boolean | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
   const handleSelect = (answer: boolean) => {
     console.log('[TrueFalseStep] handleSelect', { answer, showFeedback });
-    
+
     if (showFeedback) {
       console.log('[TrueFalseStep] Already showing feedback, ignoring');
       return;
@@ -94,43 +92,43 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
               showFeedback && selectedAnswer === true && !isCorrect && styles.buttonIncorrect,
             ]}
           >
-          <Pressable
-            onPress={() => handleSelect(true)}
-            disabled={showFeedback}
-            style={styles.buttonPressable}
-          >
-            <View style={styles.buttonIconContainer}>
-              {showFeedback && correctAnswer === true ? (
-                <MotiView
-                  from={{ scale: 0, rotate: '-180deg' }}
-                  animate={{ scale: 1, rotate: '0deg' }}
-                  transition={SPRING_CONFIGS.bouncy}
-                >
-                  <Check size={40} color="#FFFFFF" strokeWidth={3} />
-                </MotiView>
-              ) : showFeedback && selectedAnswer === true && !isCorrect ? (
-                <MotiView
-                  from={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={SPRING_CONFIGS.bouncy}
-                >
-                  <X size={40} color="#FFFFFF" strokeWidth={3} />
-                </MotiView>
-              ) : (
-                <ThumbsUp size={36} color={selectedAnswer === true ? '#FFFFFF' : '#10B981'} />
-              )}
-            </View>
-            <Text
-              style={[
-                styles.buttonText,
-                { color: colors.text.primary },
-                (selectedAnswer === true || (showFeedback && correctAnswer === true)) &&
-                  styles.buttonTextSelected,
-              ]}
+            <Pressable
+              onPress={() => handleSelect(true)}
+              disabled={showFeedback}
+              style={styles.buttonPressable}
             >
-              {t.steps.trueLabel}
-            </Text>
-          </Pressable>
+              <View style={styles.buttonIconContainer}>
+                {showFeedback && correctAnswer === true ? (
+                  <MotiView
+                    from={{ scale: 0, rotate: '-180deg' }}
+                    animate={{ scale: 1, rotate: '0deg' }}
+                    transition={SPRING_CONFIGS.bouncy}
+                  >
+                    <Check size={40} color="#FFFFFF" strokeWidth={3} />
+                  </MotiView>
+                ) : showFeedback && selectedAnswer === true && !isCorrect ? (
+                  <MotiView
+                    from={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={SPRING_CONFIGS.bouncy}
+                  >
+                    <X size={40} color="#FFFFFF" strokeWidth={3} />
+                  </MotiView>
+                ) : (
+                  <ThumbsUp size={36} color={selectedAnswer === true ? '#FFFFFF' : '#10B981'} />
+                )}
+              </View>
+              <Text
+                style={[
+                  styles.buttonText,
+                  { color: colors.text.primary },
+                  (selectedAnswer === true || (showFeedback && correctAnswer === true)) &&
+                    styles.buttonTextSelected,
+                ]}
+              >
+                {t.steps.trueLabel}
+              </Text>
+            </Pressable>
           </View>
         </MotiView>
 
@@ -150,43 +148,43 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
               showFeedback && selectedAnswer === false && !isCorrect && styles.buttonIncorrect,
             ]}
           >
-          <Pressable
-            onPress={() => handleSelect(false)}
-            disabled={showFeedback}
-            style={styles.buttonPressable}
-          >
-            <View style={styles.buttonIconContainer}>
-              {showFeedback && correctAnswer === false ? (
-                <MotiView
-                  from={{ scale: 0, rotate: '-180deg' }}
-                  animate={{ scale: 1, rotate: '0deg' }}
-                  transition={SPRING_CONFIGS.bouncy}
-                >
-                  <Check size={40} color="#FFFFFF" strokeWidth={3} />
-                </MotiView>
-              ) : showFeedback && selectedAnswer === false && !isCorrect ? (
-                <MotiView
-                  from={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={SPRING_CONFIGS.bouncy}
-                >
-                  <X size={40} color="#FFFFFF" strokeWidth={3} />
-                </MotiView>
-              ) : (
-                <ThumbsDown size={36} color={selectedAnswer === false ? '#FFFFFF' : '#EF4444'} />
-              )}
-            </View>
-            <Text
-              style={[
-                styles.buttonText,
-                { color: colors.text.primary },
-                (selectedAnswer === false || (showFeedback && correctAnswer === false)) &&
-                  styles.buttonTextSelected,
-              ]}
+            <Pressable
+              onPress={() => handleSelect(false)}
+              disabled={showFeedback}
+              style={styles.buttonPressable}
             >
-              {t.steps.falseLabel}
-            </Text>
-          </Pressable>
+              <View style={styles.buttonIconContainer}>
+                {showFeedback && correctAnswer === false ? (
+                  <MotiView
+                    from={{ scale: 0, rotate: '-180deg' }}
+                    animate={{ scale: 1, rotate: '0deg' }}
+                    transition={SPRING_CONFIGS.bouncy}
+                  >
+                    <Check size={40} color="#FFFFFF" strokeWidth={3} />
+                  </MotiView>
+                ) : showFeedback && selectedAnswer === false && !isCorrect ? (
+                  <MotiView
+                    from={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={SPRING_CONFIGS.bouncy}
+                  >
+                    <X size={40} color="#FFFFFF" strokeWidth={3} />
+                  </MotiView>
+                ) : (
+                  <ThumbsDown size={36} color={selectedAnswer === false ? '#FFFFFF' : '#EF4444'} />
+                )}
+              </View>
+              <Text
+                style={[
+                  styles.buttonText,
+                  { color: colors.text.primary },
+                  (selectedAnswer === false || (showFeedback && correctAnswer === false)) &&
+                    styles.buttonTextSelected,
+                ]}
+              >
+                {t.steps.falseLabel}
+              </Text>
+            </Pressable>
           </View>
         </MotiView>
       </View>

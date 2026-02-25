@@ -189,7 +189,8 @@ export const SpotErrorStep: React.FC<SpotErrorStepProps> = ({
       {selectedLines.size > 0 && !showFeedback && (
         <Pressable onPress={handleCheck} style={styles.checkButton}>
           <Text style={styles.checkButtonText}>
-            {t.steps.checkAnswer} ({selectedLines.size} {selectedLines.size === 1 ? t.steps.linesSingular : t.steps.linesPlural})
+            {t.steps.checkAnswer} ({selectedLines.size}{' '}
+            {selectedLines.size === 1 ? t.steps.linesSingular : t.steps.linesPlural})
           </Text>
         </Pressable>
       )}
@@ -198,7 +199,9 @@ export const SpotErrorStep: React.FC<SpotErrorStepProps> = ({
         <FeedbackCard
           isCorrect={isCorrect}
           explanation={explanation}
-          correctAnswer={isCorrect ? undefined : `${t.feedback.line} ${correctLineNumbers.join(', ')}`}
+          correctAnswer={
+            isCorrect ? undefined : `${t.feedback.line} ${correctLineNumbers.join(', ')}`
+          }
           correctAnswerLabel={t.feedback.errorOnLine}
         />
       )}

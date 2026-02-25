@@ -29,9 +29,11 @@ AppNavigator (Root)
 ## Navigation Types
 
 ### 1. Tab Navigation
+
 Huvudnavigation via `FloatingTabBar`.
 
 **Tabs:**
+
 - 🏠 Home
 - 📰 News
 - 📚 Courses
@@ -39,6 +41,7 @@ Huvudnavigation via `FloatingTabBar`.
 - 👤 Profile
 
 **Implementation:**
+
 ```typescript
 const [activeTab, setActiveTab] = useState<TabKey>('Home');
 
@@ -46,21 +49,23 @@ const handleTabPress = (key: string) => {
   if (navigationRef.isReady()) {
     const currentRoute = navigationRef.getCurrentRoute()?.name;
     const tabScreens = ['Home', 'News', 'Courses', 'Content', 'Profile'];
-    
+
     // Reset stack if on detail screen
     if (currentRoute && !tabScreens.includes(currentRoute)) {
       navigationRef.navigate(key as any);
     }
   }
-  
+
   setActiveTab(key as TabKey);
 };
 ```
 
 ### 2. Stack Navigation
+
 För detail screens och nested navigation.
 
 **Navigation Methods:**
+
 ```typescript
 // Navigate to screen
 navigation.navigate('CourseDetail', { id: courseId });
@@ -76,9 +81,11 @@ navigation.reset({
 ```
 
 ### 3. Menu Navigation
+
 Fullscreen hamburger menu.
 
 **Features:**
+
 - Smooth fade in/out
 - Floating orbs background
 - Categorized menu items
@@ -87,15 +94,18 @@ Fullscreen hamburger menu.
 ## Components
 
 ### AppNavigator
+
 Root navigation component.
 
 **Responsibilities:**
+
 - Setup NavigationContainer
 - Manage active tab state
 - Handle tab bar visibility
 - Coordinate menu and navigation
 
 **Key Logic:**
+
 ```typescript
 // Hide tab bar on detail screens
 const hideOnScreens = ['Lesson', 'CourseDetail', 'NewsDetail', 'ContentDetail', 'Auth'];
@@ -103,15 +113,18 @@ setIsTabBarVisible(!hideOnScreens.includes(routeName || ''));
 ```
 
 ### FloatingTabBar
+
 Custom tab bar component.
 
 **Features:**
+
 - Floating design
 - Active tab indicator
 - Smooth animations
 - Emoji icons
 
 **Props:**
+
 ```typescript
 interface FloatingTabBarProps {
   activeTab: string;
@@ -120,15 +133,18 @@ interface FloatingTabBarProps {
 ```
 
 ### FullscreenMenu
+
 Hamburger menu overlay.
 
 **Features:**
+
 - Fullscreen modal
 - Categorized sections
 - Gradient cards
 - Close button
 
 **Props:**
+
 ```typescript
 interface FullscreenMenuProps {
   visible: boolean;
@@ -139,9 +155,11 @@ interface FullscreenMenuProps {
 ```
 
 ### MenuButton
+
 Hamburger menu button.
 
 **Features:**
+
 - Animated lines
 - Press feedback
 - Customizable size
@@ -149,6 +167,7 @@ Hamburger menu button.
 ## Contexts
 
 ### TabNavigationContext
+
 Manages active tab state.
 
 ```typescript
@@ -160,6 +179,7 @@ interface TabNavigationContextType {
 ```
 
 ### MenuContext
+
 Manages menu visibility.
 
 ```typescript
@@ -173,6 +193,7 @@ interface MenuContextType {
 ## Navigation Flow
 
 ### Tab Switch
+
 ```
 User taps tab
   ↓
@@ -192,6 +213,7 @@ Screen re-renders
 ```
 
 ### Detail Navigation
+
 ```
 User taps item
   ↓
@@ -207,6 +229,7 @@ Detail screen renders
 ```
 
 ### Back Navigation
+
 ```
 User taps back
   ↓
@@ -242,6 +265,7 @@ const linking = {
 ## Animations
 
 ### Screen Transitions
+
 ```typescript
 screenOptions={{
   headerShown: false,
@@ -250,6 +274,7 @@ screenOptions={{
 ```
 
 ### Tab Bar
+
 ```typescript
 <MotiView
   from={{ opacity: 0, translateY: 50 }}
@@ -259,6 +284,7 @@ screenOptions={{
 ```
 
 ### Menu
+
 ```typescript
 <MotiView
   from={{ opacity: 0 }}
@@ -270,6 +296,7 @@ screenOptions={{
 ## Type Safety
 
 ### Navigation Types
+
 ```typescript
 export type RootStackParamList = {
   Auth: undefined;
@@ -290,6 +317,7 @@ export type RootStackParamList = {
 ```
 
 ### Typed Navigation Hook
+
 ```typescript
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -302,6 +330,7 @@ const navigation = useNavigation<NavigationProp>();
 ## Best Practices
 
 ### 1. Always Use TypeScript Types
+
 ```typescript
 // Good
 navigation.navigate('CourseDetail', { id: courseId });
@@ -311,6 +340,7 @@ navigation.navigate('CourseDetail' as any);
 ```
 
 ### 2. Handle Back Button
+
 ```typescript
 const handleGoBack = () => {
   console.log('[Screen] Going back');
@@ -319,6 +349,7 @@ const handleGoBack = () => {
 ```
 
 ### 3. Reset Stack When Needed
+
 ```typescript
 // When switching tabs from detail screen
 if (currentRoute && !tabScreens.includes(currentRoute)) {
@@ -327,7 +358,9 @@ if (currentRoute && !tabScreens.includes(currentRoute)) {
 ```
 
 ### 4. Debug Logging
+
 All navigation actions ska loggas:
+
 ```typescript
 console.log('[Component] Navigation action', { screen, params });
 ```
@@ -335,12 +368,15 @@ console.log('[Component] Navigation action', { screen, params });
 ## Troubleshooting
 
 ### Tab Bar Not Hiding
+
 Check `hideOnScreens` array i AppNavigator.
 
 ### Stack Not Resetting
+
 Ensure `navigationRef.navigate()` is called before `setActiveTab()`.
 
 ### Menu Not Closing
+
 Verify `MenuContext.closeMenu()` is called in handlers.
 
 ## Future Enhancements

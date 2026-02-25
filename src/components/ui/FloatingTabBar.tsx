@@ -19,20 +19,26 @@ interface TabItem {
 interface FloatingTabBarProps {
   activeTab: string;
   onTabPress: (key: string) => void;
+  isGuest?: boolean;
+  onGuestSignIn?: () => void;
 }
 
-export function FloatingTabBar({ activeTab, onTabPress }: FloatingTabBarProps) {
+export function FloatingTabBar({ activeTab, onTabPress, isGuest }: FloatingTabBarProps) {
   const insets = useSafeAreaInsets();
-  const { isDark, colors } = useTheme();
+  const { isDark } = useTheme();
   const { t } = useLanguage();
 
-  const tabs: TabItem[] = [
+  const allTabs: TabItem[] = [
     { key: 'Home', emoji: '🏠', iconName: 'home', label: t.tabs.home },
     { key: 'News', emoji: '📰', iconName: 'news', label: t.tabs.news },
     { key: 'Courses', emoji: '📚', iconName: 'courses', label: t.tabs.courses },
     { key: 'Content', emoji: '📂', label: t.tabs.content },
     { key: 'Profile', emoji: '👤', iconName: 'profile', label: t.tabs.profile },
   ];
+
+  const tabs = isGuest
+    ? allTabs.filter((tab) => tab.key === 'News' || tab.key === 'Content')
+    : allTabs;
 
   console.log('[FloatingTabBar] Rendered', { activeTab });
 
@@ -47,7 +53,13 @@ export function FloatingTabBar({ activeTab, onTabPress }: FloatingTabBarProps) {
         from={{ opacity: 0, translateY: 50 }}
         animate={{ opacity: 1, translateY: 0 }}
         transition={SPRING_CONFIGS.smooth}
-        style={[styles.tabContainer, { backgroundColor: isDark ? '#1D1933' : '#FFFFFF', borderColor: isDark ? 'rgba(139, 92, 246, 0.25)' : 'rgba(0, 0, 0, 0.08)' }]}
+        style={[
+          styles.tabContainer,
+          {
+            backgroundColor: isDark ? '#1D1933' : '#FFFFFF',
+            borderColor: isDark ? 'rgba(139, 92, 246, 0.25)' : 'rgba(0, 0, 0, 0.08)',
+          },
+        ]}
       >
         {tabs.map((tab, index) => {
           const isActive = activeTab === tab.key;

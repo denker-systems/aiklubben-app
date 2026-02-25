@@ -6,7 +6,6 @@ import { Play, Clock, Zap, X, Target } from 'lucide-react-native';
 import { Text, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
-import { getUiColors } from '@/config/design';
 import { useLanguage } from '@/contexts/LanguageContext';
 import * as Haptics from 'expo-haptics';
 
@@ -34,7 +33,6 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
   lesson,
 }) => {
   const { isDark, colors } = useTheme();
-  const ui = getUiColors(isDark);
   const { t, ti } = useLanguage();
 
   // useCallback for performance (Rule 10)
@@ -58,7 +56,16 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
           transition={SPRING_CONFIGS.bouncy}
           style={styles.dialogContainer}
         >
-          <Pressable style={[styles.dialog, { backgroundColor: isDark ? '#1A1625' : '#FFFFFF', borderColor: isDark ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.15)' }]} onPress={(e) => e.stopPropagation()}>
+          <Pressable
+            style={[
+              styles.dialog,
+              {
+                backgroundColor: isDark ? '#1A1625' : '#FFFFFF',
+                borderColor: isDark ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.15)',
+              },
+            ]}
+            onPress={(e) => e.stopPropagation()}
+          >
             {/* Close Button - Apple HIG: min 44x44 touch target */}
             <Pressable
               style={[styles.closeButton, { backgroundColor: colors.glass.light }]}
@@ -89,7 +96,10 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
               style={styles.lessonBadge}
             >
               <Text style={styles.lessonBadgeText}>
-                {ti(t.lessons.lessonOf, { current: lesson.lessonNumber, total: lesson.totalLessons })}
+                {ti(t.lessons.lessonOf, {
+                  current: lesson.lessonNumber,
+                  total: lesson.totalLessons,
+                })}
               </Text>
             </MotiView>
 
@@ -126,17 +136,23 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
             >
               <View style={styles.statItem}>
                 <Clock size={18} color={colors.text.secondary} />
-                <Text style={[styles.statText, { color: colors.text.muted }]}>{lesson.duration || 5} min</Text>
+                <Text style={[styles.statText, { color: colors.text.muted }]}>
+                  {lesson.duration || 5} min
+                </Text>
               </View>
               <View style={[styles.statDivider, { backgroundColor: colors.border.default }]} />
               <View style={styles.statItem}>
                 <Zap size={18} color="#FCD34D" />
-                <Text style={[styles.statText, { color: colors.text.muted }]}>+{lesson.xpReward || 10} XP</Text>
+                <Text style={[styles.statText, { color: colors.text.muted }]}>
+                  +{lesson.xpReward || 10} XP
+                </Text>
               </View>
               <View style={[styles.statDivider, { backgroundColor: colors.border.default }]} />
               <View style={styles.statItem}>
                 <Target size={18} color="#8B5CF6" />
-                <Text style={[styles.statText, { color: colors.text.muted }]}>{ti(t.lessons.stepsCount, { count: 5 })}</Text>
+                <Text style={[styles.statText, { color: colors.text.muted }]}>
+                  {ti(t.lessons.stepsCount, { count: 5 })}
+                </Text>
               </View>
             </MotiView>
 
@@ -148,26 +164,28 @@ const LessonDialogComponent: React.FC<LessonDialogProps> = ({
               style={styles.buttonContainer}
             >
               <View style={styles.startButton}>
-              <Pressable
-                onPress={handleStart}
-                style={styles.startButtonPressable}
-                accessible={true}
-                accessibilityRole="button"
-                accessibilityLabel={lesson.isCompleted ? t.lessons.practiceAgain : t.lessons.startLesson}
-                accessibilityHint={ti(t.lessons.startsLesson, { title: lesson.title })}
-              >
-                <LinearGradient
-                  colors={['#10B981', '#059669']}
-                  style={styles.startButtonGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
+                <Pressable
+                  onPress={handleStart}
+                  style={styles.startButtonPressable}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    lesson.isCompleted ? t.lessons.practiceAgain : t.lessons.startLesson
+                  }
+                  accessibilityHint={ti(t.lessons.startsLesson, { title: lesson.title })}
                 >
-                  <Play size={24} color="#FFFFFF" fill="#FFFFFF" />
-                  <Text style={styles.startButtonText}>
-                    {lesson.isCompleted ? t.lessons.practiceAgain : t.lessons.startLesson}
-                  </Text>
-                </LinearGradient>
-              </Pressable>
+                  <LinearGradient
+                    colors={['#10B981', '#059669']}
+                    style={styles.startButtonGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  >
+                    <Play size={24} color="#FFFFFF" fill="#FFFFFF" />
+                    <Text style={styles.startButtonText}>
+                      {lesson.isCompleted ? t.lessons.practiceAgain : t.lessons.startLesson}
+                    </Text>
+                  </LinearGradient>
+                </Pressable>
               </View>
             </MotiView>
 
@@ -287,8 +305,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
   },
-  startButtonPressable: {
-  },
+  startButtonPressable: {},
   startButtonPressed: {
     transform: [{ scale: 0.98 }],
     opacity: 0.9,

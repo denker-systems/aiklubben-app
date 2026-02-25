@@ -31,6 +31,8 @@ interface LanguageContextType {
   t: Translations;
   // Helper for interpolated strings
   ti: (text: string, params?: Record<string, string | number>) => string;
+  // Helper for localized DB fields: l(item, 'title') → item.title_en or item.title
+  l: (item: any, field: string) => any;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -59,11 +61,18 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [],
   );
 
-  const value = useMemo(() => ({ locale, setLocale, t, ti }), [locale, setLocale, t, ti]);
-
-  return (
-    <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
+  const l = useCallback(
+    (item: any, field: string) => {
+      if (!item) return '';
+      if (locale === 'en') return item[`${field}_en`] || item[field] || '';
+      return item[field] || '';
+    },
+    [locale],
   );
+
+  const value = useMemo(() => ({ locale, setLocale, t, ti, l }), [locale, setLocale, t, ti, l]);
+
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };
 
 export const useLanguage = () => {

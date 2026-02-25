@@ -1,6 +1,7 @@
 # Mobile-First iOS Development - Expo Go
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Rules to ensure consistent rendering on iOS Expo Go vs web
 
@@ -16,6 +17,7 @@ Web is secondary. Always code for iOS behavior first.
 ### Platform Rendering Differences
 
 #### ScrollView Centering
+
 ```typescript
 // WRONG: justifyContent: 'center' in ScrollView contentContainerStyle
 // This does NOT center vertically on iOS because the content container
@@ -36,6 +38,7 @@ Web is secondary. Always code for iOS behavior first.
 ```
 
 #### Pressable Style Functions (CRITICAL)
+
 ```
 NativeWind 4 with jsxImportSource: 'nativewind' intercepts ALL JSX.
 Pressable's function-based style={({ pressed }) => [...]} loses
@@ -69,6 +72,7 @@ ALWAYS use the View-wrapper pattern for interactive elements.
 ```
 
 **Why "Fortsätt →" works but quiz buttons don't:**
+
 - LinearGradient/View with static styles → WORKS on iOS
 - Pressable with function `({ pressed }) => [styles.x]` → BROKEN on iOS
 
@@ -76,6 +80,7 @@ ALWAYS use the View-wrapper pattern for interactive elements.
 For complex conditional styles, use the manual View-wrapper pattern.
 
 #### Image Rendering
+
 ```typescript
 // Images may render differently on iOS vs web.
 // ALWAYS specify both width and height explicitly.
@@ -100,6 +105,7 @@ For complex conditional styles, use the manual View-wrapper pattern.
 ## Style Rules for Cross-Platform Consistency
 
 ### Use StyleSheet.create or Inline Style Objects
+
 ```typescript
 // PREFERRED: StyleSheet.create for static styles (optimized on iOS)
 const styles = StyleSheet.create({
@@ -114,6 +120,7 @@ const styles = StyleSheet.create({
 ```
 
 ### Avoid NativeWind className for Layout-Critical Styles
+
 ```
 IMPORTANT: NativeWind/Tailwind className can produce different results
 on iOS vs web for layout properties (flex, padding, margin, position).
@@ -123,13 +130,14 @@ Use className only for simple, non-layout styling (text color, opacity).
 ```
 
 ### Platform.select for Platform-Specific Values
+
 ```typescript
 import { Platform } from 'react-native';
 
 // Use when iOS and web need different values
 const fontSize = Platform.select({
-  ios: 17,      // iOS prefers 17pt for body text
-  default: 16,  // Web/Android
+  ios: 17, // iOS prefers 17pt for body text
+  default: 16, // Web/Android
 });
 
 // Use 'native' key to target both iOS and Android

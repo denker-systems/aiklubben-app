@@ -22,7 +22,10 @@ export const ExitModal: React.FC<ExitModalProps> = ({ visible, onCancel, onConfi
     <Modal visible={visible} transparent animationType="fade">
       <Pressable style={styles.overlay} onPress={onCancel}>
         <MotiView
-          style={[styles.modal, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
+          style={[
+            styles.modal,
+            { backgroundColor: ui.card.background, borderColor: ui.card.border },
+          ]}
           from={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={SPRING_CONFIGS.bouncy}

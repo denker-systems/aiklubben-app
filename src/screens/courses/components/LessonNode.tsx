@@ -66,7 +66,7 @@ const LessonNodeComponent: React.FC<LessonNodeProps> = ({
   delay = 0,
   size = 'medium',
 }) => {
-  const { isDark, colors: themeColors } = useTheme();
+  const { colors: themeColors } = useTheme();
   const { t, ti } = useLanguage();
   const colors = COLORS[status];
   const dimensions = SIZES[size];
@@ -232,9 +232,7 @@ const LessonNodeComponent: React.FC<LessonNodeProps> = ({
         )}
       </Pressable>
       {title && (
-        <Text style={[styles.lessonTitle, { color: themeColors.text.secondary }]}>
-          {title}
-        </Text>
+        <Text style={[styles.lessonTitle, { color: themeColors.text.secondary }]}>{title}</Text>
       )}
     </MotiView>
   );

@@ -1,6 +1,7 @@
 # Animation Rules - React Native & Moti
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Animation patterns for smooth iOS performance
 
@@ -9,6 +10,7 @@
 ## Animation Library Usage
 
 ### Primary: Moti (Reanimated 2 wrapper)
+
 ```typescript
 import { MotiView, MotiText, MotiImage } from 'moti';
 
@@ -23,6 +25,7 @@ import { MotiView, MotiText, MotiImage } from 'moti';
 ```
 
 ### Secondary: React Native Reanimated 2
+
 ```typescript
 import Animated, {
   useSharedValue,
@@ -44,6 +47,7 @@ const animatedStyle = useAnimatedStyle(() => ({
 ## Spring Configurations
 
 ### Standard Spring Configs
+
 ```typescript
 export const SPRING_CONFIGS = {
   // Quick, snappy feedback
@@ -52,28 +56,28 @@ export const SPRING_CONFIGS = {
     damping: 18,
     stiffness: 200,
   },
-  
+
   // Smooth, natural motion
   smooth: {
     type: 'spring' as const,
     damping: 20,
     stiffness: 150,
   },
-  
+
   // Bouncy, playful motion
   bouncy: {
     type: 'spring' as const,
     damping: 10,
     stiffness: 180,
   },
-  
+
   // Gentle, subtle motion
   gentle: {
     type: 'spring' as const,
     damping: 25,
     stiffness: 100,
   },
-  
+
   // Stiff, controlled motion
   stiff: {
     type: 'spring' as const,
@@ -84,6 +88,7 @@ export const SPRING_CONFIGS = {
 ```
 
 ### When to Use Each Config
+
 ```typescript
 // SNAPPY: Button presses, toggles, quick feedback
 <MotiView
@@ -115,6 +120,7 @@ export const SPRING_CONFIGS = {
 ## Timing Configurations
 
 ### Standard Timing Configs
+
 ```typescript
 export const TIMING_CONFIGS = {
   fast: {
@@ -137,6 +143,7 @@ export const TIMING_CONFIGS = {
 ## Stagger Animations
 
 ### List Item Stagger
+
 ```typescript
 // Standard stagger delay
 export const STAGGER_DELAYS = {
@@ -162,6 +169,7 @@ export const STAGGER_DELAYS = {
 ```
 
 ### Stagger with Maximum Delay
+
 ```typescript
 // Prevent excessive delays for long lists
 const getStaggerDelay = (index: number, maxItems: number = 10) => {
@@ -175,6 +183,7 @@ const getStaggerDelay = (index: number, maxItems: number = 10) => {
 ## Entry Animations
 
 ### Screen Entry Animation
+
 ```typescript
 // Standard screen entry
 <MotiView
@@ -188,6 +197,7 @@ const getStaggerDelay = (index: number, maxItems: number = 10) => {
 ```
 
 ### Component Entry Patterns
+
 ```typescript
 // Fade in
 const fadeIn = {
@@ -219,6 +229,7 @@ const slideInRight = {
 ## Exit Animations
 
 ### Exit Animation Pattern
+
 ```typescript
 import { AnimatePresence } from 'moti';
 
@@ -242,6 +253,7 @@ import { AnimatePresence } from 'moti';
 ## Loop Animations
 
 ### Pulse Animation
+
 ```typescript
 // Subtle pulse for attention
 <MotiView
@@ -256,6 +268,7 @@ import { AnimatePresence } from 'moti';
 ```
 
 ### Breathing Animation
+
 ```typescript
 // Gentle breathing effect
 <MotiView
@@ -275,6 +288,7 @@ import { AnimatePresence } from 'moti';
 ## Press Animations
 
 ### Button Press Pattern
+
 ```typescript
 const [isPressed, setIsPressed] = useState(false);
 
@@ -295,6 +309,7 @@ const [isPressed, setIsPressed] = useState(false);
 ```
 
 ### 3D Button Press (Duolingo-style)
+
 ```typescript
 // Depth-based press animation
 <Pressable>
@@ -305,8 +320,8 @@ const [isPressed, setIsPressed] = useState(false);
         style={[
           styles.buttonBottom,
           {
-            transform: [{ 
-              translateY: pressed ? DEPTH / 2 : DEPTH 
+            transform: [{
+              translateY: pressed ? DEPTH / 2 : DEPTH
             }],
           },
         ]}
@@ -331,6 +346,7 @@ const [isPressed, setIsPressed] = useState(false);
 ## Performance Rules
 
 ### Animation Performance Checklist
+
 1. **Use `transform` and `opacity`** - These are GPU-accelerated
 2. **Avoid animating layout properties** - width, height, padding cause layout recalc
 3. **Use `useNativeDriver: true`** when using Animated API
@@ -338,6 +354,7 @@ const [isPressed, setIsPressed] = useState(false);
 5. **Use `removeClippedSubviews`** for animated lists
 
 ### What NOT to Animate
+
 ```typescript
 // AVOID animating these (causes layout thrashing):
 // - width/height (use scale instead)
@@ -356,12 +373,13 @@ const [isPressed, setIsPressed] = useState(false);
 ## Accessibility
 
 ### Reduced Motion Support
+
 ```typescript
 import { useReducedMotion } from 'moti';
 
 const MyComponent = () => {
   const reducedMotion = useReducedMotion();
-  
+
   return (
     <MotiView
       animate={{ opacity: 1, scale: 1 }}

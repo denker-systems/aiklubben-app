@@ -18,16 +18,33 @@ import {
   HelpCircle,
   LogOut,
   Shield,
+  Trash2,
 } from 'lucide-react-native';
 
 export const SettingsScreen = () => {
   console.log('[SettingsScreen] Rendered');
-  
+
   const navigation = useNavigation<any>();
-  const canGoBack = useNavigationState(state => state.routes.length > 1);
+  const canGoBack = useNavigationState((state) => state.routes.length > 1);
   const { isDark, toggleTheme, notificationsEnabled, setNotificationsEnabled, colors } = useTheme();
   const { t, locale, setLocale } = useLanguage();
-  const { signOut } = useAuth();
+  const { signOut, deleteAccount } = useAuth();
+
+  const handleDeleteAccount = useCallback(() => {
+    Alert.alert(t.settings.deleteAccountTitle, t.settings.deleteAccountMessage, [
+      { text: t.common.cancel, style: 'cancel' },
+      {
+        text: t.settings.deleteAccountConfirm,
+        style: 'destructive',
+        onPress: async () => {
+          const { error } = await deleteAccount();
+          if (error) {
+            Alert.alert(t.settings.deleteAccountTitle, t.settings.deleteAccountError);
+          }
+        },
+      },
+    ]);
+  }, [deleteAccount, t]);
 
   const handleProfileSettings = useCallback(() => {
     console.log('[SettingsScreen] handleProfileSettings - navigating to Profile');
@@ -36,19 +53,15 @@ export const SettingsScreen = () => {
 
   const handleChangePassword = useCallback(() => {
     console.log('[SettingsScreen] handleChangePassword');
-    Alert.alert(
-      t.settings.changePassword,
-      t.settings.changePasswordMessage,
-      [
-        { text: t.common.cancel, style: 'cancel' },
-        {
-          text: t.settings.changePasswordSendLink,
-          onPress: () => {
-            Alert.alert(t.settings.changePasswordSent, t.settings.changePasswordSentMessage);
-          },
+    Alert.alert(t.settings.changePassword, t.settings.changePasswordMessage, [
+      { text: t.common.cancel, style: 'cancel' },
+      {
+        text: t.settings.changePasswordSendLink,
+        onPress: () => {
+          Alert.alert(t.settings.changePasswordSent, t.settings.changePasswordSentMessage);
         },
-      ]
-    );
+      },
+    ]);
   }, [t]);
 
   const handlePrivacySettings = useCallback(() => {
@@ -80,7 +93,11 @@ export const SettingsScreen = () => {
     <ScreenWrapper title={t.settings.title} showBack={canGoBack}>
       {/* App Settings */}
       <View style={styles.section}>
-        <Text variant="tiny" weight="bold" style={[styles.sectionTitle, { color: colors.text.muted }]}>
+        <Text
+          variant="tiny"
+          weight="bold"
+          style={[styles.sectionTitle, { color: colors.text.muted }]}
+        >
           {t.settings.appSettings}
         </Text>
         <Card variant="glass" noPadding>
@@ -131,7 +148,11 @@ export const SettingsScreen = () => {
 
       {/* Account & Security */}
       <View style={styles.section}>
-        <Text variant="tiny" weight="bold" style={[styles.sectionTitle, { color: colors.text.muted }]}>
+        <Text
+          variant="tiny"
+          weight="bold"
+          style={[styles.sectionTitle, { color: colors.text.muted }]}
+        >
           {t.settings.accountSecurity}
         </Text>
         <Card variant="glass" noPadding>
@@ -162,7 +183,11 @@ export const SettingsScreen = () => {
 
       {/* Support */}
       <View style={styles.section}>
-        <Text variant="tiny" weight="bold" style={[styles.sectionTitle, { color: colors.text.muted }]}>
+        <Text
+          variant="tiny"
+          weight="bold"
+          style={[styles.sectionTitle, { color: colors.text.muted }]}
+        >
           {t.settings.helpSupport}
         </Text>
         <Card variant="glass" noPadding>
@@ -186,7 +211,11 @@ export const SettingsScreen = () => {
 
       {/* About App */}
       <View style={styles.section}>
-        <Text variant="tiny" weight="bold" style={[styles.sectionTitle, { color: colors.text.muted }]}>
+        <Text
+          variant="tiny"
+          weight="bold"
+          style={[styles.sectionTitle, { color: colors.text.muted }]}
+        >
           {t.settings.aboutSection}
         </Text>
         <Card variant="glass" noPadding>
@@ -213,6 +242,24 @@ export const SettingsScreen = () => {
             isLast
             onPress={handleLogout}
             destructive
+          />
+        </Card>
+      </View>
+
+      {/* Danger Zone */}
+      <View style={styles.section}>
+        <Text variant="tiny" weight="bold" style={[styles.sectionTitle, { color: '#EF4444' }]}>
+          {t.settings.dangerZone}
+        </Text>
+        <Card variant="glass" noPadding>
+          <SettingsRow
+            icon={Trash2}
+            title={t.settings.deleteAccount}
+            colors={colors}
+            isLast
+            onPress={handleDeleteAccount}
+            destructive
+            showArrow
           />
         </Card>
       </View>
@@ -271,7 +318,9 @@ const SettingsRow: React.FC<SettingsRowProps> = ({
     return (
       <Pressable
         onPress={onPress}
-        style={({ pressed }) => [pressed && { opacity: 0.7, backgroundColor: colors.glass.pressed }]}
+        style={({ pressed }) => [
+          pressed && { opacity: 0.7, backgroundColor: colors.glass.pressed },
+        ]}
       >
         {content}
       </Pressable>

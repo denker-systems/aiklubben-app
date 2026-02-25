@@ -17,6 +17,7 @@ This workflow guides you through deploying the AI Klubben app to the Apple App S
 ### 1. Configure Project
 
 Ensure `app.json` has required iOS configuration:
+
 - `bundleIdentifier`: `nu.aiklubben.app`
 - `buildNumber`: Auto-incremented by EAS
 - `version`: Semantic version (e.g., `1.0.0`)
@@ -36,6 +37,7 @@ eas build --platform ios --profile production
 ```
 
 This will:
+
 - Generate/reuse Apple signing credentials
 - Build the app in the cloud (~10-20 minutes)
 - Provide a `.ipa` file download link
@@ -47,6 +49,7 @@ eas submit --platform ios --latest
 ```
 
 This will:
+
 - Upload the build to App Store Connect
 - Create the app listing if it doesn't exist
 - Generate App Store Connect API key (first time)
@@ -54,6 +57,7 @@ This will:
 ### 5. Complete App Store Connect Setup
 
 Go to [App Store Connect](https://appstoreconnect.apple.com) and:
+
 - Add app description and metadata
 - Upload screenshots (required for different iPhone sizes)
 - Set app category
@@ -66,17 +70,21 @@ Go to [App Store Connect](https://appstoreconnect.apple.com) and:
 ### For Native Changes (new dependencies, iOS config changes)
 
 1. **Update version in `app.json`:**
+
 ```json
 "version": "1.0.1"
 ```
+
 (buildNumber auto-increments)
 
 2. **Build new version:**
+
 ```bash
 eas build --platform ios --profile production
 ```
 
 3. **Submit to App Store:**
+
 ```bash
 eas submit --platform ios --latest
 ```
@@ -106,16 +114,21 @@ Defined in `eas.json`:
 ## Common Issues
 
 ### Missing Assets
+
 If icon/splash screen are missing, either:
+
 - Add `icon.png` (1024x1024) and `splash.png` to `assets/` folder
 - Use [Expo Icon Generator](https://icon.kitchen/)
 
 ### Apple Server Errors
+
 If you get "Internal Server Error" from Apple:
+
 - Wait a few minutes and retry
 - Check [Apple System Status](https://developer.apple.com/system-status/)
 
 ### TestFlight Group Creation Failed
+
 This is not critical - you can manually create TestFlight groups in App Store Connect.
 
 ## Useful Commands

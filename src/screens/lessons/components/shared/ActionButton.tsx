@@ -66,11 +66,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       style={[fullWidth && styles.fullWidth, style]}
     >
       <View style={styles.button}>
-        <Pressable
-          onPress={onPress}
-          disabled={disabled}
-          style={styles.buttonPressable}
-        >
+        <Pressable onPress={onPress} disabled={disabled} style={styles.buttonPressable}>
           {isGhost ? (
             <MotiView
               style={[styles.ghostContent, getSizeStyles(), { borderColor: ui.card.border }]}
@@ -79,7 +75,10 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
               {Icon && iconPosition === 'left' && (
                 <Icon size={size === 'small' ? 16 : 20} color={themeColors.text.secondary} />
               )}
-              <Text variant="body" style={[styles.ghostLabel, { color: themeColors.text.secondary }]}>
+              <Text
+                variant="body"
+                style={[styles.ghostLabel, { color: themeColors.text.secondary }]}
+              >
                 {label}
               </Text>
               {Icon && iconPosition === 'right' && (

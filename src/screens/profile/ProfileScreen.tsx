@@ -8,16 +8,17 @@ import { brandColors } from '@/config/theme';
 import { supabase } from '@/config/supabase';
 import { Text, Badge, FloatingOrbs, TiltCard, AppIcon } from '@/components/ui';
 import { useMenu } from '@/contexts/MenuContext';
-import { useNavigation, useNavigationState } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { SPRING_CONFIGS } from '@/lib/animations';
-import { BADGES, getLevelForXP, getXPProgress, getNextLevel } from '@/types/gamification';
+import { BADGES } from '@/types/gamification';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getUiColors } from '@/config/design';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useUserStats } from '@/hooks/useUserStats';
 
 export const ProfileScreen = () => {
   console.log('[ProfileScreen] Rendered');
-  
+
   const { user, signOut } = useAuth();
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
@@ -25,81 +26,67 @@ export const ProfileScreen = () => {
   const { isDark, colors } = useTheme();
   const ui = getUiColors(isDark);
   const { t } = useLanguage();
+  const { stats, level, nextLevel, xpProgress } = useUserStats();
   const [profile, setProfile] = useState<any>(null);
-  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [coursesStarted, setCoursesStarted] = useState(0);
 
   useEffect(() => {
-    console.log('[ProfileScreen] useEffect triggered', { hasUser: !!user });
-    
-    const fetchProfileData = async () => {
-      if (!user) {
-        console.log('[ProfileScreen] No user, skipping fetch');
-        return;
-      }
-
-      console.log('[ProfileScreen] Fetching profile data for user:', user.id);
+    const fetchProfile = async () => {
+      if (!user) return;
       try {
-        const { data: profileData, error: profileError } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
+        if (!error) setProfile(data);
 
-        if (profileError) {
-          console.error('[ProfileScreen] Error fetching profile:', profileError);
-          throw profileError;
-        }
-        
-        console.log('[ProfileScreen] Profile data fetched:', { name: profileData?.name });
-        setProfile(profileData);
+        // Count fully completed courses
+        const { data: allLessons } = await supabase.from('course_lessons').select('id, course_id');
 
-        const { data: statsData, error: statsError } = await supabase
-          .from('user_stats')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (!statsError && statsData) {
-          setStats({
-            totalXP: statsData.total_xp || 150,
-            currentStreak: statsData.current_streak || 3,
-            longestStreak: statsData.longest_streak || 7,
-            lessonsCompleted: statsData.lessons_completed || 5,
-            articlesRead: statsData.articles_read || 12,
-            badgesEarned: statsData.badges_earned || ['first_lesson', 'first_article'],
+        if (allLessons && allLessons.length > 0) {
+          const totalPerCourse: Record<string, number> = {};
+          const lessonToCourse: Record<string, string> = {};
+          allLessons.forEach((l: any) => {
+            totalPerCourse[l.course_id] = (totalPerCourse[l.course_id] || 0) + 1;
+            lessonToCourse[l.id] = l.course_id;
           });
-        } else {
-          // Demo data for development
-          setStats({
-            totalXP: 150,
-            currentStreak: 3,
-            longestStreak: 7,
-            lessonsCompleted: 5,
-            articlesRead: 12,
-            badgesEarned: ['first_lesson', 'first_article'],
-          });
+
+          const lessonIds = allLessons.map((l: any) => l.id);
+          const { data: completedData } = await supabase
+            .from('user_lesson_progress')
+            .select('lesson_id')
+            .eq('user_id', user.id)
+            .eq('status', 'completed')
+            .in('lesson_id', lessonIds);
+
+          if (completedData) {
+            const completedPerCourse: Record<string, number> = {};
+            completedData.forEach((c: any) => {
+              const cId = lessonToCourse[c.lesson_id];
+              if (cId) completedPerCourse[cId] = (completedPerCourse[cId] || 0) + 1;
+            });
+            const fullyCompleted = Object.keys(completedPerCourse).filter(
+              (id) => completedPerCourse[id] >= (totalPerCourse[id] || Infinity),
+            );
+            setCoursesStarted(fullyCompleted.length);
+          }
         }
       } catch (err) {
-        console.error('Error fetching profile:', err);
+        console.error('[ProfileScreen] Error fetching profile:', err);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchProfileData();
+    fetchProfile();
   }, [user]);
-
-  const level = getLevelForXP(stats?.totalXP || 0);
-  const nextLevel = getNextLevel(stats?.totalXP || 0);
-  const xpProgress = getXPProgress(stats?.totalXP || 0);
-  const roleEmoji = profile?.role === 'admin' ? '👑' : level.icon;
-
-  const canGoBack = useNavigationState(state => state.routes.length > 1);
 
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+      <View
+        style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={brandColors.purple} />
         </View>
@@ -111,13 +98,21 @@ export const ProfileScreen = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header matching other screens */}
       <View style={[styles.headerRow, { paddingTop: insets.top + 16 }]}>
-        <Text variant="h1" style={styles.headerTitle}>{t.profile.title}</Text>
+        <Text variant="h1" style={styles.headerTitle}>
+          {t.profile.title}
+        </Text>
         <Pressable
           onPress={() => menuContext?.openMenu()}
           style={[styles.menuButton, { backgroundColor: colors.glass.light }]}
         >
           <View style={[styles.menuLine, { backgroundColor: colors.text.secondary }]} />
-          <View style={[styles.menuLine, styles.menuLineShort, { backgroundColor: colors.text.secondary }]} />
+          <View
+            style={[
+              styles.menuLine,
+              styles.menuLineShort,
+              { backgroundColor: colors.text.secondary },
+            ]}
+          />
         </Pressable>
       </View>
       <ScrollView
@@ -149,7 +144,12 @@ export const ProfileScreen = () => {
                 <AppIcon name="profile" size={80} />
               </View>
             )}
-            <View style={[styles.levelBadge, { backgroundColor: level.color, borderColor: colors.background }]}>
+            <View
+              style={[
+                styles.levelBadge,
+                { backgroundColor: level.color, borderColor: colors.background },
+              ]}
+            >
               <Text style={styles.levelBadgeText}>{level.level}</Text>
             </View>
           </MotiView>
@@ -171,7 +171,7 @@ export const ProfileScreen = () => {
             </Text>
 
             <View style={styles.badgeRow}>
-              <Badge label={level.name} variant="primary" />
+              <Badge label={t.levels[level.level as keyof typeof t.levels]} variant="primary" />
               {profile?.role === 'admin' && <Badge label="Admin" variant="secondary" />}
             </View>
           </MotiView>
@@ -193,8 +193,12 @@ export const ProfileScreen = () => {
                 <AppIcon name="xp" size={36} />
               </LinearGradient>
               <View>
-                <Text style={[styles.xpValue, { color: colors.text.primary }]}>{stats?.totalXP || 0} XP</Text>
-                <Text style={[styles.xpLabel, { color: colors.text.secondary }]}>{t.profile.nextLevel} {nextLevel?.minXP || 'Max'} XP</Text>
+                <Text style={[styles.xpValue, { color: colors.text.primary }]}>
+                  {stats?.totalXP || 0} XP
+                </Text>
+                <Text style={[styles.xpLabel, { color: colors.text.secondary }]}>
+                  {t.profile.nextLevel} {nextLevel?.minXP || 'Max'} XP
+                </Text>
               </View>
             </View>
             <View style={styles.xpProgressContainer}>
@@ -216,16 +220,20 @@ export const ProfileScreen = () => {
           >
             <View style={styles.quickStat}>
               <LinearGradient
-                colors={['#f97316', '#ea580c']}
+                colors={['#8B5CF6', '#6366f1']}
                 style={styles.quickStatGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <AppIcon name="streak" size={36} />
+                <AppIcon name="courses" size={36} />
               </LinearGradient>
               <View>
-                <Text style={[styles.quickStatValue, { color: colors.text.primary }]}>{stats?.currentStreak || 0}</Text>
-                <Text style={[styles.quickStatLabel, { color: colors.text.secondary }]}>{t.common.days}</Text>
+                <Text style={[styles.quickStatValue, { color: colors.text.primary }]}>
+                  {coursesStarted}
+                </Text>
+                <Text style={[styles.quickStatLabel, { color: colors.text.secondary }]}>
+                  {t.tabs.courses}
+                </Text>
               </View>
             </View>
             <View style={[styles.quickStatDivider, { backgroundColor: colors.glass.medium }]} />
@@ -239,8 +247,12 @@ export const ProfileScreen = () => {
                 <AppIcon name="courses" size={36} />
               </LinearGradient>
               <View>
-                <Text style={[styles.quickStatValue, { color: colors.text.primary }]}>{stats?.lessonsCompleted || 0}</Text>
-                <Text style={[styles.quickStatLabel, { color: colors.text.secondary }]}>{t.common.lessons}</Text>
+                <Text style={[styles.quickStatValue, { color: colors.text.primary }]}>
+                  {stats?.lessonsCompleted || 0}
+                </Text>
+                <Text style={[styles.quickStatLabel, { color: colors.text.secondary }]}>
+                  {t.common.lessons}
+                </Text>
               </View>
             </View>
             <View style={[styles.quickStatDivider, { backgroundColor: colors.glass.medium }]} />
@@ -254,8 +266,12 @@ export const ProfileScreen = () => {
                 <Text style={styles.quickStatEmoji}>🏆</Text>
               </LinearGradient>
               <View>
-                <Text style={[styles.quickStatValue, { color: colors.text.primary }]}>{stats?.badgesEarned?.length || 0}</Text>
-                <Text style={[styles.quickStatLabel, { color: colors.text.secondary }]}>{t.common.badges}</Text>
+                <Text style={[styles.quickStatValue, { color: colors.text.primary }]}>
+                  {stats?.badgesEarned?.length || 0}
+                </Text>
+                <Text style={[styles.quickStatLabel, { color: colors.text.secondary }]}>
+                  {t.common.badges}
+                </Text>
               </View>
             </View>
           </MotiView>
@@ -277,49 +293,60 @@ export const ProfileScreen = () => {
                   <AppIcon name="streak" size={36} />
                 </LinearGradient>
                 <View>
-                  <Text style={[styles.streakCardTitle, { color: colors.text.primary }]}>{t.profile.streak}</Text>
+                  <Text style={[styles.streakCardTitle, { color: colors.text.primary }]}>
+                    {t.profile.streak}
+                  </Text>
                   <Text style={styles.streakCardSubtitle}>{t.profile.keepGoing}</Text>
                 </View>
                 <View style={styles.streakCardValue}>
                   <Text style={styles.streakCardNumber}>{stats?.currentStreak || 0}</Text>
-                  <Text style={[styles.streakCardDays, { color: colors.text.secondary }]}>{t.common.days}</Text>
+                  <Text style={[styles.streakCardDays, { color: colors.text.secondary }]}>
+                    {t.common.days}
+                  </Text>
                 </View>
               </View>
             </TiltCard>
           </MotiView>
 
-          {/* Badges Section */}
-          <MotiView
-            style={styles.section}
-            from={{ opacity: 0, translateY: 20 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ ...SPRING_CONFIGS.smooth, delay: 500 }}
-          >
-            <View style={styles.sectionHeader}>
-              <Text variant="h3" style={styles.sectionTitle}>
-                {t.profile.yourBadges}
-              </Text>
-            </View>
-            <View style={styles.badgesGrid}>
-              {BADGES.slice(0, 6).map((badge, index) => {
-                const isUnlocked = stats?.badgesEarned?.includes(badge.id);
-                return (
-                  <MotiView
-                    key={badge.id}
-                    style={[styles.badgeItem, { backgroundColor: ui.card.background, borderColor: ui.card.border }, !isUnlocked && styles.badgeItemLocked]}
-                    from={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ ...SPRING_CONFIGS.bouncy, delay: 550 + index * 50 }}
-                  >
-                    <Text style={styles.badgeEmoji}>{badge.icon}</Text>
-                    <Text style={[styles.badgeName, { color: colors.text.primary }]} numberOfLines={1}>
-                      {(t.badges as any)[badge.id]?.name || badge.name}
-                    </Text>
-                  </MotiView>
-                );
-              })}
-            </View>
-          </MotiView>
+          {/* Badges Section - only show if user has earned badges */}
+          {stats?.badgesEarned && stats.badgesEarned.length > 0 && (
+            <MotiView
+              style={styles.section}
+              from={{ opacity: 0, translateY: 20 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ ...SPRING_CONFIGS.smooth, delay: 500 }}
+            >
+              <View style={styles.sectionHeader}>
+                <Text variant="h3" style={styles.sectionTitle}>
+                  {t.profile.yourBadges}
+                </Text>
+              </View>
+              <View style={styles.badgesGrid}>
+                {BADGES.filter((badge) => stats?.badgesEarned?.includes(badge.id)).map(
+                  (badge, index) => (
+                    <MotiView
+                      key={badge.id}
+                      style={[
+                        styles.badgeItem,
+                        { backgroundColor: ui.card.background, borderColor: ui.card.border },
+                      ]}
+                      from={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ ...SPRING_CONFIGS.bouncy, delay: 550 + index * 50 }}
+                    >
+                      <Text style={styles.badgeEmoji}>{badge.icon}</Text>
+                      <Text
+                        style={[styles.badgeName, { color: colors.text.primary }]}
+                        numberOfLines={1}
+                      >
+                        {(t.badges as any)[badge.id]?.name || badge.name}
+                      </Text>
+                    </MotiView>
+                  ),
+                )}
+              </View>
+            </MotiView>
+          )}
 
           {/* Actions */}
           <MotiView
@@ -332,7 +359,10 @@ export const ProfileScreen = () => {
               onPress={() => navigation.navigate('Settings')}
               tiltAmount={2}
               scaleAmount={0.98}
-              style={[styles.actionButton, { backgroundColor: ui.card.background, borderColor: ui.card.border }]}
+              style={[
+                styles.actionButton,
+                { backgroundColor: ui.card.background, borderColor: ui.card.border },
+              ]}
             >
               <LinearGradient
                 colors={['#8B5CF6', '#6366f1']}
@@ -346,7 +376,10 @@ export const ProfileScreen = () => {
                 <Text variant="body" style={[styles.actionTitle, { color: colors.text.primary }]}>
                   {t.profile.settings}
                 </Text>
-                <Text variant="caption" style={[styles.actionSubtitle, { color: colors.text.secondary }]}>
+                <Text
+                  variant="caption"
+                  style={[styles.actionSubtitle, { color: colors.text.secondary }]}
+                >
                   {t.profile.settingsSubtitle}
                 </Text>
               </View>
@@ -357,7 +390,11 @@ export const ProfileScreen = () => {
               onPress={() => signOut()}
               tiltAmount={2}
               scaleAmount={0.98}
-              style={[styles.actionButton, { backgroundColor: ui.card.background, borderColor: ui.card.border }, styles.logoutButton]}
+              style={[
+                styles.actionButton,
+                { backgroundColor: ui.card.background, borderColor: ui.card.border },
+                styles.logoutButton,
+              ]}
             >
               <LinearGradient
                 colors={['#EF4444', '#DC2626']}
@@ -371,7 +408,10 @@ export const ProfileScreen = () => {
                 <Text variant="body" style={[styles.actionTitle, { color: '#EF4444' }]}>
                   {t.profile.logout}
                 </Text>
-                <Text variant="caption" style={[styles.actionSubtitle, { color: colors.text.secondary }]}>
+                <Text
+                  variant="caption"
+                  style={[styles.actionSubtitle, { color: colors.text.secondary }]}
+                >
                   {t.profile.endSession}
                 </Text>
               </View>

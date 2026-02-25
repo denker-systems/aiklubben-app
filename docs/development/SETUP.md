@@ -3,6 +3,7 @@
 ## Prerequisites
 
 ### Required Software
+
 - **Node.js:** v20.x eller senare (LTS)
 - **npm:** Latest stable
 - **Git:** För version control
@@ -11,11 +12,13 @@
 ### Platform-Specific
 
 #### iOS Development (macOS only)
+
 - **Xcode:** Latest version från App Store
 - **iOS Simulator:** Installeras med Xcode
 - **CocoaPods:** `sudo gem install cocoapods`
 
 #### Android Development
+
 - **Android Studio:** Latest version
 - **Android SDK:** API Level 33+
 - **Android Emulator:** Via Android Studio
@@ -23,12 +26,14 @@
 ## Installation
 
 ### 1. Clone Repository
+
 ```bash
 git clone https://github.com/your-org/aiklubben-app.git
 cd aiklubben-app
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
@@ -36,17 +41,20 @@ npm install
 ### 3. Environment Setup
 
 Create `.env` file:
+
 ```bash
 cp .env.example .env
 ```
 
 Add Supabase credentials:
+
 ```env
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ### 4. Start Development Server
+
 ```bash
 npm start
 ```
@@ -54,16 +62,19 @@ npm start
 ## Running the App
 
 ### iOS Simulator
+
 ```bash
 npm run ios
 ```
 
 ### Android Emulator
+
 ```bash
 npm run android
 ```
 
 ### Physical Device
+
 1. Install Expo Go app
 2. Scan QR code from terminal
 
@@ -93,7 +104,9 @@ aiklubben-app/
 ## Configuration Files
 
 ### app.json
+
 Expo configuration:
+
 ```json
 {
   "expo": {
@@ -112,7 +125,9 @@ Expo configuration:
 ```
 
 ### tsconfig.json
+
 TypeScript configuration:
+
 ```json
 {
   "extends": "expo/tsconfig.base",
@@ -126,27 +141,28 @@ TypeScript configuration:
 ```
 
 ### tailwind.config.js
+
 NativeWind configuration:
+
 ```javascript
 module.exports = {
-  content: [
-    "./App.{js,jsx,ts,tsx}",
-    "./src/**/*.{js,jsx,ts,tsx}"
-  ],
+  content: ['./App.{js,jsx,ts,tsx}', './src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
       colors: {
         // Custom colors
-      }
-    }
-  }
-}
+      },
+    },
+  },
+};
 ```
 
 ## Development Tools
 
 ### VS Code Extensions
+
 Rekommenderade extensions:
+
 - ESLint
 - Prettier
 - TypeScript
@@ -154,6 +170,7 @@ Rekommenderade extensions:
 - Tailwind CSS IntelliSense
 
 ### VS Code Settings
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -165,6 +182,7 @@ Rekommenderade extensions:
 ## Scripts
 
 ### Development
+
 ```bash
 npm start              # Start Metro bundler
 npm run ios           # Run on iOS
@@ -172,12 +190,14 @@ npm run android       # Run on Android
 ```
 
 ### Code Quality
+
 ```bash
 npm run lint          # Run ESLint
 npm run type-check    # TypeScript check
 ```
 
 ### Build
+
 ```bash
 npm run build         # Production build
 ```
@@ -185,6 +205,7 @@ npm run build         # Production build
 ## Troubleshooting
 
 ### Metro Bundler Issues
+
 ```bash
 # Clear cache
 npx expo start -c
@@ -196,6 +217,7 @@ npx expo start -c
 ```
 
 ### iOS Simulator Issues
+
 ```bash
 # Reset simulator
 xcrun simctl erase all
@@ -205,6 +227,7 @@ cd ios && pod install && cd ..
 ```
 
 ### Android Emulator Issues
+
 ```bash
 # Clear Android cache
 cd android
@@ -213,6 +236,7 @@ cd ..
 ```
 
 ### TypeScript Errors
+
 ```bash
 # Check for errors
 npx tsc --noEmit
@@ -224,6 +248,7 @@ Cmd+Shift+P -> "TypeScript: Restart TS Server"
 ## Database Setup
 
 ### Supabase Local Development
+
 ```bash
 # Install Supabase CLI
 npm install -g supabase
@@ -236,6 +261,7 @@ supabase db push
 ```
 
 ### Seed Data
+
 ```bash
 # Run seed script
 npm run db:seed
@@ -244,11 +270,13 @@ npm run db:seed
 ## Testing
 
 ### Unit Tests (Planned)
+
 ```bash
 npm test
 ```
 
 ### E2E Tests (Planned)
+
 ```bash
 npm run test:e2e
 ```

@@ -41,7 +41,6 @@ import { VideoStep } from './steps/VideoStep';
 import { CodeSnippetStep } from './steps/CodeSnippetStep';
 
 import * as Haptics from 'expo-haptics';
-import { Audio } from 'expo-av';
 
 type StepType =
   | 'content'
@@ -89,7 +88,7 @@ export const LessonScreen = () => {
   const { user } = useAuth();
   const { isDark, colors } = useTheme();
   const ui = getUiColors(isDark);
-  const { t } = useLanguage();
+  const { t, l } = useLanguage();
 
   const { lessonId, courseId } = route.params;
 
@@ -101,6 +100,7 @@ export const LessonScreen = () => {
   const [showCelebration, setShowCelebration] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
   const [canContinue, setCanContinue] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [feedbackType, setFeedbackType] = useState<'correct' | 'incorrect' | null>(null);
   const [lives, setLives] = useState(3);
   const [streak, setStreak] = useState(0);
@@ -118,20 +118,20 @@ export const LessonScreen = () => {
 
   useEffect(() => {
     console.log('[LessonScreen] useEffect triggered', { lessonId, userId: user?.id });
-    
+
     const fetchUserData = async () => {
       if (!user) {
         console.log('[LessonScreen] No user, skipping user data fetch');
         return;
       }
-      
+
       console.log('[LessonScreen] Fetching user data for:', user.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('current_streak')
         .eq('id', user.id)
         .single();
-      
+
       if (error) {
         console.error('[LessonScreen] Error fetching user data:', error);
       } else {
@@ -139,7 +139,7 @@ export const LessonScreen = () => {
         if (data) setStreak(data.current_streak || 0);
       }
     };
-    
+
     fetchUserData();
     fetchLesson();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -159,17 +159,16 @@ export const LessonScreen = () => {
         throw error;
       }
 
-      console.log('[LessonScreen] Lesson data fetched:', {
-        id: data.id,
-        title: data.title,
-        stepsCount: data.lesson_steps?.length
-      });
-
       // Sort steps by order_index
       if (data.lesson_steps) {
         data.lesson_steps.sort((a: LessonStep, b: LessonStep) => a.order_index - b.order_index);
-        console.log('[LessonScreen] Steps sorted, types:', data.lesson_steps.map((s: LessonStep) => s.step_type));
       }
+
+      console.log('[LessonScreen] Lesson data fetched:', {
+        id: data.id,
+        title: data.title,
+        stepsCount: data.lesson_steps?.length,
+      });
 
       setLesson(data);
     } catch (err) {
@@ -182,7 +181,7 @@ export const LessonScreen = () => {
   const playSound = async (type: 'correct' | 'incorrect') => {
     // Sounds disabled - causes CORS issues on web
     return;
-    
+
     /* Uncomment when sound files are properly hosted
     try {
       const { sound } = await Audio.Sound.createAsync(
@@ -233,14 +232,14 @@ export const LessonScreen = () => {
   };
 
   const handleNext = async () => {
-    console.log('[LessonScreen] handleNext', { 
-      hasLesson: !!lesson, 
-      canContinue, 
-      currentStepIndex, 
+    console.log('[LessonScreen] handleNext', {
+      hasLesson: !!lesson,
+      canContinue,
+      currentStepIndex,
       totalSteps: lesson?.lesson_steps.length,
-      lives 
+      lives,
     });
-    
+
     if (!lesson || !canContinue) {
       console.log('[LessonScreen] Cannot continue - missing lesson or not allowed');
       return;
@@ -264,13 +263,13 @@ export const LessonScreen = () => {
   };
 
   const completeLesson = async () => {
-    console.log('[LessonScreen] completeLesson started', { 
-      hasLesson: !!lesson, 
+    console.log('[LessonScreen] completeLesson started', {
+      hasLesson: !!lesson,
       hasUser: !!user,
       score,
-      totalSteps: lesson?.lesson_steps.length 
+      totalSteps: lesson?.lesson_steps.length,
     });
-    
+
     if (!lesson) {
       console.error('[LessonScreen] No lesson data, cannot complete');
       return;
@@ -307,7 +306,7 @@ export const LessonScreen = () => {
       setShowCelebration(true);
       return;
     }
-    
+
     console.log('[LessonScreen] User logged in, saving progress to database');
 
     try {
@@ -322,12 +321,12 @@ export const LessonScreen = () => {
       if (profileError) {
         console.error('[LessonScreen] Error fetching profile:', profileError);
       }
-      
+
       if (!currentProfile) {
         console.error('[LessonScreen] No profile found for user');
         return;
       }
-      
+
       console.log('[LessonScreen] Profile data:', currentProfile);
 
       const currentXP = currentProfile.total_xp || 0;
@@ -372,7 +371,7 @@ export const LessonScreen = () => {
         completed_at: new Date().toISOString(),
         xp_earned: totalXP,
       });
-      
+
       if (progressError) {
         console.error('[LessonScreen] Error saving progress:', progressError);
       } else {
@@ -380,7 +379,12 @@ export const LessonScreen = () => {
       }
 
       // 5. Update profile with XP, streak, and stats
-      console.log('[LessonScreen] Updating profile', { newXP, newStreak, longestStreak, lessonsCompleted });
+      console.log('[LessonScreen] Updating profile', {
+        newXP,
+        newStreak,
+        longestStreak,
+        lessonsCompleted,
+      });
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -391,7 +395,7 @@ export const LessonScreen = () => {
           lessons_completed: lessonsCompleted,
         })
         .eq('id', user.id);
-        
+
       if (updateError) {
         console.error('[LessonScreen] Error updating profile:', updateError);
       } else {
@@ -399,7 +403,12 @@ export const LessonScreen = () => {
       }
 
       // 6. Set celebration data
-      console.log('[LessonScreen] Setting celebration data', { baseXP, bonusXP, newStreak, leveledUp });
+      console.log('[LessonScreen] Setting celebration data', {
+        baseXP,
+        bonusXP,
+        newStreak,
+        leveledUp,
+      });
       setCelebrationData({
         xpEarned: baseXP,
         bonusXP: bonusXP,
@@ -456,7 +465,9 @@ export const LessonScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+      <View
+        style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={brandColors.purple} />
         </View>
@@ -466,7 +477,9 @@ export const LessonScreen = () => {
 
   if (!lesson) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+      <View
+        style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
+      >
         <Text variant="body" style={styles.errorText}>
           Kunde inte ladda lektionen
         </Text>
@@ -498,12 +511,20 @@ export const LessonScreen = () => {
     );
   }
 
-  const currentStep = lesson.lesson_steps[currentStepIndex];
+  const rawStep = lesson.lesson_steps[currentStepIndex];
+  const currentStep = {
+    ...rawStep,
+    content: l(rawStep, 'content'),
+    correct_answer: l(rawStep, 'correct_answer'),
+    explanation: l(rawStep, 'explanation'),
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 16, borderBottomColor: ui.card.border }]}>
+      <View
+        style={[styles.header, { paddingTop: insets.top + 16, borderBottomColor: ui.card.border }]}
+      >
         <Pressable
           onPress={handleExit}
           style={[styles.exitButton, { backgroundColor: ui.card.background }]}
@@ -650,12 +671,20 @@ export const LessonScreen = () => {
               onContinue={() => setCanContinue(true)}
             />
           )}
-
         </MotiView>
       </ScrollView>
 
       {/* Bottom Action Button */}
-      <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 16, borderTopColor: ui.card.border, backgroundColor: colors.background }]}>
+      <View
+        style={[
+          styles.bottomBar,
+          {
+            paddingBottom: insets.bottom + 16,
+            borderTopColor: ui.card.border,
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
         <Pressable
           onPress={handleNext}
           disabled={!canContinue}
@@ -668,7 +697,9 @@ export const LessonScreen = () => {
             end={{ x: 1, y: 1 }}
           >
             <Text variant="body" style={styles.continueText}>
-              {currentStepIndex < lesson.lesson_steps.length - 1 ? t.common.continue : t.lessons.finishLesson}
+              {currentStepIndex < lesson.lesson_steps.length - 1
+                ? t.common.continue
+                : t.lessons.finishLesson}
             </Text>
           </LinearGradient>
         </Pressable>

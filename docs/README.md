@@ -7,18 +7,21 @@ Välkommen till dokumentationen för AI Klubben mobilapp!
 Dokumentationen är organiserad i följande kategorier:
 
 ### 🏗️ [Architecture](./architecture/)
+
 - Teknisk stack och arkitektur
 - Projektstruktur
 - Databas-schema
 - API-integration
 
 ### 🎨 [Design](./design/)
+
 - Design system
 - Komponentbibliotek
 - Gamification design
 - UI/UX-riktlinjer
 
 ### ⚙️ [Features](./features/)
+
 - Lessons & Courses
 - Gamification
 - Authentication
@@ -26,17 +29,20 @@ Dokumentationen är organiserad i följande kategorier:
 - Content Management
 
 ### 🔧 [Development](./development/)
+
 - Setup & Installation
 - Utvecklingsworkflow
 - Testing
 - Deployment
 
 ### 📖 [API](./api/)
+
 - Supabase integration
 - REST endpoints
 - Real-time subscriptions
 
 ### 🐛 [Troubleshooting](./troubleshooting/)
+
 - Vanliga problem
 - Debug-guide
 - FAQ
@@ -50,6 +56,7 @@ Dokumentationen är organiserad i följande kategorier:
 ## 📱 Om Appen
 
 AI Klubben är en React Native-app byggd med Expo som erbjuder:
+
 - Interaktiva AI-lektioner
 - Gamification med XP, streaks och badges
 - Kurser i prompt engineering och AI

@@ -1,6 +1,7 @@
 # Code Quality Rules - TypeScript & React Native
 
 ## Activation
+
 - **Mode**: Always On
 - **Description**: Code quality standards and TypeScript best practices
 
@@ -9,6 +10,7 @@
 ## TypeScript Configuration
 
 ### Strict Mode Requirements
+
 ```json
 // tsconfig.json - REQUIRED settings
 {
@@ -35,13 +37,14 @@
 ## Type Definitions
 
 ### NEVER Use `any`
+
 ```typescript
 // WRONG: Using any
-const processData = (data: any) => { };
+const processData = (data: any) => {};
 const items: any[] = [];
 
 // CORRECT: Use specific types
-const processData = (data: UserData) => { };
+const processData = (data: UserData) => {};
 const items: User[] = [];
 
 // CORRECT: Use unknown for truly unknown data
@@ -52,6 +55,7 @@ const processArray = <T>(items: T[]): T[] => items;
 ```
 
 ### Type vs Interface
+
 ```typescript
 // USE interface for:
 // - Object shapes that may be extended
@@ -79,6 +83,7 @@ type UserOrAdmin = User | Admin;
 ```
 
 ### Type Assertions
+
 ```typescript
 // AVOID type assertions when possible
 // WRONG: Unsafe assertion
@@ -86,12 +91,7 @@ const user = data as User;
 
 // CORRECT: Type guard
 const isUser = (data: unknown): data is User => {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    'name' in data &&
-    'email' in data
-  );
+  return typeof data === 'object' && data !== null && 'name' in data && 'email' in data;
 };
 
 if (isUser(data)) {
@@ -109,6 +109,7 @@ if (!element) throw new Error('Root element not found');
 ## Null Safety
 
 ### Defensive Null Checks
+
 ```typescript
 // ALWAYS check for null/undefined before use
 // WRONG: Unsafe access
@@ -127,6 +128,7 @@ if (user && user.profile) {
 ```
 
 ### Non-Null Assertion Usage
+
 ```typescript
 // AVOID non-null assertion (!) when possible
 // WRONG: Hiding potential null issues
@@ -148,21 +150,22 @@ const firstItem = items[0]; // Safe after check
 ## Function Patterns
 
 ### Early Returns
+
 ```typescript
 // CORRECT: Early returns reduce nesting
 const processUser = (user: User | null): Result => {
   if (!user) {
     return { error: 'No user provided' };
   }
-  
+
   if (!user.isActive) {
     return { error: 'User is not active' };
   }
-  
+
   if (!user.hasPermission) {
     return { error: 'User lacks permission' };
   }
-  
+
   // Main logic with all checks passed
   return { data: process(user) };
 };
@@ -186,6 +189,7 @@ const processUserBad = (user: User | null): Result => {
 ```
 
 ### Function Parameter Limits
+
 ```typescript
 // WRONG: Too many parameters
 const createUser = (
@@ -195,7 +199,7 @@ const createUser = (
   role: string,
   department: string,
   startDate: Date,
-) => { };
+) => {};
 
 // CORRECT: Use options object for 3+ parameters
 interface CreateUserOptions {
@@ -207,7 +211,7 @@ interface CreateUserOptions {
   startDate?: Date;
 }
 
-const createUser = (options: CreateUserOptions) => { };
+const createUser = (options: CreateUserOptions) => {};
 ```
 
 ---
@@ -215,6 +219,7 @@ const createUser = (options: CreateUserOptions) => { };
 ## Async/Await Patterns
 
 ### Error Handling
+
 ```typescript
 // CORRECT: Explicit try-catch with typed errors
 const fetchUser = async (id: string): Promise<User | null> => {
@@ -232,17 +237,15 @@ const fetchUser = async (id: string): Promise<User | null> => {
 };
 
 // CORRECT: Result type pattern
-type Result<T, E = Error> = 
-  | { success: true; data: T }
-  | { success: false; error: E };
+type Result<T, E = Error> = { success: true; data: T } | { success: false; error: E };
 
 const fetchUserResult = async (id: string): Promise<Result<User>> => {
   try {
     const response = await api.get(`/users/${id}`);
     return { success: true, data: response.data };
   } catch (error) {
-    return { 
-      success: false, 
+    return {
+      success: false,
       error: error instanceof Error ? error : new Error('Unknown error'),
     };
   }
@@ -250,6 +253,7 @@ const fetchUserResult = async (id: string): Promise<Result<User>> => {
 ```
 
 ### Avoid Floating Promises
+
 ```typescript
 // WRONG: Floating promise
 useEffect(() => {
@@ -270,9 +274,7 @@ useEffect(() => {
 
 // CORRECT: Using .then/.catch
 useEffect(() => {
-  fetchData()
-    .then(setData)
-    .catch(console.error);
+  fetchData().then(setData).catch(console.error);
 }, []);
 ```
 
@@ -281,6 +283,7 @@ useEffect(() => {
 ## Import Organization
 
 ### Import Order (Enforced)
+
 ```typescript
 // 1. React imports
 import React, { useState, useEffect, useCallback } from 'react';
@@ -313,6 +316,7 @@ import { COLORS, SPACING } from '@/constants';
 ```
 
 ### Absolute Imports
+
 ```typescript
 // CORRECT: Use absolute imports with @ alias
 import { Button } from '@/components/ui';
@@ -332,6 +336,7 @@ import { HelperFunction } from './helpers';
 ## Naming Conventions
 
 ### File Naming
+
 ```
 Components:     PascalCase.tsx     (Button.tsx, UserCard.tsx)
 Hooks:          camelCase.ts       (useAuth.ts, useFetch.ts)
@@ -342,17 +347,18 @@ Screens:        PascalCase.tsx     (HomeScreen.tsx)
 ```
 
 ### Variable/Function Naming
+
 ```typescript
 // Components: PascalCase
-const UserProfile: React.FC = () => { };
+const UserProfile: React.FC = () => {};
 
 // Hooks: camelCase starting with 'use'
-const useUserData = () => { };
+const useUserData = () => {};
 
 // Event handlers: handle + Event
-const handlePress = () => { };
-const handleSubmit = () => { };
-const handleChange = (value: string) => { };
+const handlePress = () => {};
+const handleSubmit = () => {};
+const handleChange = (value: string) => {};
 
 // Booleans: is/has/should/can prefix
 const isLoading = true;
@@ -370,6 +376,7 @@ const API_BASE_URL = 'https://api.example.com';
 ## Comments
 
 ### When to Comment
+
 ```typescript
 // COMMENT: Complex business logic
 // Calculate discount based on user tier and purchase history

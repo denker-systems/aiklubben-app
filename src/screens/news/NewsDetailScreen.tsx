@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   View,
   Image,
@@ -7,11 +7,12 @@ import {
   Pressable,
   StyleSheet,
   Dimensions,
+  Linking,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
-import { ArrowLeft, Calendar, Clock } from 'lucide-react-native';
+import { ArrowLeft, Calendar, Clock, ExternalLink } from 'lucide-react-native';
 import { supabase } from '@/config/supabase';
 import { brandColors } from '@/config/theme';
 import { format } from 'date-fns';
@@ -31,7 +32,8 @@ export const NewsDetailScreen = () => {
   const { id } = route.params;
 
   const { isDark, colors } = useTheme();
-  const { t } = useLanguage();
+  const { t, l } = useLanguage();
+  const themedMarkdownStyles = useMemo(() => getMarkdownStyles(isDark), [isDark]);
 
   console.log('[NewsDetailScreen] Rendered', { articleId: id });
 
@@ -46,7 +48,7 @@ export const NewsDetailScreen = () => {
 
   useEffect(() => {
     console.log('[NewsDetailScreen] useEffect triggered', { id });
-    
+
     const fetchArticle = async () => {
       console.log('[NewsDetailScreen] Fetching article');
       try {
@@ -96,7 +98,9 @@ export const NewsDetailScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+      <View
+        style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
+      >
         <View style={styles.loadingContainer}>
           <MotiView
             from={{ opacity: 0, scale: 0.8 }}
@@ -112,7 +116,9 @@ export const NewsDetailScreen = () => {
 
   if (!article) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+      <View
+        style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
+      >
         <View style={styles.loadingContainer}>
           <Text variant="h2">{t.newsDetail.articleNotFound}</Text>
           <Pressable onPress={handleGoBack} style={styles.backLink}>
@@ -126,26 +132,34 @@ export const NewsDetailScreen = () => {
   }
 
   const getProcessedContent = () => {
-    if (!article.content) return '';
-    const titleLine = `# ${article.title}`;
-    if (article.content.trim().startsWith(titleLine)) {
-      return article.content.trim().replace(titleLine, '').trim();
+    const body = l(article, 'content');
+    if (!body) return '';
+    const titleLine = `# ${l(article, 'title')}`;
+    if (body.trim().startsWith(titleLine)) {
+      return body.trim().replace(titleLine, '').trim();
     }
-    return article.content;
+    return body;
   };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Floating Header */}
       <MotiView
-        style={[styles.floatingHeader, { paddingTop: insets.top + 8, opacity: headerOpacity, backgroundColor: isDark ? 'rgba(12, 10, 23, 0.95)' : 'rgba(255, 255, 255, 0.95)' }]}
+        style={[
+          styles.floatingHeader,
+          {
+            paddingTop: insets.top + 8,
+            opacity: headerOpacity,
+            backgroundColor: isDark ? 'rgba(12, 10, 23, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+          },
+        ]}
         animate={{ opacity: headerOpacity }}
       >
         <Pressable onPress={handleGoBack} style={styles.headerBackButton}>
           <ArrowLeft size={20} color="#F9FAFB" />
         </Pressable>
         <Text variant="body" numberOfLines={1} style={styles.headerTitle}>
-          {article.title}
+          {l(article, 'title')}
         </Text>
         <View style={{ width: 40 }} />
       </MotiView>
@@ -166,7 +180,9 @@ export const NewsDetailScreen = () => {
               resizeMode="cover"
             />
           ) : (
-            <View style={[styles.heroPlaceholder, { backgroundColor: isDark ? '#1A1625' : '#F3F4F6' }]}>
+            <View
+              style={[styles.heroPlaceholder, { backgroundColor: isDark ? '#1A1625' : '#F3F4F6' }]}
+            >
               <Text style={styles.heroEmoji}>{article.news_categories?.emoji || '📰'}</Text>
             </View>
           )}
@@ -189,7 +205,7 @@ export const NewsDetailScreen = () => {
           animate={{ opacity: 1, translateY: 0 }}
           transition={SPRING_CONFIGS.smooth}
         >
-          {/* Category Badge */}
+          {/* Category + Format Badges */}
           <MotiView
             from={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -200,6 +216,15 @@ export const NewsDetailScreen = () => {
               <Text style={styles.categoryEmoji}>{article.news_categories.emoji}</Text>
             )}
             <Badge label={article.news_categories?.name || 'Nyhet'} variant="primary" />
+            {article.content_format && article.content_format !== 'news' && (
+              <Badge
+                label={
+                  (t.newsDetail as any)[`format${article.content_format.charAt(0).toUpperCase() + article.content_format.slice(1)}`]
+                  || article.content_format
+                }
+                variant="secondary"
+              />
+            )}
           </MotiView>
 
           {/* Title */}
@@ -209,7 +234,7 @@ export const NewsDetailScreen = () => {
             transition={{ ...SPRING_CONFIGS.smooth, delay: STAGGER_DELAYS.normal }}
           >
             <Text variant="h1" style={styles.title}>
-              {article.title}
+              {l(article, 'title')}
             </Text>
           </MotiView>
 
@@ -255,7 +280,7 @@ export const NewsDetailScreen = () => {
           )}
 
           {/* Summary Card */}
-          {article.summary && (
+          {l(article, 'summary') && (
             <MotiView
               style={styles.summaryCard}
               from={{ opacity: 0, translateX: -20 }}
@@ -264,7 +289,7 @@ export const NewsDetailScreen = () => {
             >
               <View style={styles.summaryAccent} />
               <Text variant="body" style={[styles.summaryText, { color: colors.text.secondary }]}>
-                {article.summary}
+                {l(article, 'summary')}
               </Text>
             </MotiView>
           )}
@@ -275,36 +300,93 @@ export const NewsDetailScreen = () => {
             animate={{ opacity: 1 }}
             transition={{ ...SPRING_CONFIGS.gentle, delay: STAGGER_DELAYS.normal * 4 }}
           >
-            <Markdown style={markdownStyles}>{getProcessedContent()}</Markdown>
+            <Markdown style={themedMarkdownStyles}>{getProcessedContent()}</Markdown>
           </MotiView>
+
+          {/* AI Analysis Section */}
+          {l(article, 'analysis') && (
+            <MotiView
+              from={{ opacity: 0, translateY: 10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ ...SPRING_CONFIGS.smooth, delay: STAGGER_DELAYS.normal * 4.5 }}
+              style={styles.analysisCard}
+            >
+              <View style={styles.analysisHeader}>
+                <Text style={styles.analysisEmoji}>🤖</Text>
+                <Text variant="body-sm" weight="bold" style={{ color: brandColors.purple }}>
+                  {t.newsDetail.aiAnalysis || 'AI-analys'}
+                </Text>
+              </View>
+              <Text variant="body" style={[styles.analysisText, { color: colors.text.secondary }]}>
+                {l(article, 'analysis')}
+              </Text>
+            </MotiView>
+          )}
+
+          {/* Sources Section */}
+          {article.sources && article.sources.length > 0 && (
+            <MotiView
+              from={{ opacity: 0, translateY: 10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ ...SPRING_CONFIGS.smooth, delay: STAGGER_DELAYS.normal * 5 }}
+              style={styles.sourcesSection}
+            >
+              <Text variant="h3" style={[styles.sourcesTitle, { color: colors.text.primary }]}>
+                {t.newsDetail.sources || 'Källor'}
+              </Text>
+              {article.sources.map((source: any, index: number) => (
+                <Pressable
+                  key={index}
+                  onPress={() => source.url && Linking.openURL(source.url)}
+                  style={styles.sourceItem}
+                >
+                  <View style={styles.sourceInfo}>
+                    <Text variant="body-sm" weight="bold" style={{ color: brandColors.purple }}>
+                      {source.name}
+                    </Text>
+                    {source.title && (
+                      <Text
+                        variant="caption"
+                        numberOfLines={1}
+                        style={{ color: colors.text.muted }}
+                      >
+                        {source.title}
+                      </Text>
+                    )}
+                  </View>
+                  <ExternalLink size={16} color={brandColors.purple} />
+                </Pressable>
+              ))}
+            </MotiView>
+          )}
         </MotiView>
       </ScrollView>
     </View>
   );
 };
 
-const markdownStyles = {
+const getMarkdownStyles = (isDark: boolean) => ({
   body: {
-    color: '#E5E7EB',
+    color: isDark ? '#E5E7EB' : '#374151',
     fontSize: 17,
     lineHeight: 28,
   },
   heading1: {
-    color: '#F9FAFB',
+    color: isDark ? '#F9FAFB' : '#111827',
     fontSize: 26,
     fontWeight: '700' as const,
     marginTop: 32,
     marginBottom: 16,
   },
   heading2: {
-    color: '#F9FAFB',
+    color: isDark ? '#F9FAFB' : '#111827',
     fontSize: 22,
     fontWeight: '600' as const,
     marginTop: 28,
     marginBottom: 12,
   },
   heading3: {
-    color: '#F9FAFB',
+    color: isDark ? '#F9FAFB' : '#111827',
     fontSize: 18,
     fontWeight: '600' as const,
     marginTop: 24,
@@ -313,11 +395,16 @@ const markdownStyles = {
   paragraph: { marginBottom: 16 },
   bullet_list: { marginBottom: 16 },
   ordered_list: { marginBottom: 16 },
-  list_item: { color: '#E5E7EB', fontSize: 17, lineHeight: 28, marginBottom: 8 },
-  strong: { fontWeight: '700' as const, color: '#FFFFFF' },
-  em: { fontStyle: 'italic' as const, color: '#D1D5DB' },
+  list_item: {
+    color: isDark ? '#E5E7EB' : '#374151',
+    fontSize: 17,
+    lineHeight: 28,
+    marginBottom: 8,
+  },
+  strong: { fontWeight: '700' as const, color: isDark ? '#FFFFFF' : '#111827' },
+  em: { fontStyle: 'italic' as const, color: isDark ? '#D1D5DB' : '#6B7280' },
   blockquote: {
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    backgroundColor: isDark ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.08)',
     borderLeftColor: brandColors.purple,
     borderLeftWidth: 3,
     paddingHorizontal: 16,
@@ -326,8 +413,8 @@ const markdownStyles = {
     borderRadius: 8,
   },
   code_inline: {
-    backgroundColor: 'rgba(139, 92, 246, 0.15)',
-    color: '#A78BFA',
+    backgroundColor: isDark ? 'rgba(139, 92, 246, 0.15)' : 'rgba(139, 92, 246, 0.1)',
+    color: isDark ? '#A78BFA' : '#7C3AED',
     paddingHorizontal: 6,
     borderRadius: 4,
   },
@@ -335,7 +422,7 @@ const markdownStyles = {
     color: brandColors.purple,
     textDecorationLine: 'underline' as const,
   },
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -469,6 +556,49 @@ const styles = StyleSheet.create({
     flex: 1,
     // color set dynamically
     fontStyle: 'italic',
+    lineHeight: 24,
+  },
+  sourcesSection: {
+    marginTop: 32,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(139, 92, 246, 0.15)',
+  },
+  sourcesTitle: {
+    marginBottom: 16,
+  },
+  sourceItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(139, 92, 246, 0.06)',
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  sourceInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  analysisCard: {
+    marginTop: 24,
+    padding: 20,
+    backgroundColor: 'rgba(139, 92, 246, 0.06)',
+    borderRadius: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: brandColors.purple,
+  },
+  analysisHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  analysisEmoji: {
+    fontSize: 18,
+  },
+  analysisText: {
     lineHeight: 24,
   },
 });

@@ -28,10 +28,7 @@ export const StartButton: React.FC<StartButtonProps> = ({
       <View style={styles.pointer} />
 
       <View style={styles.button}>
-        <Pressable
-          onPress={onPress}
-          style={styles.buttonPressable}
-        >
+        <Pressable onPress={onPress} style={styles.buttonPressable}>
           <Text style={styles.text}>{label}</Text>
         </Pressable>
       </View>
