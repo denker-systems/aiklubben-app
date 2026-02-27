@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Pressable, StyleSheet, ViewStyle } from 'react-native';
 import { MotiView } from 'moti';
 import { Check, X } from 'lucide-react-native';
@@ -7,6 +7,7 @@ import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getUiColors } from '@/config/design';
 import { brandColors } from '@/config/theme';
+import { useFeedback } from '@/hooks/useFeedback';
 
 type ChipState = 'default' | 'selected' | 'correct' | 'incorrect' | 'disabled' | 'used';
 
@@ -33,7 +34,13 @@ export const OptionChip: React.FC<OptionChipProps> = ({
 }) => {
   const { isDark } = useTheme();
   const ui = getUiColors(isDark);
+  const { feedbackSelection } = useFeedback();
   const isDisabled = disabled || state === 'disabled' || state === 'used';
+
+  const handlePress = useCallback(() => {
+    feedbackSelection();
+    onPress?.();
+  }, [onPress, feedbackSelection]);
 
   const getStateStyles = () => {
     switch (state) {
@@ -81,7 +88,7 @@ export const OptionChip: React.FC<OptionChipProps> = ({
           style,
         ]}
       >
-        <Pressable onPress={onPress} disabled={isDisabled} style={styles.chipPressable}>
+        <Pressable onPress={handlePress} disabled={isDisabled} style={styles.chipPressable}>
           <Text
             variant="body"
             style={[

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { MotiView } from 'moti';
 import { Check, X, Lightbulb } from 'lucide-react-native';
@@ -7,6 +7,7 @@ import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
+import { useFeedback } from '@/hooks/useFeedback';
 
 interface FeedbackCardProps {
   isCorrect: boolean;
@@ -27,8 +28,20 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
+  const { feedbackCorrect, feedbackIncorrect } = useFeedback();
   const defaultTitle = isCorrect ? t.feedback.correct : t.feedback.incorrect;
   const color = isCorrect ? '#10B981' : '#EF4444';
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (isCorrect) {
+        feedbackCorrect();
+      } else {
+        feedbackIncorrect();
+      }
+    }, delay);
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
     <MotiView

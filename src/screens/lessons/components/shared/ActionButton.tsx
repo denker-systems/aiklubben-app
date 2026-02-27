@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Pressable, StyleSheet, ViewStyle } from 'react-native';
 import { MotiView } from 'moti';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,6 +8,7 @@ import { SPRING_CONFIGS } from '@/lib/animations';
 import { brandColors } from '@/config/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getUiColors } from '@/config/design';
+import { useFeedback } from '@/hooks/useFeedback';
 
 type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost';
 
@@ -44,8 +45,14 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
 }) => {
   const { isDark, colors: themeColors } = useTheme();
   const ui = getUiColors(isDark);
+  const { feedbackTap } = useFeedback();
   const colors = disabled ? variantColors.secondary : variantColors[variant];
   const isGhost = variant === 'ghost';
+
+  const handlePress = useCallback(() => {
+    feedbackTap();
+    onPress();
+  }, [onPress, feedbackTap]);
 
   const getSizeStyles = () => {
     switch (size) {
@@ -66,7 +73,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       style={[fullWidth && styles.fullWidth, style]}
     >
       <View style={styles.button}>
-        <Pressable onPress={onPress} disabled={disabled} style={styles.buttonPressable}>
+        <Pressable onPress={handlePress} disabled={disabled} style={styles.buttonPressable}>
           {isGhost ? (
             <MotiView
               style={[styles.ghostContent, getSizeStyles(), { borderColor: ui.card.border }]}
