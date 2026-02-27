@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 import { useColorScheme, Appearance } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { themeColors, ThemeColors } from '@/config/design';
+import { scheduleDailyReminder, cancelDailyReminder } from '@/hooks/useNotifications';
 
 export type ThemeType = 'light' | 'dark' | 'system';
 export type ResolvedTheme = 'light' | 'dark';
@@ -18,7 +19,7 @@ interface ThemeContextType {
   isDark: boolean;
   colors: ThemeColors;
   notificationsEnabled: boolean;
-  setNotificationsEnabled: (enabled: boolean) => void;
+  setNotificationsEnabled: (enabled: boolean, title?: string, body?: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -69,15 +70,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode; defaultTheme?:
     setTheme(newTheme);
   }, [resolvedTheme, setTheme]);
 
-  const setNotificationsEnabled = useCallback(async (enabled: boolean) => {
-    console.log('[ThemeContext] Setting notifications enabled:', enabled);
-    try {
-      setNotificationsState(enabled);
-      await AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(enabled));
-    } catch (error) {
-      console.error('❌ Error saving notifications setting:', error);
-    }
-  }, []);
+  const setNotificationsEnabled = useCallback(
+    async (enabled: boolean, title?: string, body?: string) => {
+      console.log('[ThemeContext] Setting notifications enabled:', enabled);
+      try {
+        setNotificationsState(enabled);
+        await AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(enabled));
+        if (enabled && title && body) {
+          await scheduleDailyReminder(title, body);
+        } else if (!enabled) {
+          await cancelDailyReminder();
+        }
+      } catch (error) {
+        console.error('❌ Error saving notifications setting:', error);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     const initializeSettings = async () => {

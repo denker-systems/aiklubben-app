@@ -154,6 +154,9 @@ export const en: Translations = {
     title: 'Settings',
     appSettings: 'APP SETTINGS',
     notifications: 'Notifications',
+    notificationReminderTitle: 'Time to learn!',
+    notificationReminderBody:
+      'You have a daily goal to reach. Open AI Klubben and continue your journey.',
     darkMode: 'Dark mode',
     language: 'Language',
     accountSecurity: 'ACCOUNT & SECURITY',

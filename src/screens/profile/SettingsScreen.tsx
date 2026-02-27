@@ -108,7 +108,13 @@ export const SettingsScreen = () => {
             right={
               <Switch
                 value={notificationsEnabled}
-                onValueChange={setNotificationsEnabled}
+                onValueChange={(enabled) =>
+                  setNotificationsEnabled(
+                    enabled,
+                    t.settings.notificationReminderTitle,
+                    t.settings.notificationReminderBody,
+                  )
+                }
                 trackColor={{ false: colors.glass.strong, true: brandColors.purple }}
                 thumbColor={notificationsEnabled ? '#FFFFFF' : '#F4F3F4'}
               />

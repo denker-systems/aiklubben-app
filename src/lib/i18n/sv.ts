@@ -152,6 +152,9 @@ export const sv = {
     title: 'Inställningar',
     appSettings: 'APP-INSTÄLLNINGAR',
     notifications: 'Aviseringar',
+    notificationReminderTitle: 'Dags att lära sig!',
+    notificationReminderBody:
+      'Du har ett dagligt mål att uppnå. Öppna AI Klubben och fortsätt din resa.',
     darkMode: 'Mörkt läge',
     language: 'Språk',
     accountSecurity: 'KONTO & SÄKERHET',
