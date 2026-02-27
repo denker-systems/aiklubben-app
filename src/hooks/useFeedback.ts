@@ -6,9 +6,9 @@ import { Audio } from 'expo-av';
 type SoundKey = 'correct' | 'incorrect' | 'celebrate';
 
 const soundFiles: Record<SoundKey, any> = {
-  correct: require('@/assets/sounds/correct.mp3'),
-  incorrect: require('@/assets/sounds/incorrect.mp3'),
-  celebrate: require('@/assets/sounds/celebrate.mp3'),
+  correct: require('../../assets/sounds/correct.mp3'),
+  incorrect: require('../../assets/sounds/incorrect.mp3'),
+  celebrate: require('../../assets/sounds/celebrate.mp3'),
 };
 
 const soundVolumes: Record<SoundKey, number> = {
