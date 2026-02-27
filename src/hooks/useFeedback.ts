@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Audio } from 'expo-av';
 
@@ -16,7 +17,10 @@ const soundVolumes: Record<SoundKey, number> = {
   celebrate: 0.7,
 };
 
+const isNative = Platform.OS !== 'web';
+
 async function playSound(key: SoundKey) {
+  if (!isNative) return;
   try {
     const { sound } = await Audio.Sound.createAsync(soundFiles[key], {
       shouldPlay: true,
@@ -34,10 +38,12 @@ async function playSound(key: SoundKey) {
 
 export function useFeedback() {
   useEffect(() => {
+    if (!isNative) return;
     Audio.setAudioModeAsync({ playsInSilentModeIOS: false }).catch(() => {});
   }, []);
 
   const feedbackCorrect = useCallback(async () => {
+    if (!isNative) return;
     await Promise.all([
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
       playSound('correct'),
@@ -45,6 +51,7 @@ export function useFeedback() {
   }, []);
 
   const feedbackIncorrect = useCallback(async () => {
+    if (!isNative) return;
     await Promise.all([
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error),
       playSound('incorrect'),
@@ -52,10 +59,12 @@ export function useFeedback() {
   }, []);
 
   const feedbackTap = useCallback(async () => {
+    if (!isNative) return;
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   }, []);
 
   const feedbackCelebrate = useCallback(async () => {
+    if (!isNative) return;
     await Promise.all([
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
       playSound('celebrate'),
@@ -63,10 +72,12 @@ export function useFeedback() {
   }, []);
 
   const feedbackHeavy = useCallback(async () => {
+    if (!isNative) return;
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
   }, []);
 
   const feedbackSelection = useCallback(async () => {
+    if (!isNative) return;
     await Haptics.selectionAsync();
   }, []);
 
