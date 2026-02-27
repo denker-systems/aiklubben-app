@@ -1,6 +1,8 @@
 import { useEffect, useCallback } from 'react';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+import { supabase } from '@/config/supabase';
 
 const REMINDER_HOUR = 18;
 const REMINDER_MINUTE = 0;
@@ -56,6 +58,26 @@ export async function cancelDailyReminder(): Promise<void> {
     }
   } catch (err) {
     console.error('[useNotifications] cancelDailyReminder error:', err);
+  }
+}
+
+export async function registerPushToken(userId: string): Promise<void> {
+  try {
+    if (Platform.OS !== 'ios') return;
+
+    const granted = await requestNotificationPermission();
+    if (!granted) return;
+
+    const tokenData = await Notifications.getExpoPushTokenAsync();
+    const token = tokenData.data;
+    if (!token) return;
+
+    await supabase.from('push_tokens').upsert(
+      { user_id: userId, token, platform: 'ios' },
+      { onConflict: 'user_id,token' },
+    );
+  } catch (err) {
+    console.error('[useNotifications] registerPushToken error:', err);
   }
 }
 

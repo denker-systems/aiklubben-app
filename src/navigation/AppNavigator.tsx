@@ -33,6 +33,7 @@ import { TabNavigationProvider, useTabNavigation } from '@/contexts/TabNavigatio
 import { RootStackParamList } from '@/types/navigation';
 import { brandColors } from '@/config/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { registerPushToken } from '@/hooks/useNotifications';
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -69,6 +70,7 @@ const AppNavigatorContent = () => {
       setHasOnboarded(data?.has_done_onboarding ?? false);
     };
     checkOnboarding();
+    registerPushToken(user.id);
   }, [user]);
 
   const handleStartComplete = useCallback(() => {
