@@ -333,7 +333,10 @@ export const NewsDetailScreen = () => {
               from={{ opacity: 0, translateY: 10 }}
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ ...SPRING_CONFIGS.smooth, delay: STAGGER_DELAYS.normal * 4.5 }}
-              style={styles.analysisCard}
+              style={[
+                styles.analysisCard,
+                { backgroundColor: colors.glass.light, borderColor: colors.border.subtle },
+              ]}
             >
               <View style={styles.analysisHeader}>
                 <Text style={styles.analysisEmoji}>🤖</Text>
@@ -362,7 +365,7 @@ export const NewsDetailScreen = () => {
                 <Pressable
                   key={index}
                   onPress={() => source.url && Linking.openURL(source.url)}
-                  style={styles.sourceItem}
+                  style={[styles.sourceItem, { backgroundColor: colors.glass.light, borderWidth: 1, borderColor: colors.border.subtle }]}
                 >
                   <View style={styles.sourceInfo}>
                     <Text variant="body-sm" weight="bold" style={{ color: brandColors.purple }}>
@@ -617,8 +620,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: 'rgba(139, 92, 246, 0.06)',
-    borderRadius: 12,
+    borderRadius: 14,
     marginBottom: 8,
   },
   sourceInfo: {
@@ -628,8 +630,8 @@ const styles = StyleSheet.create({
   analysisCard: {
     marginTop: 24,
     padding: 20,
-    backgroundColor: 'rgba(139, 92, 246, 0.06)',
     borderRadius: 16,
+    borderWidth: 1,
     borderLeftWidth: 3,
     borderLeftColor: brandColors.purple,
   },
