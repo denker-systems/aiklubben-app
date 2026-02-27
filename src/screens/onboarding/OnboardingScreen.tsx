@@ -3,7 +3,7 @@ import { View, Pressable, StyleSheet, Image, ImageSourcePropType } from 'react-n
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { useFeedback } from '@/hooks/useFeedback';
 import { supabase } from '@/config/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { Text, StepIndicator } from '@/components/ui';
@@ -68,6 +68,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }
   const { user } = useAuth();
   const { isDark, colors } = useTheme();
   const [currentStep, setCurrentStep] = useState(0);
+  const { feedbackTap, feedbackCelebrate } = useFeedback();
 
   const isLastStep = currentStep === STEPS.length - 1;
   const stepData = STEPS[currentStep];
@@ -80,19 +81,19 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }
   }, [user, onComplete]);
 
   const handleNext = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (isLastStep) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      feedbackCelebrate();
       await markOnboardingDone();
     } else {
+      feedbackTap();
       setCurrentStep((s) => s + 1);
     }
-  }, [isLastStep, markOnboardingDone]);
+  }, [isLastStep, markOnboardingDone, feedbackTap, feedbackCelebrate]);
 
   const handleSkip = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    feedbackTap();
     await markOnboardingDone();
-  }, [markOnboardingDone]);
+  }, [markOnboardingDone, feedbackTap]);
 
   const bg = isDark
     ? [brandColors.deepDark, '#1a1040', brandColors.darkBg]

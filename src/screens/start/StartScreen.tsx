@@ -3,7 +3,7 @@ import { View, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { useFeedback } from '@/hooks/useFeedback';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text, StepIndicator } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
@@ -48,16 +48,17 @@ export const StartScreen: React.FC<StartScreenProps> = ({ onComplete }) => {
   const [step, setStep] = useState(0);
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [selectedLang, setSelectedLang] = useState<Locale | null>(null);
+  const { feedbackTap, feedbackCelebrate } = useFeedback();
   const [selectedTheme, setSelectedTheme] = useState<ResolvedTheme>('light');
 
   const goNext = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    feedbackTap();
     setStep((s) => s + 1);
-  }, []);
+  }, [feedbackTap]);
 
   const handleRegionSelect = useCallback(
     (region: Region) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      feedbackTap();
       setSelectedRegion(region);
       if (region === 'europe' || region === 'south_america') {
         setSelectedLang('sv');
@@ -71,7 +72,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({ onComplete }) => {
 
   const handleLangSelect = useCallback(
     (lang: Locale) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      feedbackTap();
       setSelectedLang(lang);
       setLocale(lang);
       setTimeout(goNext, 300);
@@ -81,7 +82,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({ onComplete }) => {
 
   const handleThemeSelect = useCallback(
     (theme: ResolvedTheme) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      feedbackTap();
       setSelectedTheme(theme);
       setTheme(theme);
       setTimeout(goNext, 400);
@@ -90,10 +91,10 @@ export const StartScreen: React.FC<StartScreenProps> = ({ onComplete }) => {
   );
 
   const handleGetStarted = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    feedbackCelebrate();
     await AsyncStorage.setItem(STORAGE_KEY, 'true');
     onComplete();
-  }, [onComplete]);
+  }, [onComplete, feedbackCelebrate]);
 
   // Dynamic colors based on current theme
   const bg = isDark
