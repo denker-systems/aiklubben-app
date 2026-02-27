@@ -2,19 +2,17 @@ import { useCallback, useEffect } from 'react';
 import * as Haptics from 'expo-haptics';
 import { Audio } from 'expo-av';
 
-type SoundKey = 'correct' | 'incorrect' | 'tap' | 'celebrate';
+type SoundKey = 'correct' | 'incorrect' | 'celebrate';
 
 const soundFiles: Record<SoundKey, any> = {
   correct: require('@/assets/sounds/correct.mp3'),
   incorrect: require('@/assets/sounds/incorrect.mp3'),
-  tap: require('@/assets/sounds/tap.mp3'),
   celebrate: require('@/assets/sounds/celebrate.mp3'),
 };
 
 const soundVolumes: Record<SoundKey, number> = {
   correct: 0.6,
   incorrect: 0.6,
-  tap: 0.4,
   celebrate: 0.7,
 };
 
@@ -54,10 +52,7 @@ export function useFeedback() {
   }, []);
 
   const feedbackTap = useCallback(async () => {
-    await Promise.all([
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
-      playSound('tap'),
-    ]);
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   }, []);
 
   const feedbackCelebrate = useCallback(async () => {
