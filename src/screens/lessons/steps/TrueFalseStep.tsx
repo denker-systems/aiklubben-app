@@ -7,7 +7,7 @@ import { Text } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import * as Haptics from 'expo-haptics';
+import { useFeedback } from '@/hooks/useFeedback';
 
 // Screen dimensions available if needed
 
@@ -28,6 +28,7 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
+  const { feedbackCorrect, feedbackIncorrect } = useFeedback();
 
   console.log('[TrueFalseStep] Rendered', { statement: content.statement, correctAnswer });
 
@@ -42,7 +43,6 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
       return;
     }
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setSelectedAnswer(answer);
     setShowFeedback(true);
     const isCorrect = answer === correctAnswer;
@@ -50,9 +50,9 @@ export const TrueFalseStep: React.FC<TrueFalseStepProps> = ({
     console.log('[TrueFalseStep] Answer checked', { answer, correctAnswer, isCorrect });
 
     if (isCorrect) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      feedbackCorrect();
     } else {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      feedbackIncorrect();
     }
 
     onAnswer(answer, isCorrect);

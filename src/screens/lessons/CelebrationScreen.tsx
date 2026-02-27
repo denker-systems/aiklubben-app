@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { MotiView } from 'moti';
 import { Zap, TrendingUp, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { useFeedback } from '@/hooks/useFeedback';
 import { Text, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -71,6 +71,7 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
   const { isDark, colors } = useTheme();
   const ui = getUiColors(isDark);
   const { t, ti } = useLanguage();
+  const { feedbackCelebrate } = useFeedback();
 
   console.log('[CelebrationScreen] Rendered', {
     xpEarned,
@@ -96,7 +97,7 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
   }));
 
   useEffect(() => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    feedbackCelebrate();
     const timer = setTimeout(() => setShowConfetti(false), 3000);
     return () => clearTimeout(timer);
   }, []);

@@ -22,7 +22,8 @@
           "color": "#8B5CF6",
           "sounds": []
         }
-      ]
+      ],
+      "expo-av"
     ],
     "ios": {
       "supportsTablet": true,

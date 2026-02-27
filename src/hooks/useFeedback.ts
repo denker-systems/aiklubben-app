@@ -1,11 +1,11 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Audio } from 'expo-av';
 
 type SoundKey = 'correct' | 'incorrect' | 'celebrate';
 
-const soundFiles: Record<SoundKey, any> = {
+const soundSources: Record<SoundKey, any> = {
   correct: require('../../assets/sounds/correct.mp3'),
   incorrect: require('../../assets/sounds/incorrect.mp3'),
   celebrate: require('../../assets/sounds/celebrate.mp3'),
@@ -22,25 +22,21 @@ const isNative = Platform.OS !== 'web';
 async function playSound(key: SoundKey) {
   if (!isNative) return;
   try {
-    const { sound } = await Audio.Sound.createAsync(soundFiles[key], {
-      shouldPlay: true,
-      volume: soundVolumes[key],
-    });
+    await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+    const { sound } = await Audio.Sound.createAsync(soundSources[key]);
+    await sound.setVolumeAsync(soundVolumes[key]);
+    await sound.playAsync();
     sound.setOnPlaybackStatusUpdate((status) => {
       if (status.isLoaded && status.didJustFinish) {
         sound.unloadAsync();
       }
     });
-  } catch {
-    // Sound file missing or unavailable – silently ignore
+  } catch (err) {
+    console.warn('[useFeedback] Sound error:', key, err);
   }
 }
 
 export function useFeedback() {
-  useEffect(() => {
-    if (!isNative) return;
-    Audio.setAudioModeAsync({ playsInSilentModeIOS: false }).catch(() => {});
-  }, []);
 
   const feedbackCorrect = useCallback(async () => {
     if (!isNative) return;

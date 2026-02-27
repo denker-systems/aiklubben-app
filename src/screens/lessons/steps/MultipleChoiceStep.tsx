@@ -8,7 +8,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { getUiColors } from '@/config/design';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { brandColors } from '@/config/theme';
-import * as Haptics from 'expo-haptics';
+import { useFeedback } from '@/hooks/useFeedback';
 
 // Screen dimensions available if needed
 
@@ -31,6 +31,7 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
   const { isDark, colors } = useTheme();
   const ui = getUiColors(isDark);
   const { t } = useLanguage();
+  const { feedbackCorrect, feedbackIncorrect, feedbackSelection } = useFeedback();
 
   console.log('[MultipleChoiceStep] Rendered', {
     question: content.question,
@@ -51,7 +52,6 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
         return;
       }
 
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       setSelectedIndex(index);
       setShowFeedback(true);
       const isCorrect = index === correctIndex;
@@ -63,9 +63,9 @@ const MultipleChoiceStepComponent: React.FC<MultipleChoiceStepProps> = ({
       });
 
       if (isCorrect) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        feedbackCorrect();
       } else {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        feedbackIncorrect();
       }
 
       onAnswer(index, isCorrect);
