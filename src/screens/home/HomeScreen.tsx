@@ -15,8 +15,6 @@ import { getUiColors } from '@/config/design';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUserStats } from '@/hooks/useUserStats';
 import { useTabNavigation } from '@/contexts/TabNavigationContext';
-import { useLocation } from '@/hooks/useLocation';
-import { MapPin } from 'lucide-react-native';
 
 export const HomeScreen = () => {
   console.log('[HomeScreen] Rendered');
@@ -30,7 +28,6 @@ export const HomeScreen = () => {
   const { user } = useAuth();
   const { stats, level } = useUserStats();
   const { navigateToTab } = useTabNavigation();
-  const { location, permissionGranted, requestLocation } = useLocation();
   const [profile, setProfile] = useState<any>(null);
   const [recentNews, setRecentNews] = useState<any[]>([]);
   const [courseProgress, setCourseProgress] = useState<{
@@ -230,6 +227,18 @@ export const HomeScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Pressable
+        onPress={() => menuContext?.openMenu()}
+        style={[
+          styles.menuButton,
+          { backgroundColor: colors.glass.light, top: insets.top + 16 },
+        ]}
+      >
+        <View style={[styles.menuLine, { backgroundColor: colors.text.secondary }]} />
+        <View
+          style={[styles.menuLine, styles.menuLineShort, { backgroundColor: colors.text.secondary }]}
+        />
+      </Pressable>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
@@ -254,19 +263,7 @@ export const HomeScreen = () => {
                 {profile?.name?.split(' ')[0] || t.common.friend}
               </Text>
             </View>
-            <Pressable
-              onPress={() => menuContext?.openMenu()}
-              style={[styles.menuButton, { backgroundColor: colors.glass.light }]}
-            >
-              <View style={[styles.menuLine, { backgroundColor: colors.text.secondary }]} />
-              <View
-                style={[
-                  styles.menuLine,
-                  styles.menuLineShort,
-                  { backgroundColor: colors.text.secondary },
-                ]}
-              />
-            </Pressable>
+            <View style={{ width: 44 }} />
           </View>
 
           {/* Stats Row with Emojis */}
@@ -526,43 +523,6 @@ export const HomeScreen = () => {
             </View>
           </MotiView>
         )}
-        {/* Location Banner */}
-        {permissionGranted === false && (
-          <MotiView
-            style={[styles.locationBanner, { backgroundColor: colors.glass.light }]}
-            from={{ opacity: 0, translateY: 10 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={SPRING_CONFIGS.smooth}
-          >
-            <MapPin size={18} color={brandColors.purple} />
-            <View style={styles.locationTextContainer}>
-              <Text variant="body-sm" weight="medium" style={{ color: colors.text.primary }}>
-                {t.home.locationTitle}
-              </Text>
-              <Text variant="caption" style={{ color: colors.text.secondary }}>
-                {t.home.locationBody}
-              </Text>
-            </View>
-            <Pressable onPress={requestLocation} style={styles.locationButton}>
-              <Text variant="caption" weight="bold" style={{ color: brandColors.purple }}>
-                {t.home.locationEnable}
-              </Text>
-            </Pressable>
-          </MotiView>
-        )}
-        {location && (
-          <MotiView
-            style={[styles.locationBanner, { backgroundColor: colors.glass.light }]}
-            from={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={SPRING_CONFIGS.smooth}
-          >
-            <MapPin size={18} color={brandColors.purple} />
-            <Text variant="caption" style={{ color: colors.text.secondary, marginLeft: 8 }}>
-              {location.city ? `${location.city}, ${location.country}` : location.country}
-            </Text>
-          </MotiView>
-        )}
       </ScrollView>
     </View>
   );
@@ -612,10 +572,12 @@ const styles = StyleSheet.create({
     // color from Text component
   },
   menuButton: {
+    position: 'absolute',
+    right: 20,
+    zIndex: 100,
     width: 44,
     height: 44,
     borderRadius: 22,
-    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
@@ -908,24 +870,5 @@ const styles = StyleSheet.create({
   },
   newsSummary: {
     // color from Text component
-  },
-  locationBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    marginBottom: 16,
-    padding: 14,
-    borderRadius: 16,
-    gap: 10,
-  },
-  locationTextContainer: {
-    flex: 1,
-    gap: 2,
-  },
-  locationButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.12)',
   },
 });

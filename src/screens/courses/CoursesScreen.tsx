@@ -169,6 +169,22 @@ export const CoursesScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Pressable
+        onPress={handleOpenMenu}
+        style={[
+          styles.menuButton,
+          { backgroundColor: colors.glass.light, top: insets.top + 16 },
+        ]}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={t.menu.openMenu}
+        accessibilityHint={t.menu.openMenuHint}
+      >
+        <View style={[styles.menuLine, { backgroundColor: colors.text.secondary }]} />
+        <View
+          style={[styles.menuLine, styles.menuLineShort, { backgroundColor: colors.text.secondary }]}
+        />
+      </Pressable>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
@@ -190,23 +206,7 @@ export const CoursesScreen = () => {
                 {t.courses.title}
               </Text>
             </View>
-            <Pressable
-              onPress={handleOpenMenu}
-              style={[styles.menuButton, { backgroundColor: colors.glass.light }]}
-              accessible={true}
-              accessibilityRole="button"
-              accessibilityLabel={t.menu.openMenu}
-              accessibilityHint={t.menu.openMenuHint}
-            >
-              <View style={[styles.menuLine, { backgroundColor: colors.text.secondary }]} />
-              <View
-                style={[
-                  styles.menuLine,
-                  styles.menuLineShort,
-                  { backgroundColor: colors.text.secondary },
-                ]}
-              />
-            </Pressable>
+            <View style={{ width: 44 }} />
           </View>
 
           {/* Quick Stats with Emojis */}
@@ -506,10 +506,12 @@ const styles = StyleSheet.create({
     // color from Text component
   },
   menuButton: {
+    position: 'absolute',
+    right: 20,
+    zIndex: 100,
     width: 44,
     height: 44,
     borderRadius: 22,
-    // backgroundColor set dynamically
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,

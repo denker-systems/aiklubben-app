@@ -105,9 +105,6 @@ export const en: Translations = {
     newsSubtitle: 'Latest news',
     resourcesAction: 'Resources',
     resourcesSubtitle: 'Tools & guides',
-    locationTitle: 'Local AI content',
-    locationBody: 'Enable location for locally relevant AI content.',
-    locationEnable: 'Enable',
   },
 
   // News Screen

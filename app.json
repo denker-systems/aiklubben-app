@@ -20,13 +20,6 @@
           "color": "#8B5CF6",
           "sounds": []
         }
-      ],
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "AI Klubben uses your location to show locally relevant AI news and events.",
-          "locationWhenInUsePermission": "AI Klubben uses your location to show locally relevant AI news and events."
-        }
       ]
     ],
     "ios": {
