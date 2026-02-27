@@ -18,7 +18,7 @@ export function useLocation() {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setPermissionGranted(false);
+        setPermissionGranted(null);
         return;
       }
       setPermissionGranted(true);
