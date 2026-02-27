@@ -103,6 +103,9 @@ export const sv = {
     newsSubtitle: 'Senaste nytt',
     resourcesAction: 'Resurser',
     resourcesSubtitle: 'Verktyg & guider',
+    locationTitle: 'Lokalt AI-innehåll',
+    locationBody: 'Aktivera plats för lokalt relevant AI-innehåll.',
+    locationEnable: 'Aktivera',
   },
 
   // News Screen

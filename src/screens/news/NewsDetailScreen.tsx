@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
   View,
   Image,
@@ -8,11 +8,12 @@ import {
   StyleSheet,
   Dimensions,
   Linking,
+  Share,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
-import { ArrowLeft, Calendar, Clock, ExternalLink } from 'lucide-react-native';
+import { ArrowLeft, Calendar, Clock, ExternalLink, Share2 } from 'lucide-react-native';
 import { supabase } from '@/config/supabase';
 import { brandColors } from '@/config/theme';
 import { format } from 'date-fns';
@@ -37,7 +38,6 @@ export const NewsDetailScreen = () => {
 
   console.log('[NewsDetailScreen] Rendered', { articleId: id });
 
-  // Navigate to News screen instead of goBack to maintain correct navigation flow
   const handleGoBack = () => {
     console.log('[NewsDetailScreen] handleGoBack - going back');
     navigation.goBack();
@@ -45,6 +45,18 @@ export const NewsDetailScreen = () => {
 
   const [article, setArticle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const handleShare = useCallback(async () => {
+    if (!article) return;
+    try {
+      await Share.share({
+        title: l(article, 'title'),
+        message: `${l(article, 'title')}\n\n${l(article, 'summary') || ''}\n\nLäs mer i AI Klubben-appen.`,
+      });
+    } catch (err) {
+      console.error('[NewsDetailScreen] Share error:', err);
+    }
+  }, [article, l]);
 
   useEffect(() => {
     console.log('[NewsDetailScreen] useEffect triggered', { id });
@@ -161,7 +173,9 @@ export const NewsDetailScreen = () => {
         <Text variant="body" numberOfLines={1} style={styles.headerTitle}>
           {l(article, 'title')}
         </Text>
-        <View style={{ width: 40 }} />
+        <Pressable onPress={handleShare} style={styles.headerShareButton}>
+          <Share2 size={20} color={brandColors.purple} />
+        </Pressable>
       </MotiView>
 
       <ScrollView
@@ -196,6 +210,15 @@ export const NewsDetailScreen = () => {
           >
             <ArrowLeft size={24} color="#FFFFFF" />
           </Pressable>
+
+          <Pressable
+            onPress={handleShare}
+            style={[styles.shareButton, { top: insets.top + 16 }]}
+            accessible={true}
+            accessibilityRole="button"
+          >
+            <Share2 size={22} color="#FFFFFF" />
+          </Pressable>
         </View>
 
         {/* Content Container */}
@@ -219,8 +242,9 @@ export const NewsDetailScreen = () => {
             {article.content_format && article.content_format !== 'news' && (
               <Badge
                 label={
-                  (t.newsDetail as any)[`format${article.content_format.charAt(0).toUpperCase() + article.content_format.slice(1)}`]
-                  || article.content_format
+                  (t.newsDetail as any)[
+                    `format${article.content_format.charAt(0).toUpperCase() + article.content_format.slice(1)}`
+                  ] || article.content_format
                 }
                 variant="secondary"
               />
@@ -460,6 +484,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  headerShareButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   headerTitle: {
     flex: 1,
     // color from Text component
@@ -491,6 +523,18 @@ const styles = StyleSheet.create({
   backButton: {
     position: 'absolute',
     left: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  shareButton: {
+    position: 'absolute',
+    right: 16,
     width: 44,
     height: 44,
     borderRadius: 22,
