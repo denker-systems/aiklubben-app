@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
+  RefreshControl,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
@@ -52,6 +53,7 @@ export const CoursesScreen = () => {
   const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [userProgress, setUserProgress] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -119,6 +121,26 @@ export const CoursesScreen = () => {
     fetchCourses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await new Promise<void>((resolve) => {
+      const run = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('content')
+            .select('*')
+            .eq('category', 'kurser')
+            .eq('status', 'published')
+            .order('created_at', { ascending: false });
+          if (!error) setCourses(data || []);
+        } catch {}
+        resolve();
+      };
+      run();
+    });
+    setRefreshing(false);
+  }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getLevelInfo = useCallback((level: string) => {
@@ -189,6 +211,14 @@ export const CoursesScreen = () => {
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={brandColors.purple}
+            colors={[brandColors.purple]}
+          />
+        }
       >
         {/* Header */}
         <MotiView

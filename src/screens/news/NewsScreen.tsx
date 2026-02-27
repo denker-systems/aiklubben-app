@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Image, ActivityIndicator, StyleSheet, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedScrollHandler } from 'react-native-reanimated';
 import { MotiView } from 'moti';
@@ -28,6 +28,7 @@ export const NewsScreen = () => {
 
   const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
@@ -89,6 +90,33 @@ export const NewsScreen = () => {
     fetchNews();
   }, []);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const { data, error } = await supabase
+        .from('news')
+        .select('*, news_categories(name, name_en, emoji)')
+        .eq('is_published', true)
+        .order('published_at', { ascending: false });
+      if (!error && data) {
+        const authorIds = data.map((item) => item.author_id).filter(Boolean);
+        if (authorIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, name, avatar_url')
+            .in('id', authorIds);
+          if (profiles) {
+            data.forEach((item) => {
+              item.profiles = profiles.find((p) => p.id === item.author_id);
+            });
+          }
+        }
+        setNews(data);
+      }
+    } catch {}
+    setRefreshing(false);
+  };
+
   const headerHeight = getHeaderHeight(insets);
 
   return (
@@ -110,6 +138,14 @@ export const NewsScreen = () => {
         showsVerticalScrollIndicator={false}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={brandColors.purple}
+            colors={[brandColors.purple]}
+          />
+        }
       >
         {/* Content count */}
         <MotiView

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { View, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, ScrollView, Pressable, StyleSheet, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { useNavigation } from '@react-navigation/native';
@@ -30,6 +30,7 @@ export const HomeScreen = () => {
   const { navigateToTab } = useTabNavigation();
   const [profile, setProfile] = useState<any>(null);
   const [recentNews, setRecentNews] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const [courseProgress, setCourseProgress] = useState<{
     courseId: string;
     courseName: string;
@@ -165,6 +166,19 @@ export const HomeScreen = () => {
     fetchData();
   }, [user]);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const [{ data: newsData }, { data: profileData }] = await Promise.all([
+        supabase.from('news').select('*').eq('is_published', true).order('published_at', { ascending: false }).limit(3),
+        user ? supabase.from('profiles').select('name').eq('id', user.id).single() : Promise.resolve({ data: null }),
+      ]);
+      if (newsData) setRecentNews(newsData);
+      if (profileData) setProfile(profileData);
+    } catch {}
+    setRefreshing(false);
+  };
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return t.greetings.morning;
@@ -243,6 +257,14 @@ export const HomeScreen = () => {
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={brandColors.purple}
+            colors={[brandColors.purple]}
+          />
+        }
       >
         {/* Header */}
         <MotiView

@@ -4,6 +4,7 @@ import { MotiView } from 'moti';
 import { Zap, TrendingUp, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFeedback } from '@/hooks/useFeedback';
+import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 import { Text, AppIcon } from '@/components/ui';
 import { SPRING_CONFIGS } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -72,6 +73,7 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
   const ui = getUiColors(isDark);
   const { t, ti } = useLanguage();
   const { feedbackCelebrate } = useFeedback();
+  const { trackLessonComplete } = useReviewPrompt();
 
   console.log('[CelebrationScreen] Rendered', {
     xpEarned,
@@ -98,6 +100,7 @@ export const CelebrationScreen: React.FC<CelebrationScreenProps> = ({
 
   useEffect(() => {
     feedbackCelebrate();
+    trackLessonComplete();
     const timer = setTimeout(() => setShowConfetti(false), 3000);
     return () => clearTimeout(timer);
   }, []);
